@@ -41,8 +41,7 @@ public:
         cr = CM_Get_Device_Interface_ListW(&hidguid, NULL, const_cast<wchar_t*>(deviceInterfaceList.data()), deviceInterfaceListLength, CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
         assert(cr == CR_SUCCESS);
 
-        // Enumerate devices of this interface class
-        printf("Finding matching HID devices\n");
+        printf("Searching for matching HID devices...\n");
 
         std::vector<Match> results;
         for (const wchar_t * currentInterface = deviceInterfaceList.c_str(); *currentInterface; currentInterface += wcslen(currentInterface) + 1) {
@@ -78,7 +77,7 @@ public:
             if (query.Usage && (query.Usage != caps.Usage))
                 continue;
 
-            printf("\nFound matching device with VID: 0x%x, PID: 0x%x\n", attr.VendorID, attr.ProductID);
+            printf("  Found matching device with VendorID=%x, ProductID=%x\n", attr.VendorID, attr.ProductID);
             
 #if 0
             wchar_t man_buffer[128] = L"<unknown>";
