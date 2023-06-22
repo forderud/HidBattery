@@ -1,12 +1,12 @@
 #pragma once
 #include <windows.h>
-#include <cfgmgr32.h>
+#include <cfgmgr32.h> // for CM_Get_Device_Interface_List
+#include <hidsdi.h>
+#include <wrl/wrappers/corewrappers.h>
 
 #include <cassert>
 #include <string>
-#include <stdexcept>
 #include <vector>
-#include <wrl/wrappers/corewrappers.h>
 
 #pragma comment(lib, "hid.lib")
 #pragma comment(lib, "mincore.lib")

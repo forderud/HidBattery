@@ -1,10 +1,3 @@
-#include <windows.h>
-#include <SetupAPI.h>
-#include <hidsdi.h>
-#include <string>
-#include <iostream>
-#include <vector>
-#include <cassert>
 #include "HID.hpp"
 
 
