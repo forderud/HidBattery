@@ -22,7 +22,7 @@ bool UpdateTailColor(HANDLE hid_dev, HIDP_CAPS caps, COLORREF color) {
     FeatureReport[0] = 0x24; // Report ID 36
     FeatureReport[1] = 0xB2; // magic value
     FeatureReport[2] = 0x03; // magic value
-    // tail light color
+    // tail-light color
     FeatureReport[3] = (color     )  & 0xFF; // red
     FeatureReport[4] = (color >> 8)  & 0xFF; // green
     FeatureReport[5] = (color >> 16) & 0xFF; // blue
@@ -40,7 +40,7 @@ bool UpdateTailColor(HANDLE hid_dev, HIDP_CAPS caps, COLORREF color) {
 
 int main(int argc, char* argv[]) {
     if (argc < 4) {
-        printf("Intellimouse tail-light shifter.\n");
+        printf("IntelliMouse tail-light shifter.\n");
         printf("Usage: \"TailLight.exe <red> <green> <blue>\" (example: \"TailLight.exe 0 0 255\").\n");
         return -1;
     }
@@ -49,12 +49,12 @@ int main(int argc, char* argv[]) {
     BYTE green = atoi(argv[2]);
     BYTE blue = atoi(argv[3]);
 
-    HID::Query intellimouse;
-    intellimouse.VendorID = 0x045E; // Microsoft
-    intellimouse.ProductID = 0x082A; // Intellimouse
-    intellimouse.Usage = 0x0212;
+    HID::Query mouse;
+    mouse.VendorID = 0x045E;  // Microsoft
+    mouse.ProductID = 0x082A; // Pro IntelliMouse
+    mouse.Usage = 0x0212;     // magic value
 
-    auto matches = HID::FindDevices(intellimouse);
+    auto matches = HID::FindDevices(mouse);
     for (auto& match : matches) {
         wprintf(L"Updating %s\n", match.name.c_str());
         UpdateTailColor(match.dev.Get(), match.caps, RGB(red, green, blue));
