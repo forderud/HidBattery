@@ -11,10 +11,9 @@ bool UpdateTailColor(HANDLE hid_dev, HIDP_CAPS caps, COLORREF color) {
     printf("  NumberFeatureButtonCaps=%u, NumberFeatureValueCaps=%u, NumberFeatureDataIndices=%u\n", caps.NumberFeatureButtonCaps, caps.NumberFeatureValueCaps, caps.NumberFeatureDataIndices);
 #endif
 
-    if (caps.FeatureReportByteLength == 0)
+    if (caps.FeatureReportByteLength != 73)
         return false;
     
-    assert(caps.FeatureReportByteLength == 73);
     // increase size by 1 for report ID header
     std::vector<BYTE> FeatureReport(caps.FeatureReportByteLength + 1, (BYTE)0);
 
@@ -32,6 +31,7 @@ bool UpdateTailColor(HANDLE hid_dev, HIDP_CAPS caps, COLORREF color) {
         DWORD err = GetLastError();
         printf("ERROR: HidD_SetFeature failure (err %d).\n", err);
         assert(ok);
+        return false;
     }
         
     printf("SUCCESS: Tail-light color updated.\n");
