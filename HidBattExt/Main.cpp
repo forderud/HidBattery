@@ -33,8 +33,7 @@ bool UpdateTailColor(HANDLE hid_dev, HIDP_CAPS caps, COLORREF color) {
         assert(ok);
         return false;
     }
-        
-    printf("SUCCESS: Tail-light color updated.\n");
+
     return true;
 }
 
@@ -57,6 +56,8 @@ int main(int argc, char* argv[]) {
     auto matches = HID::FindDevices(mouse);
     for (auto& match : matches) {
         wprintf(L"Updating %s\n", match.name.c_str());
-        UpdateTailColor(match.dev.Get(), match.caps, RGB(red, green, blue));
+        bool ok = UpdateTailColor(match.dev.Get(), match.caps, RGB(red, green, blue));
+        if (ok)
+            printf("SUCCESS: Tail-light color updated.\n");
     }
 }
