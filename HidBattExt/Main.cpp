@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
     mouse.Usage = 0x0212;     // magic value
 
     auto matches = HID::FindDevices(mouse);
-    for (auto& match : matches) {
+    for (HID::Match& match : matches) {
         wprintf(L"Updating %s\n", match.name.c_str());
         bool ok = UpdateTailColor(match.dev.Get(), match.caps, RGB(red, green, blue));
         if (ok)
