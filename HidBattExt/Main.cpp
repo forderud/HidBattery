@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
     mouse.VendorID = 0x045E;  // Microsoft
     mouse.ProductID = 0x082A; // Pro IntelliMouse
     mouse.Usage = 0x0212;     //
-    mouse.UsagePage = 0xff07; //
+    mouse.UsagePage = 0xFF07; //
 
     auto matches = HID::FindDevices(mouse);
     for (HID::Match& match : matches) {
