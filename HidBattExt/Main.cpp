@@ -12,7 +12,7 @@ bool UpdateTailColor(HANDLE hid_dev, HIDP_CAPS caps, COLORREF color) {
 #endif
 
     if (caps.FeatureReportByteLength != 73)
-        return false;
+        return false; // length mismatch
     
     // increase size by 1 for report ID header
     std::vector<BYTE> FeatureReport(caps.FeatureReportByteLength + 1, (BYTE)0);
