@@ -18,7 +18,7 @@ bool UpdateTailColor(HANDLE hid_dev, HIDP_CAPS caps, COLORREF color) {
     std::vector<BYTE> FeatureReport(caps.FeatureReportByteLength + 1, (BYTE)0);
 
     // Set feature report values (as observed in USBPcap/Wireshark)
-    FeatureReport[0] = 0x24; // Report ID 36
+    FeatureReport[0] = 0x24; // ReportID 36
     FeatureReport[1] = 0xB2; // magic value
     FeatureReport[2] = 0x03; // magic value
     // tail-light color
