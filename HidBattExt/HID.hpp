@@ -21,6 +21,7 @@ public:
         USHORT VendorID = 0;
         USHORT ProductID = 0;
         USHORT Usage = 0;
+        USHORT UsagePage = 0;
     };
 
     struct Match {
@@ -75,6 +76,8 @@ public:
             HidP_GetCaps(reportDesc, &caps);
 
             if (query.Usage && (query.Usage != caps.Usage))
+                continue;
+            if (query.UsagePage && (query.UsagePage != caps.UsagePage))
                 continue;
 
             printf("  Found matching device with VendorID=%x, ProductID=%x\n", attr.VendorID, attr.ProductID);
