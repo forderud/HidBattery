@@ -16,7 +16,7 @@
 class HID {
 public:
     // RAII wrapper of file HANDLE objects
-    using HandleWrap = Microsoft::WRL::Wrappers::FileHandle;
+    using FileHandle = Microsoft::WRL::Wrappers::FileHandle;
 
     struct Query {
         USHORT VendorID = 0;
@@ -27,7 +27,7 @@ public:
 
     struct Match {
         std::wstring name;
-        HandleWrap dev;
+        FileHandle dev;
         HIDP_CAPS caps = {};
     };
 
@@ -47,7 +47,7 @@ public:
 
         std::vector<Match> results;
         for (const wchar_t * currentInterface = deviceInterfaceList.c_str(); *currentInterface; currentInterface += wcslen(currentInterface) + 1) {
-            HandleWrap hid_dev(CreateFileW(currentInterface,
+            FileHandle hid_dev(CreateFileW(currentInterface,
                 GENERIC_READ | GENERIC_WRITE,
                 FILE_SHARE_READ | FILE_SHARE_WRITE,
                 NULL,
