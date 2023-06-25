@@ -12,6 +12,25 @@
 #pragma comment(lib, "mincore.lib")
 
 
+/** RAII wrapper of PHIDP_PREPARSED_DATA. */
+class PreparsedData {
+public:
+    PreparsedData(HANDLE hid_dev) {
+        HidD_GetPreparsedData(hid_dev, &report);
+    }
+    ~PreparsedData() {
+        HidD_FreePreparsedData(report);
+        report = nullptr;
+    }
+
+    operator PHIDP_PREPARSED_DATA() const {
+        return report;
+    }
+
+private:
+    PHIDP_PREPARSED_DATA report = nullptr; // report descriptor for top-level collection
+};
+
 /** Human Interface Devices (HID) device search class. */
 class HID {
 public:
@@ -70,8 +89,7 @@ public:
                 continue;
 
             // found a match
-            PHIDP_PREPARSED_DATA reportDesc = {}; // report descriptor for top-level collection
-            HidD_GetPreparsedData(hid_dev.Get(), &reportDesc);
+            PreparsedData reportDesc(hid_dev.Get());
 
             HIDP_CAPS caps = {};
             HidP_GetCaps(reportDesc, &caps);
@@ -92,9 +110,6 @@ public:
             HidD_GetProductString(hid_dev.Get(), prod_buffer, (ULONG)std::size(prod_buffer)); // ignore erorrs
             printf("  Product: %ws\n", prod_buffer);
 #endif
-
-            HidD_FreePreparsedData(reportDesc);
-
             results.push_back({currentInterface, std::move(hid_dev), caps});
         }
 
