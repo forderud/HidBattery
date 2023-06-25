@@ -19,8 +19,14 @@ public:
         HidD_GetPreparsedData(hid_dev, &report);
     }
     ~PreparsedData() {
-        HidD_FreePreparsedData(report);
-        report = nullptr;
+        if (report) {
+            HidD_FreePreparsedData(report);
+            report = nullptr;
+        }
+    }
+
+    PreparsedData(PreparsedData&& obj) {
+        std::swap(report, obj.report);
     }
 
     operator PHIDP_PREPARSED_DATA() const {
@@ -47,6 +53,7 @@ public:
     struct Match {
         std::wstring name;
         FileHandle dev;
+        PreparsedData report;
         HIDP_CAPS caps = {};
     };
 
@@ -110,7 +117,7 @@ public:
             HidD_GetProductString(hid_dev.Get(), prod_buffer, (ULONG)std::size(prod_buffer)); // ignore erorrs
             printf("  Product: %ws\n", prod_buffer);
 #endif
-            results.push_back({currentInterface, std::move(hid_dev), caps});
+            results.push_back({currentInterface, std::move(hid_dev), std::move(reportDesc), caps});
         }
 
         return results;
