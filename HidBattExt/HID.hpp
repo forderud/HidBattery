@@ -11,12 +11,13 @@
 #pragma comment(lib, "hid.lib")
 #pragma comment(lib, "mincore.lib")
 
-// RAII wrapper of file HANDLE objects
-using HandleWrap = Microsoft::WRL::Wrappers::FileHandle;
 
-
+/** Human Interface Devices (HID) device search class. */
 class HID {
 public:
+    // RAII wrapper of file HANDLE objects
+    using HandleWrap = Microsoft::WRL::Wrappers::FileHandle;
+
     struct Query {
         USHORT VendorID = 0;
         USHORT ProductID = 0;
