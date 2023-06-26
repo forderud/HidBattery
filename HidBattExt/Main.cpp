@@ -1,7 +1,7 @@
 #include "HID.hpp"
 
 
-bool UpdateTailColor(HANDLE hid_dev, HIDP_CAPS caps, COLORREF color) {
+bool UpdateTailColor(HANDLE hid_dev, PHIDP_PREPARSED_DATA reportDesc, HIDP_CAPS caps, COLORREF color) {
 #if 0
     printf("Device capabilities:\n");
     printf("  Usage=0x%04X, UsagePage=0x%04X\n", caps.Usage, caps.UsagePage);
@@ -13,12 +13,17 @@ bool UpdateTailColor(HANDLE hid_dev, HIDP_CAPS caps, COLORREF color) {
 
     if (caps.FeatureReportByteLength != 73)
         return false; // length mismatch
-    
+
+    HIDP_VALUE_CAPS     ValueCaps = {};
+    USHORT              ValueCapsLength = caps.NumberFeatureValueCaps;
+    NTSTATUS status = HidP_GetValueCaps(HidP_Feature, &ValueCaps, &ValueCapsLength, reportDesc);
+    assert(status == HIDP_STATUS_SUCCESS);
+
     // increase size by 1 for report ID header
     std::vector<BYTE> FeatureReport(caps.FeatureReportByteLength + 1, (BYTE)0);
 
     // Set feature report values (as observed in USBPcap/Wireshark)
-    FeatureReport[0] = 0x24; // ReportID 36
+    FeatureReport[0] = ValueCaps.ReportID; // ReportID 0x24 (36)
     FeatureReport[1] = 0xB2; // magic value
     FeatureReport[2] = 0x03; // magic value
     // tail-light color
@@ -57,7 +62,7 @@ int main(int argc, char* argv[]) {
     auto matches = HID::FindDevices(mouse);
     for (HID::Match& match : matches) {
         wprintf(L"Updating %s\n", match.name.c_str());
-        bool ok = UpdateTailColor(match.dev.Get(), match.caps, RGB(red, green, blue));
+        bool ok = UpdateTailColor(match.dev.Get(), match.report, match.caps, RGB(red, green, blue));
         if (!ok)
             return -2;
 
