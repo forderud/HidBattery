@@ -14,24 +14,24 @@ bool UpdateTailColor(HANDLE hid_dev, PHIDP_PREPARSED_DATA reportDesc, HIDP_CAPS 
     if (caps.FeatureReportByteLength != 73)
         return false; // length mismatch
 
-    HIDP_VALUE_CAPS     ValueCaps = {};
+    HIDP_VALUE_CAPS     valueCaps = {};
     USHORT              ValueCapsLength = caps.NumberFeatureValueCaps;
-    NTSTATUS status = HidP_GetValueCaps(HidP_Feature, &ValueCaps, &ValueCapsLength, reportDesc);
+    NTSTATUS status = HidP_GetValueCaps(HidP_Feature, &valueCaps, &ValueCapsLength, reportDesc);
     assert(status == HIDP_STATUS_SUCCESS);
 
     // increase size by 1 for report ID header
-    std::vector<BYTE> FeatureReport(caps.FeatureReportByteLength + 1, (BYTE)0);
+    std::vector<BYTE> featureReport(caps.FeatureReportByteLength + 1, (BYTE)0);
 
     // Set feature report values (as observed in USBPcap/Wireshark)
-    FeatureReport[0] = ValueCaps.ReportID; // ReportID 0x24 (36)
-    FeatureReport[1] = 0xB2; // magic value
-    FeatureReport[2] = 0x03; // magic value
+    featureReport[0] = valueCaps.ReportID; // ReportID 0x24 (36)
+    featureReport[1] = 0xB2; // magic value
+    featureReport[2] = 0x03; // magic value
     // tail-light color
-    FeatureReport[3] = (color     )  & 0xFF; // red
-    FeatureReport[4] = (color >> 8)  & 0xFF; // green
-    FeatureReport[5] = (color >> 16) & 0xFF; // blue
+    featureReport[3] = (color     )  & 0xFF; // red
+    featureReport[4] = (color >> 8)  & 0xFF; // green
+    featureReport[5] = (color >> 16) & 0xFF; // blue
 
-    BOOLEAN ok = HidD_SetFeature(hid_dev, FeatureReport.data(), (ULONG)FeatureReport.size());
+    BOOLEAN ok = HidD_SetFeature(hid_dev, featureReport.data(), (ULONG)featureReport.size());
     if (!ok) {
         DWORD err = GetLastError();
         printf("ERROR: HidD_SetFeature failure (err %d).\n", err);
