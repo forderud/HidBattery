@@ -80,7 +80,8 @@ public:
                 NULL));
             if (!hid_dev.IsValid()) {
                 DWORD err = GetLastError();
-                //assert(err == ERROR_ACCESS_DENIED); // (5) observed for already used devices
+                //assert(err != ERROR_ACCESS_DENIED); // (5) observed for already used devices
+                //assert(err != ERROR_SHARING_VIOLATION); // (32)
                 if (verbose)
                     printf("WARNING: CreateFile failed: (err %d) for %ls\n", err, currentInterface);
 
