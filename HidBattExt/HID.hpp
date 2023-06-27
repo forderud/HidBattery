@@ -61,12 +61,14 @@ public:
         GUID hidguid = {};
         HidD_GetHidGuid(&hidguid);
 
+        const ULONG searchScope = CM_GET_DEVICE_INTERFACE_LIST_PRESENT; // only currently 'live' device interfaces
+
         ULONG deviceInterfaceListLength = 0;
-        CONFIGRET cr = CM_Get_Device_Interface_List_SizeW(&deviceInterfaceListLength, &hidguid, NULL, CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
+        CONFIGRET cr = CM_Get_Device_Interface_List_SizeW(&deviceInterfaceListLength, &hidguid, NULL, searchScope);
         assert(cr == CR_SUCCESS);
 
         std::wstring deviceInterfaceList(deviceInterfaceListLength, L'\0');
-        cr = CM_Get_Device_Interface_ListW(&hidguid, NULL, const_cast<wchar_t*>(deviceInterfaceList.data()), deviceInterfaceListLength, CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
+        cr = CM_Get_Device_Interface_ListW(&hidguid, NULL, const_cast<wchar_t*>(deviceInterfaceList.data()), deviceInterfaceListLength, searchScope);
         assert(cr == CR_SUCCESS);
 
         std::vector<Match> results;
