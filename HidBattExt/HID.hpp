@@ -67,6 +67,7 @@ public:
         CONFIGRET cr = CM_Get_Device_Interface_List_SizeW(&deviceInterfaceListLength, &hidguid, NULL, searchScope);
         assert(cr == CR_SUCCESS);
 
+        // symbolic link name of interface instances
         std::wstring deviceInterfaceList(deviceInterfaceListLength, L'\0');
         cr = CM_Get_Device_Interface_ListW(&hidguid, NULL, const_cast<wchar_t*>(deviceInterfaceList.data()), deviceInterfaceListLength, searchScope);
         assert(cr == CR_SUCCESS);
