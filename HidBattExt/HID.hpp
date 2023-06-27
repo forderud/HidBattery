@@ -57,7 +57,7 @@ public:
         HIDP_CAPS caps = {};
     };
 
-    static std::vector<Match> FindDevices (const Query& query) {
+    static std::vector<Match> FindDevices (const Query& query, bool verbose = false) {
         GUID hidguid = {};
         HidD_GetHidGuid(&hidguid);
 
@@ -68,8 +68,6 @@ public:
         std::wstring deviceInterfaceList(deviceInterfaceListLength, L'\0');
         cr = CM_Get_Device_Interface_ListW(&hidguid, NULL, const_cast<wchar_t*>(deviceInterfaceList.data()), deviceInterfaceListLength, CM_GET_DEVICE_INTERFACE_LIST_PRESENT);
         assert(cr == CR_SUCCESS);
-
-        printf("Searching for matching HID devices...\n");
 
         std::vector<Match> results;
         for (const wchar_t * currentInterface = deviceInterfaceList.c_str(); *currentInterface; currentInterface += wcslen(currentInterface) + 1) {
@@ -83,31 +81,35 @@ public:
             if (!hid_dev.IsValid()) {
                 DWORD err = GetLastError();
                 //assert(err == ERROR_ACCESS_DENIED); // (5) observed for already used devices
-                //printf("WARNING: CreateFile failed: (err %d) for %ls\n", err, currentInterface);
+                if (verbose)
+                    printf("WARNING: CreateFile failed: (err %d) for %ls\n", err, currentInterface);
+
                 continue;
             }
 
             HIDD_ATTRIBUTES attr = {};
             HidD_GetAttributes(hid_dev.Get(), &attr);
 
-            if (query.VendorID && (query.VendorID != attr.VendorID))
-                continue;
-            if (query.ProductID && (query.ProductID != attr.ProductID))
-                continue;
-
-            // found a match
             PreparsedData reportDesc(hid_dev.Get());
 
             HIDP_CAPS caps = {};
             HidP_GetCaps(reportDesc, &caps);
+
+            if (verbose)
+                printf("Device %ls (VendorID=%x, ProductID=%x, Usage=%x, UsagePage=%x)\n", currentInterface, attr.VendorID, attr.ProductID, caps.Usage, caps.UsagePage);
+
+            if (query.VendorID && (query.VendorID != attr.VendorID))
+                continue;
+            if (query.ProductID && (query.ProductID != attr.ProductID))
+                continue;
 
             if (query.Usage && (query.Usage != caps.Usage))
                 continue;
             if (query.UsagePage && (query.UsagePage != caps.UsagePage))
                 continue;
 
-            printf("  Found matching device with VendorID=%x, ProductID=%x\n", attr.VendorID, attr.ProductID);
-            
+            if (verbose)
+                printf("  Found matching device with VendorID=%x, ProductID=%x\n", attr.VendorID, attr.ProductID);
 #if 0
             wchar_t man_buffer[128] = L"<unknown>";
             HidD_GetManufacturerString(hid_dev.Get(), man_buffer, (ULONG)std::size(man_buffer)); // ignore errors

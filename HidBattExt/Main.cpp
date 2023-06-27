@@ -59,6 +59,7 @@ int main(int argc, char* argv[]) {
     mouse.Usage = 0x0212;     //
     mouse.UsagePage = 0xFF07; //
 
+    printf("Searching for matching HID devices...\n");
     auto matches = HID::FindDevices(mouse);
     for (HID::Match& match : matches) {
         wprintf(L"Updating %s\n", match.name.c_str());
