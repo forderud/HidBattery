@@ -16,7 +16,7 @@ WmiInitialize(
 
     NTSTATUS status = WdfDeviceAssignMofResourceName(Device, &mofRsrcName);
     if (!NT_SUCCESS(status)) {
-        KdPrint(("FireFly: Error in WdfDeviceAssignMofResourceName %x\n", status));
+        KdPrint(("TailLight: Error in WdfDeviceAssignMofResourceName %x\n", status));
         return status;
     }
 
@@ -60,7 +60,7 @@ EvtWmiInstanceQueryInstance(
 
     UNREFERENCED_PARAMETER(OutBufferSize);
 
-    KdPrint(("FireFly: WMI QueryInstance\n"));
+    KdPrint(("TailLight: WMI QueryInstance\n"));
 
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
 
@@ -70,7 +70,7 @@ EvtWmiInstanceQueryInstance(
 
     RtlCopyMemory(/*dst*/OutBuffer, /*src*/pInfo, sizeof(*pInfo));
 
-    KdPrint(("FireFly: WMI QueryInstance completed\n"));
+    KdPrint(("TailLight: WMI QueryInstance completed\n"));
     return STATUS_SUCCESS;
 }
 
@@ -85,7 +85,7 @@ EvtWmiInstanceSetInstance(
 
     UNREFERENCED_PARAMETER(InBufferSize);
 
-    KdPrint(("FireFly: WMI SetInstance\n"));
+    KdPrint(("TailLight: WMI SetInstance\n"));
 
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
 
@@ -101,7 +101,7 @@ EvtWmiInstanceSetInstance(
         pInfo->TailLight
         );
 
-    KdPrint(("FireFly: WMI SetInstance completed\n"));
+    KdPrint(("TailLight: WMI SetInstance completed\n"));
     return status;
 }
 
@@ -115,7 +115,7 @@ EvtWmiInstanceSetItem(
 {
     PAGED_CODE();
 
-    KdPrint(("FireFly: WMI SetItem\n"));
+    KdPrint(("TailLight: WMI SetItem\n"));
 
     if (DataItemId != 1)
         return STATUS_INVALID_DEVICE_REQUEST;
@@ -132,6 +132,6 @@ EvtWmiInstanceSetItem(
         pInfo->TailLight
         );
 
-    KdPrint(("FireFly: WMI SetItem completed\n"));
+    KdPrint(("TailLight: WMI SetItem completed\n"));
     return status;
 }

@@ -34,7 +34,7 @@ Arguments:
     WDFDEVICE device = 0;
     NTSTATUS status = WdfDeviceCreate(&DeviceInit, &attributes, &device);
     if (!NT_SUCCESS(status)) {
-        KdPrint(("FireFly: WdfDeviceCreate, Error %x\n", status));
+        KdPrint(("TailLight: WdfDeviceCreate, Error %x\n", status));
         return status;
     }
 
@@ -49,7 +49,7 @@ Arguments:
     // Initialize our WMI support
     status = WmiInitialize(device, deviceContext);
     if (!NT_SUCCESS(status)) {
-        KdPrint(("FireFly: Error initializing WMI 0x%x\n", status));
+        KdPrint(("TailLight: Error initializing WMI 0x%x\n", status));
         return status;
     }
 
@@ -71,7 +71,7 @@ Arguments:
                                     &memory);
 
     if (!NT_SUCCESS(status)) {
-        KdPrint(("FireFly: WdfDeviceAllocAndQueryProperty failed 0x%x\n", status));        
+        KdPrint(("TailLight: WdfDeviceAllocAndQueryProperty failed 0x%x\n", status));        
         return STATUS_UNSUCCESSFUL;
     }
 
@@ -85,7 +85,7 @@ Arguments:
         deviceContext->PdoName.MaximumLength = (USHORT)bufferLength;
         deviceContext->PdoName.Length = (USHORT)bufferLength - sizeof(UNICODE_NULL);
 
-        KdPrint(("Firefly: PdoName: %wZ\n", deviceContext->PdoName)); // outputs "\Device\00000083
+        KdPrint(("TailLight: PdoName: %wZ\n", deviceContext->PdoName)); // outputs "\Device\00000083
     }
 
     return status;
@@ -106,7 +106,7 @@ Arguments:
     Queue - Output pointer to a framework I/O queue handle, on success.
 --*/
 {
-    KdPrint(("FireFly: QueueCreate\n"));
+    KdPrint(("TailLight: QueueCreate\n"));
 
     WDF_IO_QUEUE_CONFIG queueConfig = {};
     WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
@@ -116,11 +116,11 @@ Arguments:
     NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
 
     if (!NT_SUCCESS(status)) {
-        KdPrint(("FireFly: WdfIoQueueCreate failed 0x%x\n", status));
+        KdPrint(("TailLight: WdfIoQueueCreate failed 0x%x\n", status));
         return status;
     }
 
-    KdPrint(("FireFly: QueueCreate completed\n"));
+    KdPrint(("TailLight: QueueCreate completed\n"));
 
     return status;
 }
@@ -159,7 +159,7 @@ Arguments:
 
     UNREFERENCED_PARAMETER(OutputBufferLength);
 
-    KdPrint(("FireFly: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%u)\n", IoControlCode, InputBufferLength));
+    KdPrint(("TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%u)\n", IoControlCode, InputBufferLength));
 
     WDFDEVICE device = WdfIoQueueGetDevice(Queue);
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(device);
@@ -182,7 +182,7 @@ Arguments:
     BOOLEAN ret = WdfRequestSend(Request, Target, &options);
     if (ret == FALSE) {
         status = WdfRequestGetStatus(Request);
-        KdPrint(("FireFly: WdfRequestSend failed: 0x%x\n", status));
+        KdPrint(("TailLight: WdfRequestSend failed: 0x%x\n", status));
         WdfRequestComplete(Request, status);
     }
 }
@@ -208,17 +208,17 @@ Arguments:
     WDF_REQUEST_PARAMETERS_INIT(&params);
     WdfRequestGetParameters(Request, &params);
 
-    KdPrint(("FireFly: SetFeatureFilter: Type=0x%x (DeviceControl=0xe), InputBufferLength=%u, \n", params.Type, params.Parameters.DeviceIoControl.InputBufferLength));
+    KdPrint(("TailLight: SetFeatureFilter: Type=0x%x (DeviceControl=0xe), InputBufferLength=%u, \n", params.Type, params.Parameters.DeviceIoControl.InputBufferLength));
 
     if (params.Parameters.DeviceIoControl.InputBufferLength != sizeof(TailLightReport)) {
-        KdPrint(("FireFly: SetFeatureFilter: Incorrect InputBufferLength\n"));
+        KdPrint(("TailLight: SetFeatureFilter: Incorrect InputBufferLength\n"));
         return STATUS_BUFFER_TOO_SMALL;
     }
 
     TailLightReport* packet = nullptr;
     NTSTATUS status = WdfRequestRetrieveInputBuffer(Request, sizeof(TailLightReport), (void**)&packet, NULL);
     if (!NT_SUCCESS(status) || !packet) {
-        KdPrint(("FireFly: WdfRequestRetrieveInputBuffer failed 0x%x, packet=0x%x\n", status, packet));
+        KdPrint(("TailLight: WdfRequestRetrieveInputBuffer failed 0x%x, packet=0x%x\n", status, packet));
         return status;
     }
 

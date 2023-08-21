@@ -66,13 +66,13 @@ FireflySetFeature(
 {
     PAGED_CODE();
 
-    KdPrint(("Firefly: FireflySetFeature\n"));
+    KdPrint(("TailLight: FireflySetFeature\n"));
 
     // Preinit for error.
     WDFIOTARGET_Wrap hidTarget;
     NTSTATUS status = WdfIoTargetCreate(Device, WDF_NO_OBJECT_ATTRIBUTES, &hidTarget);
     if (!NT_SUCCESS(status)) {
-        KdPrint(("FireFly: WdfIoTargetCreate failed 0x%x\n", status));
+        KdPrint(("TailLight: WdfIoTargetCreate failed 0x%x\n", status));
         return status;
     }
 
@@ -87,7 +87,7 @@ FireflySetFeature(
 
     status = WdfIoTargetOpen(hidTarget, &openParams);
     if (!NT_SUCCESS(status)) {
-        KdPrint(("FireFly: WdfIoTargetOpen failed 0x%x\n", status));
+        KdPrint(("TailLight: WdfIoTargetOpen failed 0x%x\n", status));
         return status;
     }
     
@@ -107,10 +107,10 @@ FireflySetFeature(
                                   NULL,
                                   NULL);
 
-    KdPrint(("FireFly: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInformation.ProductID, collectionInformation.VendorID, collectionInformation.VersionNumber, collectionInformation.DescriptorSize));
+    KdPrint(("TailLight: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInformation.ProductID, collectionInformation.VendorID, collectionInformation.VersionNumber, collectionInformation.DescriptorSize));
 
     if (!NT_SUCCESS(status)) {
-        KdPrint(("FireFly: WdfIoTargetSendIoctlSynchronously1 failed 0x%x\n", status));
+        KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously1 failed 0x%x\n", status));
         return status;
     }
 
@@ -133,7 +133,7 @@ FireflySetFeature(
                                   NULL);
 
     if (!NT_SUCCESS(status)) {
-        KdPrint(("FireFly: WdfIoTargetSendIoctlSynchronously2 failed 0x%x\n", status));
+        KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously2 failed 0x%x\n", status));
         return status;
     }
 
@@ -146,10 +146,10 @@ FireflySetFeature(
         return status;
     }
 
-    //KdPrint(("FireFly: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage));
+    //KdPrint(("TailLight: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage));
 
     if (caps.FeatureReportByteLength != sizeof(TailLightReport)) {
-        KdPrint(("FireFly: FeatureReportByteLength mismatch (%u, %u).\n", caps.FeatureReportByteLength, sizeof(TailLightReport)));
+        KdPrint(("TailLight: FeatureReportByteLength mismatch (%u, %u).\n", caps.FeatureReportByteLength, sizeof(TailLightReport)));
         return status;
     }
 
@@ -162,7 +162,7 @@ FireflySetFeature(
     USHORT ValueCapsLength = caps.NumberFeatureValueCaps;
     status = HidP_GetValueCaps(HidP_Feature, &valueCaps, &ValueCapsLength, preparsedData);
     if (!NT_SUCCESS(status)) {
-        KdPrint(("FireFly: HidP_GetValueCaps failed 0x%x\n", status));
+        KdPrint(("TailLight: HidP_GetValueCaps failed 0x%x\n", status));
         return status;
     }
 
@@ -181,7 +181,7 @@ FireflySetFeature(
                                   NULL,
                                   NULL);
     if (!NT_SUCCESS(status)) {
-        KdPrint(("FireFly: WdfIoTargetSendIoctlSynchronously3 failed 0x%x\n", status)); 
+        KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously3 failed 0x%x\n", status)); 
         return status;
     }
 

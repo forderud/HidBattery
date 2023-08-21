@@ -14,12 +14,12 @@ struct TailLightReport {
 
     bool IsValid() const {
         if (ReportId != 36) {// 0x24
-            KdPrint(("FireFly: TailLightReport: Unsupported report id %d\n", ReportId));
+            KdPrint(("TailLight: TailLightReport: Unsupported report id %d\n", ReportId));
             return false;
         }
 
         if ((Unknown1 != 0xB2) || (Unknown2 != 0x03)) {
-            KdPrint(("FireFly: TailLightReport: Unknown control Code 0x%x 0x%x\n", Unknown1, Unknown2));
+            KdPrint(("TailLight: TailLightReport: Unknown control Code 0x%x 0x%x\n", Unknown1, Unknown2));
             return false;
         }
 
@@ -30,7 +30,7 @@ struct TailLightReport {
         // RGB check
         unsigned int color_sum = Red + Green + Blue;
         if (color_sum > 2*256) {
-            KdPrint(("FireFly: Color saturation %u exceeded 512 threshold. Reseting color to RED to signal error\n", color_sum));
+            KdPrint(("TailLight: Color saturation %u exceeded 512 threshold. Reseting color to RED to signal error\n", color_sum));
             Red = 255;
             Green = 0;
             Blue = 0;
