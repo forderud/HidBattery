@@ -121,5 +121,8 @@ copy ..\IntelliMouse.ps1 $(OutDir)</Command>
     <ClInclude Include="vfeature.h" />
     <ClInclude Include="wmi.h" />
   </ItemGroup>
+  <ItemGroup>
+    <MessageCompile Include="messages.mc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

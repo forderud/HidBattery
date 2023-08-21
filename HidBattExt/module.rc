@@ -9,4 +9,6 @@
 
 #include "common.ver"
 
+#include "messages.rc"
+
 TailLightWMI MOFDATA TailLight.bmf
