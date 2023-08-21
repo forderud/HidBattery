@@ -1,4 +1,4 @@
-#include "FireFly.h"
+#include "driver.h"
 
 // Main driver entry, initialize the framework, register
 // driver event handlers
