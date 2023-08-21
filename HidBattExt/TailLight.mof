@@ -3,7 +3,7 @@
 [Dynamic, Provider("WMIProv"),
  WMI,
  Description("TailLight driver information"),
- guid("{AB27DB29-DB25-42E6-A3E7-28BD46BDB666}"),
+ guid("{1F351B73-03F0-4F7E-87FF-D783FFBBBAB3}"),
  locale("MS\\0x409")]
 class TailLightDeviceInformation
 {
