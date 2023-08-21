@@ -1,5 +1,5 @@
 // Where they are described.
-#define MOFRESOURCENAME L"FireflyWMI"
+#define MOFRESOURCENAME L"TailLightWMI"
 
 // Initialize the FireFly drivers WMI support
 NTSTATUS WmiInitialize(

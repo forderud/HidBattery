@@ -43,12 +43,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
   <ItemGroup Label="WrappedTaskItems">
-    <MofComp Include="firefly.mof">
-      <CreateBinaryMofFile>".\$(IntDir)\firefly.bmf"</CreateBinaryMofFile>
+    <MofComp Include="TailLight.mof">
+      <CreateBinaryMofFile>".\$(IntDir)\TailLight.bmf"</CreateBinaryMofFile>
     </MofComp>
-    <Wmimofck Include=".\$(IntDir)\firefly.bmf" />
-    <Wmimofck Include=".\$(IntDir)\firefly.bmf">
-      <HeaderOutputFile>.\$(IntDir)\fireflymof.h</HeaderOutputFile>
+    <Wmimofck Include=".\$(IntDir)\TailLight.bmf" />
+    <Wmimofck Include=".\$(IntDir)\TailLight.bmf">
+      <HeaderOutputFile>.\$(IntDir)\TailLightmof.h</HeaderOutputFile>
     </Wmimofck>
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

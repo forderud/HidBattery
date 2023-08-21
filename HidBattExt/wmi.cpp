@@ -1,7 +1,7 @@
 #include "driver.h"
 
 
-// Register our GUID and Datablock generated from the Firefly.mof file.
+// Register our GUID and Datablock generated from the TailLight.mof file.
 NTSTATUS
 WmiInitialize(
     WDFDEVICE       Device,
@@ -21,8 +21,8 @@ WmiInitialize(
     }
 
     WDF_WMI_PROVIDER_CONFIG providerConfig = {};
-    WDF_WMI_PROVIDER_CONFIG_INIT(&providerConfig, &FireflyDeviceInformation_GUID);
-    providerConfig.MinInstanceBufferSize = sizeof(FireflyDeviceInformation);
+    WDF_WMI_PROVIDER_CONFIG_INIT(&providerConfig, &TailLightDeviceInformation_GUID);
+    providerConfig.MinInstanceBufferSize = sizeof(TailLightDeviceInformation);
 
     WDF_WMI_INSTANCE_CONFIG instanceConfig = {};
     WDF_WMI_INSTANCE_CONFIG_INIT_PROVIDER_CONFIG(&instanceConfig, &providerConfig);
@@ -32,7 +32,7 @@ WmiInitialize(
     instanceConfig.EvtWmiInstanceSetItem = EvtWmiInstanceSetItem;
 
     WDF_OBJECT_ATTRIBUTES woa = {};
-    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&woa, FireflyDeviceInformation);
+    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&woa, TailLightDeviceInformation);
 
     // No need to store the WDFWMIINSTANCE in the device context because it is
     // passed back in the WMI instance callbacks and is not referenced outside
@@ -41,7 +41,7 @@ WmiInitialize(
     status = WdfWmiInstanceCreate(Device, &instanceConfig, &woa, &WmiInstance);
 
     if (NT_SUCCESS(status)) {
-        FireflyDeviceInformation* info = WdfObjectGet_FireflyDeviceInformation(WmiInstance);
+        TailLightDeviceInformation* info = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
         info->TailLight = 0x000000; // black
     }
 
@@ -62,7 +62,7 @@ EvtWmiInstanceQueryInstance(
 
     KdPrint(("FireFly: WMI QueryInstance\n"));
 
-    FireflyDeviceInformation* pInfo = WdfObjectGet_FireflyDeviceInformation(WmiInstance);
+    TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
 
     // Our mininum buffer size has been checked by the Framework
     // and failed automatically if too small.
@@ -87,7 +87,7 @@ EvtWmiInstanceSetInstance(
 
     KdPrint(("FireFly: WMI SetInstance\n"));
 
-    FireflyDeviceInformation* pInfo = WdfObjectGet_FireflyDeviceInformation(WmiInstance);
+    TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
 
     // Our mininum buffer size has been checked by the Framework
     // and failed automatically if too small.
@@ -120,11 +120,11 @@ EvtWmiInstanceSetItem(
     if (DataItemId != 1)
         return STATUS_INVALID_DEVICE_REQUEST;
 
-    if (InBufferSize < FireflyDeviceInformation_TailLight_SIZE)
+    if (InBufferSize < TailLightDeviceInformation_TailLight_SIZE)
         return STATUS_BUFFER_TOO_SMALL;
 
-    FireflyDeviceInformation* pInfo = WdfObjectGet_FireflyDeviceInformation(WmiInstance);
-    pInfo->TailLight = ((FireflyDeviceInformation*)InBuffer)->TailLight;
+    TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
+    pInfo->TailLight = ((TailLightDeviceInformation*)InBuffer)->TailLight;
 
     // Tell the HID device about the new tail light state
     NTSTATUS status = FireflySetFeature(

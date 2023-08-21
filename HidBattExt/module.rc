@@ -9,5 +9,4 @@
 
 #include "common.ver"
 
-FireflyWMI MOFDATA Firefly.bmf
-
+TailLightWMI MOFDATA TailLight.bmf

@@ -5,9 +5,9 @@
 #include <initguid.h>
 #include <wdmguid.h>
 
-// Our drivers generated include from firefly.mof
+// Our drivers generated include from TailLight.mof
 // See makefile.inc for wmi commands
-#include "fireflymof.h"
+#include "TailLightmof.h"
 
 // Our drivers modules includes
 #include "device.h"
