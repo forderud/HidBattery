@@ -5,7 +5,7 @@ EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
 
 
 NTSTATUS
-FireFlyEvtDeviceAdd(
+EvtDeviceAdd(
     WDFDRIVER Driver,
     PWDFDEVICE_INIT DeviceInit
     )

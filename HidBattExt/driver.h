@@ -18,4 +18,4 @@
 extern "C"
 DRIVER_INITIALIZE DriverEntry;
 
-EVT_WDF_DRIVER_DEVICE_ADD FireFlyEvtDeviceAdd;
+EVT_WDF_DRIVER_DEVICE_ADD EvtDeviceAdd;
