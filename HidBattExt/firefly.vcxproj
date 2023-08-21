@@ -112,7 +112,7 @@ copy ..\IntelliMouse.ps1 $(OutDir)</Command>
     <ClCompile Include="driver.cpp" />
     <ClCompile Include="vfeature.cpp" />
     <ClCompile Include="wmi.cpp" />
-    <ResourceCompile Include="firefly.rc" />
+    <ResourceCompile Include="module.rc" />
   </ItemGroup>
   <ItemGroup>
     <Inf Exclude="@(Inf)" Include="*.inx" />
