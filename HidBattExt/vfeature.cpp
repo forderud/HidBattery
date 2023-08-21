@@ -54,7 +54,7 @@ private:
 };
 
 NTSTATUS
-FireflySetFeature(
+SetFeatureColor (
     IN  WDFDEVICE Device,
     IN  ULONG     Color
     )
@@ -66,7 +66,7 @@ FireflySetFeature(
 {
     PAGED_CODE();
 
-    KdPrint(("TailLight: FireflySetFeature\n"));
+    KdPrint(("TailLight: SetFeatureColor\n"));
 
     // Preinit for error.
     WDFIOTARGET_Wrap hidTarget;

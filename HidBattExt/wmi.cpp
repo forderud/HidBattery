@@ -96,7 +96,7 @@ EvtWmiInstanceSetInstance(
     RtlMoveMemory(/*dst*/pInfo, /*src*/InBuffer, length);
 
     // Tell the HID device about the new tail light state
-    NTSTATUS status = FireflySetFeature(
+    NTSTATUS status = SetFeatureColor(
         WdfWmiInstanceGetDevice(WmiInstance),
         pInfo->TailLight
         );
@@ -127,7 +127,7 @@ EvtWmiInstanceSetItem(
     pInfo->TailLight = ((TailLightDeviceInformation*)InBuffer)->TailLight;
 
     // Tell the HID device about the new tail light state
-    NTSTATUS status = FireflySetFeature(
+    NTSTATUS status = SetFeatureColor(
         WdfWmiInstanceGetDevice(WmiInstance),
         pInfo->TailLight
         );

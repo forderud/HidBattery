@@ -54,7 +54,7 @@ struct TailLightReport {
 static_assert(sizeof(TailLightReport) == 73);
 
 
-NTSTATUS FireflySetFeature(
+NTSTATUS SetFeatureColor (
     IN  WDFDEVICE Device,
     IN  ULONG     Color
     );
