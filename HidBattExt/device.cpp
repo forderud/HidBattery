@@ -168,7 +168,7 @@ Arguments:
     NTSTATUS status = STATUS_SUCCESS; //unhandled
     switch (IoControlCode) {
       case IOCTL_HID_SET_FEATURE:
-        status = SetFeatureFilter(Request);
+        status = SetFeatureFilter(device, Request);
         break;
     }
     // ignore status variable for now
@@ -190,7 +190,8 @@ Arguments:
 
 NTSTATUS
 SetFeatureFilter(
-    _In_  WDFREQUEST        Request
+    _In_  WDFDEVICE  Device,
+    _In_  WDFREQUEST Request
 )
 /*++
 Routine Description:
@@ -204,6 +205,8 @@ Arguments:
     Request - Pointer to Request Packet.
 --*/
 {
+    UNREFERENCED_PARAMETER(Device);
+
     WDF_REQUEST_PARAMETERS params = {};
     WDF_REQUEST_PARAMETERS_INIT(&params);
     WdfRequestGetParameters(Request, &params);

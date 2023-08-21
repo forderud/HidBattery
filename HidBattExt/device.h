@@ -19,5 +19,6 @@ QueueCreate(
 
 NTSTATUS
 SetFeatureFilter(
-    _In_  WDFREQUEST        Request
+    _In_ WDFDEVICE  Device,
+    _In_ WDFREQUEST Request
 );
