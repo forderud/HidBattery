@@ -26,7 +26,7 @@ struct TailLightReport {
         return true;
     }
 
-    void SafetyCheck () {
+    bool SafetyCheck () {
         // RGB check
         unsigned int color_sum = Red + Green + Blue;
         if (color_sum > 2*256) {
@@ -34,9 +34,11 @@ struct TailLightReport {
             Red = 255;
             Green = 0;
             Blue = 0;
+            return false;
         }
-    }
 
+        return true;
+    }
 
     //report ID of the collection to which the control request is sent
     UCHAR    ReportId; // 36 (0x24)
