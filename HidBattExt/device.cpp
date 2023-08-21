@@ -1,7 +1,7 @@
 #include "driver.h"
 #include <Hidport.h>
 
-EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL FireFlyEvtIoDeviceControl;
+EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
 
 
 NTSTATUS
@@ -110,7 +110,7 @@ Arguments:
 
     WDF_IO_QUEUE_CONFIG queueConfig = {};
     WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
-    queueConfig.EvtIoDeviceControl = FireFlyEvtIoDeviceControl;
+    queueConfig.EvtIoDeviceControl = EvtIoDeviceControlFilter;
 
     WDFQUEUE queue = 0; // auto-deleted when parent is deleted
     NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
@@ -127,7 +127,7 @@ Arguments:
 
 
 VOID
-FireFlyEvtIoDeviceControl(
+EvtIoDeviceControlFilter(
     _In_  WDFQUEUE          Queue,
     _In_  WDFREQUEST        Request,
     _In_  size_t            OutputBufferLength,
