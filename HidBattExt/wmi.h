@@ -1,7 +1,7 @@
 // Where they are described.
 #define MOFRESOURCENAME L"TailLightWMI"
 
-// Initialize the FireFly drivers WMI support
+// Initialize the TailLight drivers WMI support
 NTSTATUS WmiInitialize(
     WDFDEVICE       Device,
     DEVICE_CONTEXT* DeviceContext
