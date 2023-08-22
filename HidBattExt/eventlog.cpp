@@ -15,10 +15,8 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1
     UCHAR InsertionStr1Len = 0;
     if (InsertionStr1)
         InsertionStr1Len = sizeof(WCHAR)*((UCHAR)wcslen(InsertionStr1)+1); // in bytes
-    KdPrint(("FireFly: InsertionStr1Len=%u.\n", InsertionStr1Len));
 
     size_t total_size = IO_ERROR_LOG_PACKET_size() + DumpDataLen + InsertionStr1Len;
-    KdPrint(("FireFly: total_size=%u.\n", total_size));
     if (total_size > ERROR_LOG_MAXIMUM_SIZE) {
         // overflow check
         KdPrint(("FireFly: IoAllocateErrorLogEntry too long message.\n"));
@@ -37,7 +35,6 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1
     entry->RetryCount = 0;
     entry->DumpDataSize = DumpDataLen;
     entry->NumberOfStrings = InsertionStr1Len ? 1 : 0;
-    KdPrint(("FireFly: NumberOfStrings=%u.\n", entry->NumberOfStrings));
     entry->StringOffset = IO_ERROR_LOG_PACKET_size() + DumpDataLen; // insertion string offsets
     entry->EventCategory = 0;    // TBD
     entry->ErrorCode = MessageId;
@@ -50,10 +47,8 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1
     if (DumpDataLen)
         RtlCopyMemory(/*dst*/entry->DumpData, /*src*/DumpData, DumpDataLen);
 
-    if (InsertionStr1Len) {
-        KdPrint(("FireFly: copying InsertionStr1 to offset=%u.\n", entry->StringOffset));
+    if (InsertionStr1Len)
         RtlCopyMemory(/*dst*/(BYTE*)entry + entry->StringOffset, /*src*/InsertionStr1, InsertionStr1Len);
-    }
 
     // Write to windows system log.
     // The function will take over ownership of the object.
