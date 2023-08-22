@@ -22,7 +22,3 @@ SetFeatureFilter(
     _In_ WDFDEVICE  Device,
     _In_ WDFREQUEST Request
 );
-
-
-/** Write to the Windows Event Viewer "System" log. */
-void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId);
