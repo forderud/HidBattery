@@ -7,10 +7,6 @@ constexpr USHORT IO_ERROR_LOG_PACKET_size() {
 
 
 void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1, WCHAR* InsertionStr2) {
-    // placeholder for future data
-    ULONG* DumpData = nullptr;
-    USHORT DumpDataLen = 0; // in bytes
-
     // determine length of insertion strings
     UCHAR InsertionStr1Len = 0;
     if (InsertionStr1)
@@ -20,7 +16,7 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1
         InsertionStr2Len = sizeof(WCHAR) * ((UCHAR)wcslen(InsertionStr2) + 1); // in bytes
 
 
-    size_t total_size = IO_ERROR_LOG_PACKET_size() + DumpDataLen + InsertionStr1Len + InsertionStr2Len;
+    size_t total_size = IO_ERROR_LOG_PACKET_size() + InsertionStr1Len + InsertionStr2Len;
     if (total_size > ERROR_LOG_MAXIMUM_SIZE) {
         // overflow check
         KdPrint(("FireFly: IoAllocateErrorLogEntry too long message.\n"));
@@ -37,13 +33,13 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1
 
     entry->MajorFunctionCode = 0; // (optional)
     entry->RetryCount = 0;
-    entry->DumpDataSize = DumpDataLen;
+    entry->DumpDataSize = 0;
     entry->NumberOfStrings = 0;
     if (InsertionStr1Len)
         entry->NumberOfStrings++;
     if (InsertionStr2Len)
         entry->NumberOfStrings++;
-    entry->StringOffset = IO_ERROR_LOG_PACKET_size() + DumpDataLen; // insertion string offsets
+    entry->StringOffset = IO_ERROR_LOG_PACKET_size(); // insertion string offsets
     entry->EventCategory = 0;    // TBD
     entry->ErrorCode = MessageId;
     entry->UniqueErrorValue = 0; // driver-specific code (optional)
@@ -51,9 +47,6 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1
     entry->SequenceNumber = 0;   // IRP sequence (optional)
     entry->IoControlCode = 0;    // (optional)
     entry->DeviceOffset.QuadPart = 0; // offset in device where error occured (optional)
-
-    if (DumpDataLen)
-        RtlCopyMemory(/*dst*/entry->DumpData, /*src*/DumpData, DumpDataLen);
 
     BYTE* dest = (BYTE*)entry + entry->StringOffset;
     if (InsertionStr1Len) {
