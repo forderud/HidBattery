@@ -39,13 +39,13 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1
     entry->NumberOfStrings = InsertionStr1Len ? 1 : 0;
     KdPrint(("FireFly: NumberOfStrings=%u.\n", entry->NumberOfStrings));
     entry->StringOffset = IO_ERROR_LOG_PACKET_size() + DumpDataLen; // insertion string offsets
-    entry->EventCategory = 0; // TBD
+    entry->EventCategory = 0;    // TBD
     entry->ErrorCode = MessageId;
-    //entry->UniqueErrorValue = 0; // driver-specific code (optional)
-    entry->FinalStatus = STATUS_SUCCESS; // user-space error code
-    //entry->SequenceNumber = 0; // IRP sequence (optional)
-    //entry->IoControlCode = IoControlCode; (optional)
-    //entry->DeviceOffset.QuadPart = 0; // offset in device where error occured (optional)
+    entry->UniqueErrorValue = 0; // driver-specific code (optional)
+    entry->FinalStatus = 0;      // user-space error code (optional)
+    entry->SequenceNumber = 0;   // IRP sequence (optional)
+    entry->IoControlCode = 0;    // (optional)
+    entry->DeviceOffset.QuadPart = 0; // offset in device where error occured (optional)
 
     if (DumpDataLen)
         RtlCopyMemory(/*dst*/entry->DumpData, /*src*/DumpData, DumpDataLen);
