@@ -230,10 +230,17 @@ Arguments:
         return STATUS_INVALID_PARAMETER;
     }
 
+    // capture color before safety adjustments
+    UCHAR r = packet->Red;
+    UCHAR g = packet->Green;
+    UCHAR b = packet->Blue;
     // Enforce safety limits (sets color to RED on failure)
     if (!packet->SafetyCheck()) {
         // log safety violation to Windows Event Viewer "System" log
-        WriteToSystemLog(Device, TailLight_SAFETY, L"saturation");
+        WCHAR color_str[16] = {};
+        swprintf(color_str, L"%u,%u,%u", r, g, b);
+
+        WriteToSystemLog(Device, TailLight_SAFETY, color_str);
         return STATUS_CONTENT_BLOCKED;
     }
 
