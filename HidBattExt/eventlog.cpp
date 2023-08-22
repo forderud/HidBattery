@@ -21,7 +21,7 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId) {
         return;
     }
 
-    entry->MajorFunctionCode = IRP_MJ_DEVICE_CONTROL; // (optional)
+    //entry->MajorFunctionCode = IRP_MJ_DEVICE_CONTROL; // (optional)
     entry->RetryCount = 0;
     entry->DumpDataSize = DumpDataLen;
     entry->NumberOfStrings = 0; // number of insertion strings
