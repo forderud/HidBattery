@@ -233,7 +233,7 @@ Arguments:
     // Enforce safety limits (sets color to RED on failure)
     if (!packet->SafetyCheck()) {
         // log safety violation to Windows Event Viewer "System" log
-        WriteToSystemLog(Device, TailLight_SAFETY);
+        WriteToSystemLog(Device, TailLight_SAFETY, L"saturation");
         return STATUS_CONTENT_BLOCKED;
     }
 

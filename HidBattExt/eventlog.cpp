@@ -1,12 +1,24 @@
 #include "eventlog.h"
 
 
-void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId) {
+constexpr USHORT IO_ERROR_LOG_PACKET_size() {
+    return sizeof(IO_ERROR_LOG_PACKET); // -8;
+}
+
+
+void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1) {
     // placeholder for future data
     ULONG* DumpData = nullptr;
     USHORT DumpDataLen = 0; // in bytes
 
-    size_t total_size = sizeof(IO_ERROR_LOG_PACKET) + DumpDataLen;
+    // determine length of insertion string
+    UCHAR InsertionStr1Len = 0;
+    if (InsertionStr1)
+        InsertionStr1Len = sizeof(WCHAR)*((UCHAR)wcslen(InsertionStr1)+1); // in bytes
+    KdPrint(("FireFly: InsertionStr1Len=%u.\n", InsertionStr1Len));
+
+    size_t total_size = IO_ERROR_LOG_PACKET_size() + DumpDataLen + InsertionStr1Len;
+    KdPrint(("FireFly: total_size=%u.\n", total_size));
     if (total_size > ERROR_LOG_MAXIMUM_SIZE) {
         // overflow check
         KdPrint(("FireFly: IoAllocateErrorLogEntry too long message.\n"));
@@ -24,18 +36,24 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId) {
     //entry->MajorFunctionCode = IRP_MJ_DEVICE_CONTROL; // (optional)
     entry->RetryCount = 0;
     entry->DumpDataSize = DumpDataLen;
-    entry->NumberOfStrings = 0; // number of insertion strings
-    entry->StringOffset = 0; // insertion string offsets
+    entry->NumberOfStrings = InsertionStr1Len ? 1 : 0;
+    KdPrint(("FireFly: NumberOfStrings=%u.\n", entry->NumberOfStrings));
+    entry->StringOffset = IO_ERROR_LOG_PACKET_size() + DumpDataLen; // insertion string offsets
     entry->EventCategory = 0; // TBD
     entry->ErrorCode = MessageId;
     //entry->UniqueErrorValue = 0; // driver-specific code (optional)
-    entry->FinalStatus = STATUS_SUCCESS; // user-space error code (optional)
+    entry->FinalStatus = STATUS_SUCCESS; // user-space error code
     //entry->SequenceNumber = 0; // IRP sequence (optional)
     //entry->IoControlCode = IoControlCode; (optional)
     //entry->DeviceOffset.QuadPart = 0; // offset in device where error occured (optional)
 
     if (DumpDataLen)
         RtlCopyMemory(/*dst*/entry->DumpData, /*src*/DumpData, DumpDataLen);
+
+    if (InsertionStr1Len) {
+        KdPrint(("FireFly: copying InsertionStr1 to offset=%u.\n", entry->StringOffset));
+        RtlCopyMemory(/*dst*/(BYTE*)entry + entry->StringOffset, /*src*/InsertionStr1, InsertionStr1Len);
+    }
 
     // Write to windows system log.
     // The function will take over ownership of the object.
