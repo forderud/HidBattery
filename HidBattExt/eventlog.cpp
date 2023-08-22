@@ -4,9 +4,9 @@
 void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId) {
     // placeholder for future data
     ULONG* DumpData = nullptr;
-    USHORT DumpLen = 0;
+    USHORT DumpDataLen = 0; // in bytes
 
-    size_t total_size = sizeof(IO_ERROR_LOG_PACKET) + DumpLen;
+    size_t total_size = sizeof(IO_ERROR_LOG_PACKET) + DumpDataLen;
     if (total_size > ERROR_LOG_MAXIMUM_SIZE) {
         // overflow check
         KdPrint(("FireFly: IoAllocateErrorLogEntry too long message.\n"));
@@ -21,9 +21,9 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId) {
         return;
     }
 
-    entry->MajorFunctionCode = IRP_MJ_DEVICE_CONTROL;
+    entry->MajorFunctionCode = IRP_MJ_DEVICE_CONTROL; // (optional)
     entry->RetryCount = 0;
-    entry->DumpDataSize = DumpLen;
+    entry->DumpDataSize = DumpDataLen;
     entry->NumberOfStrings = 0; // number of insertion strings
     entry->StringOffset = 0; // insertion string offsets
     entry->EventCategory = 0; // TBD
@@ -34,8 +34,8 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId) {
     //entry->IoControlCode = IoControlCode; (optional)
     //entry->DeviceOffset.QuadPart = 0; // offset in device where error occured (optional)
 
-    if (DumpLen)
-        RtlCopyMemory(/*dst*/entry->DumpData, /*src*/DumpData, DumpLen);
+    if (DumpDataLen)
+        RtlCopyMemory(/*dst*/entry->DumpData, /*src*/DumpData, DumpDataLen);
 
     // Write to windows system log.
     // The function will take over ownership of the object.
