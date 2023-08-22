@@ -233,7 +233,7 @@ Arguments:
     // Enforce safety limits (sets color to RED on failure)
     if (!packet->SafetyCheck()) {
         // log safety violation to Windows Event Viewer "System" log
-        LogToSystemLog(Device, TailLight_SAFETY);
+        WriteToSystemLog(Device, TailLight_SAFETY);
         return STATUS_CONTENT_BLOCKED;
     }
 
@@ -241,7 +241,7 @@ Arguments:
 }
 
 
-void LogToSystemLog(WDFDEVICE device, NTSTATUS MessageId) {
+void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId) {
     // placeholder for future data
     ULONG* DumpData = nullptr;
     USHORT DumpLen = 0;
@@ -254,7 +254,7 @@ void LogToSystemLog(WDFDEVICE device, NTSTATUS MessageId) {
     }
 
     // Log an informational event with the caller name
-    DEVICE_OBJECT* dev_object = WdfDeviceWdmGetDeviceObject(device);
+    DEVICE_OBJECT* dev_object = WdfDeviceWdmGetDeviceObject(Device);
     auto* entry = (IO_ERROR_LOG_PACKET*)IoAllocateErrorLogEntry(dev_object, static_cast<UCHAR>(total_size));
     if (!entry) {
         KdPrint(("FireFly: IoAllocateErrorLogEntry allocation failure.\n"));

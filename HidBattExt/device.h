@@ -24,4 +24,5 @@ SetFeatureFilter(
 );
 
 
-void LogToSystemLog(WDFDEVICE device, NTSTATUS MessageId);
+/** Write to the Windows Event Viewer "System" log. */
+void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId);
