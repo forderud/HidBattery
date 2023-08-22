@@ -237,10 +237,14 @@ Arguments:
     // Enforce safety limits (sets color to RED on failure)
     if (!packet->SafetyCheck()) {
         // log safety violation to Windows Event Viewer "System" log
-        WCHAR color_str[16] = {};
-        swprintf(color_str, L"%u,%u,%u", r, g, b);
+        WCHAR color_requested[16] = {};
+        swprintf(color_requested, L"%u,%u,%u", r, g, b);
 
-        WriteToSystemLog(Device, TailLight_SAFETY, color_str);
+        WCHAR color_adjusted[16] = {};
+        swprintf(color_adjusted, L"%u,%u,%u", packet->Red, packet->Green, packet->Blue);
+
+
+        WriteToSystemLog(Device, TailLight_SAFETY, color_requested, color_adjusted);
         return STATUS_CONTENT_BLOCKED;
     }
 

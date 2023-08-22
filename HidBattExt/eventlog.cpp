@@ -6,17 +6,21 @@ constexpr USHORT IO_ERROR_LOG_PACKET_size() {
 }
 
 
-void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1) {
+void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1, WCHAR* InsertionStr2) {
     // placeholder for future data
     ULONG* DumpData = nullptr;
     USHORT DumpDataLen = 0; // in bytes
 
-    // determine length of insertion string
+    // determine length of insertion strings
     UCHAR InsertionStr1Len = 0;
     if (InsertionStr1)
         InsertionStr1Len = sizeof(WCHAR)*((UCHAR)wcslen(InsertionStr1)+1); // in bytes
+    UCHAR InsertionStr2Len = 0;
+    if (InsertionStr2)
+        InsertionStr2Len = sizeof(WCHAR) * ((UCHAR)wcslen(InsertionStr2) + 1); // in bytes
 
-    size_t total_size = IO_ERROR_LOG_PACKET_size() + DumpDataLen + InsertionStr1Len;
+
+    size_t total_size = IO_ERROR_LOG_PACKET_size() + DumpDataLen + InsertionStr1Len + InsertionStr2Len;
     if (total_size > ERROR_LOG_MAXIMUM_SIZE) {
         // overflow check
         KdPrint(("FireFly: IoAllocateErrorLogEntry too long message.\n"));
@@ -34,7 +38,11 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1
     entry->MajorFunctionCode = 0; // (optional)
     entry->RetryCount = 0;
     entry->DumpDataSize = DumpDataLen;
-    entry->NumberOfStrings = InsertionStr1Len ? 1 : 0;
+    entry->NumberOfStrings = 0;
+    if (InsertionStr1Len)
+        entry->NumberOfStrings++;
+    if (InsertionStr2Len)
+        entry->NumberOfStrings++;
     entry->StringOffset = IO_ERROR_LOG_PACKET_size() + DumpDataLen; // insertion string offsets
     entry->EventCategory = 0;    // TBD
     entry->ErrorCode = MessageId;
@@ -47,8 +55,15 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1
     if (DumpDataLen)
         RtlCopyMemory(/*dst*/entry->DumpData, /*src*/DumpData, DumpDataLen);
 
-    if (InsertionStr1Len)
-        RtlCopyMemory(/*dst*/(BYTE*)entry + entry->StringOffset, /*src*/InsertionStr1, InsertionStr1Len);
+    BYTE* dest = (BYTE*)entry + entry->StringOffset;
+    if (InsertionStr1Len) {
+        RtlCopyMemory(/*dst*/dest, /*src*/InsertionStr1, InsertionStr1Len);
+        dest += InsertionStr1Len;
+    }
+    if (InsertionStr2Len) {
+        RtlCopyMemory(/*dst*/dest, /*src*/InsertionStr2, InsertionStr2Len);
+        dest += InsertionStr2Len;
+    }
 
     // Write to windows system log.
     // The function will take over ownership of the object.

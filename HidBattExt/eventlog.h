@@ -6,4 +6,4 @@
 
 /** Write to the Windows Event Viewer "System" log.
     InsertionStr1 is a null-terminated string. */
-void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1);
+void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1, WCHAR* InsertionStr2);
