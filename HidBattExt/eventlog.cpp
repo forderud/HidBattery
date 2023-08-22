@@ -29,7 +29,7 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId) {
     entry->EventCategory = 0; // TBD
     entry->ErrorCode = MessageId;
     //entry->UniqueErrorValue = 0; // driver-specific code (optional)
-    entry->FinalStatus = STATUS_SUCCESS; // user-space error code
+    entry->FinalStatus = STATUS_SUCCESS; // user-space error code (optional)
     //entry->SequenceNumber = 0; // IRP sequence (optional)
     //entry->IoControlCode = IoControlCode; (optional)
     //entry->DeviceOffset.QuadPart = 0; // offset in device where error occured (optional)
