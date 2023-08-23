@@ -158,6 +158,7 @@ Arguments:
     PAGED_CODE();
 
     UNREFERENCED_PARAMETER(OutputBufferLength);
+    UNREFERENCED_PARAMETER(InputBufferLength);
 
     KdPrint(("TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%u)\n", IoControlCode, InputBufferLength));
 
