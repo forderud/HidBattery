@@ -4,8 +4,7 @@
 EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
 
 
-NTSTATUS
-EvtDeviceAdd(
+NTSTATUS EvtDeviceAdd(
     WDFDRIVER Driver,
     PWDFDEVICE_INIT DeviceInit
     )
@@ -104,8 +103,7 @@ Arguments:
 }
 
 
-VOID
-EvtIoDeviceControlFilter(
+VOID EvtIoDeviceControlFilter(
     _In_  WDFQUEUE          Queue,
     _In_  WDFREQUEST        Request,
     _In_  size_t            OutputBufferLength,

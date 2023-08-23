@@ -1,7 +1,7 @@
-// The device context performs the same job as
-// a WDM device extension in the driver framework
-typedef struct _DEVICE_CONTEXT
-{
+#pragma once
+
+/** Driver-specific struct for storing instance-specific data. */
+typedef struct _DEVICE_CONTEXT {
     UNICODE_STRING PdoName;
 } DEVICE_CONTEXT;
 

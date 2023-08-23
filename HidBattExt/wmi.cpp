@@ -2,8 +2,7 @@
 
 
 // Register our GUID and Datablock generated from the TailLight.mof file.
-NTSTATUS
-WmiInitialize(
+NTSTATUS WmiInitialize(
     WDFDEVICE       Device,
     DEVICE_CONTEXT* DeviceContext
     )
@@ -48,8 +47,7 @@ WmiInitialize(
     return status;
 }
 
-NTSTATUS
-EvtWmiInstanceQueryInstance(
+NTSTATUS EvtWmiInstanceQueryInstance(
     IN  WDFWMIINSTANCE WmiInstance,
     IN  ULONG OutBufferSize,
     IN  PVOID OutBuffer,
@@ -74,8 +72,7 @@ EvtWmiInstanceQueryInstance(
     return STATUS_SUCCESS;
 }
 
-NTSTATUS
-EvtWmiInstanceSetInstance(
+NTSTATUS EvtWmiInstanceSetInstance(
     IN  WDFWMIINSTANCE WmiInstance,
     IN  ULONG InBufferSize,
     IN  PVOID InBuffer
@@ -105,8 +102,7 @@ EvtWmiInstanceSetInstance(
     return status;
 }
 
-NTSTATUS
-EvtWmiInstanceSetItem(
+NTSTATUS EvtWmiInstanceSetItem(
     IN  WDFWMIINSTANCE WmiInstance,
     IN  ULONG DataItemId,
     IN  ULONG InBufferSize,
