@@ -38,9 +38,21 @@ Arguments:
         return status;
     }
 
-    status = QueueCreate(device);
-    if (!NT_SUCCESS(status)) {
-        return status;
+    {
+        // create queue to process IOCTLs
+        WDF_IO_QUEUE_CONFIG queueConfig = {};
+        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel); // don't synchronize
+        //queueConfig.EvtIoRead // pass-through read requests 
+        //queueConfig.EvtIoWrite // pass-through write requests
+        queueConfig.EvtIoDeviceControl = EvtIoDeviceControlFilter; // filter I/O device control requests
+
+        WDFQUEUE queue = 0; // auto-deleted when parent is deleted
+        status = WdfIoQueueCreate(device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
+
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("TailLight: WdfIoQueueCreate failed 0x%x\n", status));
+            return status;
+        }
     }
 
     // Driver Framework always zero initializes an objects context memory
@@ -87,42 +99,6 @@ Arguments:
 
         KdPrint(("TailLight: PdoName: %wZ\n", deviceContext->PdoName)); // outputs "\Device\00000083
     }
-
-    return status;
-}
-
-
-NTSTATUS
-QueueCreate(
-    _In_  WDFDEVICE Device
-)
-/*++
-Routine Description:
-    This function creates a default, parallel I/O queue to proces IOCTLs
-    from hidclass.sys.
-
-Arguments:
-    Device - Handle to a framework device object.
-    Queue - Output pointer to a framework I/O queue handle, on success.
---*/
-{
-    KdPrint(("TailLight: QueueCreate\n"));
-
-    WDF_IO_QUEUE_CONFIG queueConfig = {};
-    WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
-    //queueConfig.EvtIoRead // pass-through read requests 
-    //queueConfig.EvtIoWrite // pass-through write requests
-    queueConfig.EvtIoDeviceControl = EvtIoDeviceControlFilter; // filter I/O device control requests
-
-    WDFQUEUE queue = 0; // auto-deleted when parent is deleted
-    NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
-
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: WdfIoQueueCreate failed 0x%x\n", status));
-        return status;
-    }
-
-    KdPrint(("TailLight: QueueCreate completed\n"));
 
     return status;
 }
