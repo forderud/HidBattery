@@ -61,7 +61,7 @@ Arguments:
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(device);
 
     // Initialize WMI provider
-    NTSTATUS status = WmiInitialize(device, deviceContext);
+    NTSTATUS status = WmiInitialize(device);
     if (!NT_SUCCESS(status)) {
         KdPrint(("TailLight: Error initializing WMI 0x%x\n", status));
         return status;

@@ -1,11 +1,8 @@
 // Where they are described.
 #define MOFRESOURCENAME L"TailLightWMI"
 
-// Initialize the TailLight drivers WMI support
-NTSTATUS WmiInitialize(
-    WDFDEVICE       Device,
-    DEVICE_CONTEXT* DeviceContext
-    );
+// Initialize WMI provider
+NTSTATUS WmiInitialize(WDFDEVICE Device);
 
 EVT_WDF_WMI_INSTANCE_QUERY_INSTANCE EvtWmiInstanceQueryInstance;
 
