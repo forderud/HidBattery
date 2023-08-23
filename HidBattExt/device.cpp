@@ -110,7 +110,9 @@ Arguments:
 
     WDF_IO_QUEUE_CONFIG queueConfig = {};
     WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
-    queueConfig.EvtIoDeviceControl = EvtIoDeviceControlFilter;
+    //queueConfig.EvtIoRead // pass-through read requests 
+    //queueConfig.EvtIoWrite // pass-through write requests
+    queueConfig.EvtIoDeviceControl = EvtIoDeviceControlFilter; // filter I/O device control requests
 
     WDFQUEUE queue = 0; // auto-deleted when parent is deleted
     NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
