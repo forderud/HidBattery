@@ -139,8 +139,6 @@ Arguments:
     KdPrint(("TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%u)\n", IoControlCode, InputBufferLength));
 
     WDFDEVICE device = WdfIoQueueGetDevice(Queue);
-    DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(device);
-    UNREFERENCED_PARAMETER(deviceContext);
 
     NTSTATUS status = STATUS_SUCCESS; //unhandled
     switch (IoControlCode) {
