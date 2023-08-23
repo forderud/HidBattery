@@ -148,15 +148,13 @@ Arguments:
         status = SetFeatureFilter(device, Request);
         break;
     }
-    // ignore status variable for now
+    // No NT_SUCCESS(status) check here since we don't want to fail blocked calls
 
     // Forward the request down the driver stack
-    WDFIOTARGET Target = WdfDeviceGetIoTarget(device);
-
     WDF_REQUEST_SEND_OPTIONS options = {};
     WDF_REQUEST_SEND_OPTIONS_INIT(&options, WDF_REQUEST_SEND_OPTION_SEND_AND_FORGET);
 
-    BOOLEAN ret = WdfRequestSend(Request, Target, &options);
+    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(device), &options);
     if (ret == FALSE) {
         status = WdfRequestGetStatus(Request);
         KdPrint(("TailLight: WdfRequestSend failed: 0x%x\n", status));
