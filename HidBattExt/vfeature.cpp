@@ -8,6 +8,8 @@
 
 #pragma warning(default:4201)
 #pragma warning(default:4214)
+#include "eventlog.h"
+
 
 
 /** RAII wrapper of PHIDP_PREPARSED_DATA. */
@@ -53,8 +55,8 @@ private:
     WDFIOTARGET m_obj = NULL;
 };
 
-NTSTATUS
-SetFeatureColor (
+
+NTSTATUS SetFeatureColor (
     IN  WDFDEVICE Device,
     IN  ULONG     Color
     )
@@ -183,6 +185,68 @@ SetFeatureColor (
     if (!NT_SUCCESS(status)) {
         KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously3 failed 0x%x\n", status)); 
         return status;
+    }
+
+    return status;
+}
+
+
+NTSTATUS SetFeatureFilter(
+    _In_  WDFDEVICE  Device,
+    _In_  WDFREQUEST Request
+)
+/*++
+Routine Description:
+    Handles IOCTL_HID_SET_FEATURE for all the collection.
+    For control collection (custom defined collection) it handles
+    the user-defined control codes for sideband communication
+
+Arguments:
+    QueueContext - The object context associated with the queue
+
+    Request - Pointer to Request Packet.
+--*/
+{
+    WDF_REQUEST_PARAMETERS params = {};
+    WDF_REQUEST_PARAMETERS_INIT(&params);
+    WdfRequestGetParameters(Request, &params);
+
+    KdPrint(("TailLight: SetFeatureFilter: Type=0x%x (DeviceControl=0xe), InputBufferLength=%u, \n", params.Type, params.Parameters.DeviceIoControl.InputBufferLength));
+
+    if (params.Parameters.DeviceIoControl.InputBufferLength != sizeof(TailLightReport)) {
+        KdPrint(("TailLight: SetFeatureFilter: Incorrect InputBufferLength\n"));
+        return STATUS_BUFFER_TOO_SMALL;
+    }
+
+    TailLightReport* packet = nullptr;
+    NTSTATUS status = WdfRequestRetrieveInputBuffer(Request, sizeof(TailLightReport), (void**)&packet, NULL);
+    if (!NT_SUCCESS(status) || !packet) {
+        KdPrint(("TailLight: WdfRequestRetrieveInputBuffer failed 0x%x, packet=0x%x\n", status, packet));
+        return status;
+    }
+
+    if (!packet->IsValid()) {
+        // If collection ID is not for control collection then handle
+        // this request just as you would for a regular collection.
+        return STATUS_INVALID_PARAMETER;
+    }
+
+    // capture color before safety adjustments
+    UCHAR r = packet->Red;
+    UCHAR g = packet->Green;
+    UCHAR b = packet->Blue;
+    // Enforce safety limits (sets color to RED on failure)
+    if (!packet->SafetyCheck()) {
+        // log safety violation to Windows Event Viewer "System" log
+        WCHAR color_requested[16] = {};
+        swprintf(color_requested, L"%u,%u,%u", r, g, b);
+
+        WCHAR color_adjusted[16] = {};
+        swprintf(color_adjusted, L"%u,%u,%u", packet->Red, packet->Green, packet->Blue);
+
+
+        WriteToSystemLog(Device, TailLight_SAFETY, color_requested, color_adjusted);
+        return STATUS_CONTENT_BLOCKED;
     }
 
     return status;

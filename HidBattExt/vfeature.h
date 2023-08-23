@@ -60,3 +60,8 @@ NTSTATUS SetFeatureColor (
     IN  WDFDEVICE Device,
     IN  ULONG     Color
     );
+
+NTSTATUS SetFeatureFilter(
+    _In_ WDFDEVICE  Device,
+    _In_ WDFREQUEST Request
+);
