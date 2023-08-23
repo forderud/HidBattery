@@ -95,7 +95,7 @@ EvtWmiInstanceSetInstance(
 
     RtlMoveMemory(/*dst*/pInfo, /*src*/InBuffer, length);
 
-    // Tell the HID device about the new tail light state
+    // Tell the HID device about the new tail-light state
     NTSTATUS status = SetFeatureColor(
         WdfWmiInstanceGetDevice(WmiInstance),
         pInfo->TailLight
@@ -126,7 +126,7 @@ EvtWmiInstanceSetItem(
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
     pInfo->TailLight = ((TailLightDeviceInformation*)InBuffer)->TailLight;
 
-    // Tell the HID device about the new tail light state
+    // Tell the HID device about the new tail-light state
     NTSTATUS status = SetFeatureColor(
         WdfWmiInstanceGetDevice(WmiInstance),
         pInfo->TailLight

@@ -15,6 +15,6 @@ class TailLightDeviceInformation
 
     [WmiDataId(1),
      read, write,
-     Description("Tail light in RGB COLORREF format.")]
+     Description("Tail-light in RGB COLORREF format.")]
     uint32 TailLight;
 };
