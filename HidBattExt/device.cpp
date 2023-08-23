@@ -27,14 +27,17 @@ Arguments:
     // Configure the device as a filter driver
     WdfFdoInitSetFilter(DeviceInit);
 
-    WDF_OBJECT_ATTRIBUTES attributes = {};
-    WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&attributes, DEVICE_CONTEXT);
-
     WDFDEVICE device = 0;
-    NTSTATUS status = WdfDeviceCreate(&DeviceInit, &attributes, &device);
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: WdfDeviceCreate, Error %x\n", status));
-        return status;
+    {
+        // create device
+        WDF_OBJECT_ATTRIBUTES attributes = {};
+        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&attributes, DEVICE_CONTEXT);
+
+        NTSTATUS status = WdfDeviceCreate(&DeviceInit, &attributes, &device);
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("TailLight: WdfDeviceCreate, Error %x\n", status));
+            return status;
+        }
     }
 
     {
@@ -46,7 +49,7 @@ Arguments:
         queueConfig.EvtIoDeviceControl = EvtIoDeviceControlFilter; // filter I/O device control requests
 
         WDFQUEUE queue = 0; // auto-deleted when parent is deleted
-        status = WdfIoQueueCreate(device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
+        NTSTATUS status = WdfIoQueueCreate(device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
 
         if (!NT_SUCCESS(status)) {
             KdPrint(("TailLight: WdfIoQueueCreate failed 0x%x\n", status));
@@ -57,36 +60,39 @@ Arguments:
     // Driver Framework always zero initializes an objects context memory
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(device);
 
-    // Initialize our WMI support
-    status = WmiInitialize(device, deviceContext);
+    // Initialize WMI provider
+    NTSTATUS status = WmiInitialize(device, deviceContext);
     if (!NT_SUCCESS(status)) {
         KdPrint(("TailLight: Error initializing WMI 0x%x\n", status));
         return status;
     }
 
-    // In order to send ioctls to our PDO, we have open to open it
-    // by name so that we have a valid filehandle (fileobject).
-    // When we send ioctls using the IoTarget, framework automatically 
-    // sets the filobject in the stack location.
-    WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-
-    // By parenting it to device, we don't have to worry about
-    // deleting explicitly. It will be deleted along witht the device.
-    attributes.ParentObject = device;
-
-    WDFMEMORY memory = 0;
-    status = WdfDeviceAllocAndQueryProperty(device,
-                                    DevicePropertyPhysicalDeviceObjectName,
-                                    NonPagedPoolNx,
-                                    &attributes,
-                                    &memory);
-
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: WdfDeviceAllocAndQueryProperty failed 0x%x\n", status));        
-        return STATUS_UNSUCCESSFUL;
-    }
-
     {
+        // initialize DEVICE_CONTEXT struct with PdoName
+
+        // In order to send ioctls to our PDO, we have open to open it
+        // by name so that we have a valid filehandle (fileobject).
+        // When we send ioctls using the IoTarget, framework automatically 
+        // sets the filobject in the stack location.
+        WDF_OBJECT_ATTRIBUTES attributes = {};
+        WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
+
+        // By parenting it to device, we don't have to worry about
+        // deleting explicitly. It will be deleted along witht the device.
+        attributes.ParentObject = device;
+
+        WDFMEMORY memory = 0;
+        status = WdfDeviceAllocAndQueryProperty(device,
+            DevicePropertyPhysicalDeviceObjectName,
+            NonPagedPoolNx,
+            &attributes,
+            &memory);
+
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("TailLight: WdfDeviceAllocAndQueryProperty failed 0x%x\n", status));
+            return STATUS_UNSUCCESSFUL;
+        }
+
         // initialize pDeviceContext->PdoName based on memory
         size_t bufferLength = 0;
         deviceContext->PdoName.Buffer = (WCHAR*)WdfMemoryGetBuffer(memory, &bufferLength);
