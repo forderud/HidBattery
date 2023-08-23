@@ -1,13 +1,6 @@
 #include "driver.h"
-
-#pragma warning(disable:4201)  // nameless struct/union
-#pragma warning(disable:4214)  // bit field types other than int
-
 #include <hidpddi.h>
 #include <hidclass.h>
-
-#pragma warning(default:4201)
-#pragma warning(default:4214)
 #include "eventlog.h"
 
 
