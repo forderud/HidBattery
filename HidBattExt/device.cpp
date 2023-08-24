@@ -149,7 +149,7 @@ Arguments:
     NTSTATUS status = STATUS_SUCCESS; //unhandled
     switch (IoControlCode) {
       case IOCTL_HID_SET_FEATURE:
-        status = SetFeatureFilter(device, Request);
+        status = SetFeatureFilter(device, Request, InputBufferLength);
         break;
     }
     // No NT_SUCCESS(status) check here since we don't want to fail blocked calls

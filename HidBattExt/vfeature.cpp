@@ -175,8 +175,10 @@ NTSTATUS SetFeatureColor (
 
 
 NTSTATUS SetFeatureFilter(
-    _In_  WDFDEVICE  Device,
-    _In_  WDFREQUEST Request
+    _In_ WDFDEVICE  Device,
+    _In_ WDFREQUEST Request,
+    _In_ size_t     InputBufferLength
+
 )
 /*++
 Routine Description:
@@ -190,13 +192,9 @@ Arguments:
     Request - Pointer to Request Packet.
 --*/
 {
-    WDF_REQUEST_PARAMETERS params = {};
-    WDF_REQUEST_PARAMETERS_INIT(&params);
-    WdfRequestGetParameters(Request, &params);
+    KdPrint(("TailLight: SetFeatureFilter\n"));
 
-    KdPrint(("TailLight: SetFeatureFilter: Type=0x%x (DeviceControl=0xe), InputBufferLength=%u, \n", params.Type, params.Parameters.DeviceIoControl.InputBufferLength));
-
-    if (params.Parameters.DeviceIoControl.InputBufferLength != sizeof(TailLightReport)) {
+    if (InputBufferLength != sizeof(TailLightReport)) {
         KdPrint(("TailLight: SetFeatureFilter: Incorrect InputBufferLength\n"));
         return STATUS_BUFFER_TOO_SMALL;
     }
