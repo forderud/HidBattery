@@ -63,114 +63,120 @@ NTSTATUS SetFeatureColor (
 
     KdPrint(("TailLight: SetFeatureColor\n"));
 
-    // Preinit for error.
     WDFIOTARGET_Wrap hidTarget;
-    NTSTATUS status = WdfIoTargetCreate(Device, WDF_NO_OBJECT_ATTRIBUTES, &hidTarget);
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: WdfIoTargetCreate failed 0x%x\n", status));
-        return status;
+    {
+        // open "hidTarget" using PdoName
+        NTSTATUS status = WdfIoTargetCreate(Device, WDF_NO_OBJECT_ATTRIBUTES, &hidTarget);
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("TailLight: WdfIoTargetCreate failed 0x%x\n", status));
+            return status;
+        }
+
+        // open in write-only mode
+        DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
+        WDF_IO_TARGET_OPEN_PARAMS openParams = {};
+        WDF_IO_TARGET_OPEN_PARAMS_INIT_OPEN_BY_NAME(&openParams, &deviceContext->PdoName, FILE_WRITE_ACCESS);
+
+        // We will let the framework to respond automatically to the pnp
+        // state changes of the target by closing and opening the handle.
+        openParams.ShareAccess = FILE_SHARE_WRITE | FILE_SHARE_READ;
+
+        status = WdfIoTargetOpen(hidTarget, &openParams);
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("TailLight: WdfIoTargetOpen failed 0x%x\n", status));
+            return status;
+        }
     }
 
-    // open in write-only mode
-    DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
-    WDF_IO_TARGET_OPEN_PARAMS openParams = {0};
-    WDF_IO_TARGET_OPEN_PARAMS_INIT_OPEN_BY_NAME(&openParams, &deviceContext->PdoName, FILE_WRITE_ACCESS);
-
-    // We will let the framework to respond automatically to the pnp
-    // state changes of the target by closing and opening the handle.
-    openParams.ShareAccess = FILE_SHARE_WRITE | FILE_SHARE_READ;
-
-    status = WdfIoTargetOpen(hidTarget, &openParams);
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: WdfIoTargetOpen failed 0x%x\n", status));
-        return status;
-    }
-
-    WDF_MEMORY_DESCRIPTOR      outputDescriptor = {};
     HID_COLLECTION_INFORMATION collectionInformation = {};
-    WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDescriptor, // out (mapped to collectionInformation)
-                                      (PVOID) &collectionInformation,
-                                      sizeof(HID_COLLECTION_INFORMATION));
+    {
+        // populate "collectionInformation"
+        WDF_MEMORY_DESCRIPTOR      outputDescriptor = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDescriptor, // out (mapped to collectionInformation)
+                                          (PVOID) &collectionInformation,
+                                          sizeof(HID_COLLECTION_INFORMATION));
 
-    // Now get the collection information for this device
-    status = WdfIoTargetSendIoctlSynchronously(hidTarget,
-                                  NULL,
-                                  IOCTL_HID_GET_COLLECTION_INFORMATION,
-                                  NULL,
-                                  &outputDescriptor,
-                                  NULL,
-                                  NULL);
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
+            NULL,
+            IOCTL_HID_GET_COLLECTION_INFORMATION,
+            NULL,
+            &outputDescriptor,
+            NULL,
+            NULL);
 
-    KdPrint(("TailLight: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInformation.ProductID, collectionInformation.VendorID, collectionInformation.VersionNumber, collectionInformation.DescriptorSize));
+        KdPrint(("TailLight: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInformation.ProductID, collectionInformation.VendorID, collectionInformation.VersionNumber, collectionInformation.DescriptorSize));
 
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously1 failed 0x%x\n", status));
-        return status;
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously1 failed 0x%x\n", status));
+            return status;
+        }
     }
 
     PHIDP_PREPARSED_DATA_Wrap preparsedData((PHIDP_PREPARSED_DATA)ExAllocatePool2(POOL_FLAG_NON_PAGED, collectionInformation.DescriptorSize, 'ffly'));
     if (!preparsedData) {
-        status = STATUS_INSUFFICIENT_RESOURCES;
-        return status;
+        return STATUS_INSUFFICIENT_RESOURCES;
     }
 
-    WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDescriptor, // out (mapped to preparsedData)
-                                      static_cast<PHIDP_PREPARSED_DATA>(preparsedData),
-                                      collectionInformation.DescriptorSize);
+    {
+        // populate "preparsedData"
+        WDF_MEMORY_DESCRIPTOR      outputDescriptor = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDescriptor, // out (mapped to preparsedData)
+            static_cast<PHIDP_PREPARSED_DATA>(preparsedData),
+            collectionInformation.DescriptorSize);
 
-    status = WdfIoTargetSendIoctlSynchronously(hidTarget,
-                                  NULL,
-                                  IOCTL_HID_GET_COLLECTION_DESCRIPTOR, // same as HidD_GetPreparsedData in user-mode
-                                  NULL,
-                                  &outputDescriptor,
-                                  NULL,
-                                  NULL);
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
+            NULL,
+            IOCTL_HID_GET_COLLECTION_DESCRIPTOR, // same as HidD_GetPreparsedData in user-mode
+            NULL,
+            &outputDescriptor,
+            NULL,
+            NULL);
 
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously2 failed 0x%x\n", status));
-        return status;
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously2 failed 0x%x\n", status));
+            return status;
+        }
     }
 
-    // Now get the capabilities.
-    HIDP_CAPS caps = {};
-    RtlZeroMemory(&caps, sizeof(HIDP_CAPS));
+    {
+        // get capabilities
+        HIDP_CAPS caps = {};
+        NTSTATUS status = HidP_GetCaps(preparsedData, &caps);
+        if (!NT_SUCCESS(status)) {
+            return status;
+        }
 
-    status = HidP_GetCaps(preparsedData, &caps);
-    if (!NT_SUCCESS(status)) {
-        return status;
+        //KdPrint(("TailLight: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage));
+
+        if (caps.FeatureReportByteLength != sizeof(TailLightReport)) {
+            KdPrint(("TailLight: FeatureReportByteLength mismatch (%u, %u).\n", caps.FeatureReportByteLength, sizeof(TailLightReport)));
+            return status;
+        }
     }
-
-    //KdPrint(("TailLight: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage));
-
-    if (caps.FeatureReportByteLength != sizeof(TailLightReport)) {
-        KdPrint(("TailLight: FeatureReportByteLength mismatch (%u, %u).\n", caps.FeatureReportByteLength, sizeof(TailLightReport)));
-        return status;
-    }
-
-    // Start with a zeroed report. If we are disabling the feature, this might
-    // be all we need to do.
-    status = STATUS_SUCCESS;
 
     // Create a report to send to the device.
     TailLightReport report(Color);
 
-    WDF_MEMORY_DESCRIPTOR inputDescriptor = {};
-    WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&inputDescriptor,
-                                      &report,
-                                      sizeof(report));
-    status = WdfIoTargetSendIoctlSynchronously(hidTarget,
-                                  NULL,
-                                  IOCTL_HID_SET_FEATURE,
-                                  &inputDescriptor,
-                                  NULL,
-                                  NULL,
-                                  NULL);
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously3 failed 0x%x\n", status)); 
-        return status;
+    {
+        // send TailLightReport to device
+        WDF_MEMORY_DESCRIPTOR inputDescriptor = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&inputDescriptor,
+            &report,
+            sizeof(report));
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
+            NULL,
+            IOCTL_HID_SET_FEATURE,
+            &inputDescriptor,
+            NULL,
+            NULL,
+            NULL);
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously3 failed 0x%x\n", status));
+            return status;
+        }
     }
 
-    return status;
+    return STATUS_SUCCESS;
 }
 
 
