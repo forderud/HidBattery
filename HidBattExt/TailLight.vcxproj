@@ -76,7 +76,7 @@
     </DriverSign>
     <PostBuildEvent>
       <Command>copy *.bat $(PackageDir)
-copy "C:\Program Files (x86)\Windows Kits\10\tools\$(WDKBuildFolder)\x64\devcon.exe" $(PackageDir)
+copy "C:\Program Files (x86)\Windows Kits\10\tools\$(WDKBuildFolder)\x64\dev*.exe" $(PackageDir)
 copy ..\IntelliMouse.ps1 $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -100,7 +100,7 @@ copy ..\IntelliMouse.ps1 $(OutDir)</Command>
     </DriverSign>
     <PostBuildEvent>
       <Command>copy *.bat $(PackageDir)
-copy "C:\Program Files (x86)\Windows Kits\10\tools\$(WDKBuildFolder)\x64\devcon.exe" $(PackageDir)
+copy "C:\Program Files (x86)\Windows Kits\10\tools\$(WDKBuildFolder)\x64\dev*.exe" $(PackageDir)
 copy ..\IntelliMouse.ps1 $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

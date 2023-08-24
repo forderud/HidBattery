@@ -6,6 +6,7 @@ cd /d "%~dp0"
 devcon /r install TailLight.inf "HID\VID_045E&PID_082A&MI_01&Col05"
 
 :: Use PnpUtil for installation (succeeds but driver isn't loaded)
+::devgen /add /bus ROOT
 ::PNPUTIL /add-driver TailLight.inf /install /reboot
 
 pause
