@@ -85,7 +85,6 @@ NTSTATUS SetFeatureColor (
         KdPrint(("TailLight: WdfIoTargetOpen failed 0x%x\n", status));
         return status;
     }
-    
 
     WDF_MEMORY_DESCRIPTOR      outputDescriptor = {};
     HID_COLLECTION_INFORMATION collectionInformation = {};
@@ -148,21 +147,12 @@ NTSTATUS SetFeatureColor (
         return status;
     }
 
-
     // Start with a zeroed report. If we are disabling the feature, this might
     // be all we need to do.
     status = STATUS_SUCCESS;
 
-    HIDP_VALUE_CAPS valueCaps = {};
-    USHORT ValueCapsLength = caps.NumberFeatureValueCaps;
-    status = HidP_GetValueCaps(HidP_Feature, &valueCaps, &ValueCapsLength, preparsedData);
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: HidP_GetValueCaps failed 0x%x\n", status));
-        return status;
-    }
-
     // Create a report to send to the device.
-    TailLightReport report(valueCaps.ReportID, Color);
+    TailLightReport report(Color);
 
     WDF_MEMORY_DESCRIPTOR inputDescriptor = {};
     WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&inputDescriptor,

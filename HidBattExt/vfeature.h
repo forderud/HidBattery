@@ -2,11 +2,7 @@
 
 /** Tail-light set feature report values as observed in USBPcap/Wireshark. */
 struct TailLightReport {
-    TailLightReport(IN UCHAR _ReportID, IN  ULONG Color) {
-        ReportId = _ReportID;
-        Unknown1 = 0xB2; // magic value
-        Unknown2 = 0x03; // magic value
-        // tail-light color
+    TailLightReport(ULONG Color) {
         Red = (Color) & 0xFF; // red;
         Green = (Color >> 8) & 0xFF; // green
         Blue = (Color >> 16) & 0xFF; // blue
@@ -41,11 +37,11 @@ struct TailLightReport {
     }
 
     //report ID of the collection to which the control request is sent
-    UCHAR    ReportId; // 36 (0x24)
+    UCHAR    ReportId = 36; // (0x24)
 
     // control codes (user-defined)
-    UCHAR   Unknown1; // 0xB2
-    UCHAR   Unknown2; // 0x03
+    UCHAR   Unknown1 = 0xB2; // magic value
+    UCHAR   Unknown2 = 0x03; // magic value
 
     UCHAR   Red;
     UCHAR   Green;
