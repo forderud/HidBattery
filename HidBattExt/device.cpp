@@ -40,32 +40,8 @@ Arguments:
         }
     }
 
-    {
-        // create queue to process IOCTLs
-        WDF_IO_QUEUE_CONFIG queueConfig = {};
-        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel); // don't synchronize
-        //queueConfig.EvtIoRead // pass-through read requests 
-        //queueConfig.EvtIoWrite // pass-through write requests
-        queueConfig.EvtIoDeviceControl = EvtIoDeviceControlFilter; // filter I/O device control requests
-
-        WDFQUEUE queue = 0; // auto-deleted when parent is deleted
-        NTSTATUS status = WdfIoQueueCreate(device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
-
-        if (!NT_SUCCESS(status)) {
-            KdPrint(("TailLight: WdfIoQueueCreate failed 0x%x\n", status));
-            return status;
-        }
-    }
-
     // Driver Framework always zero initializes an objects context memory
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(device);
-
-    // Initialize WMI provider
-    NTSTATUS status = WmiInitialize(device);
-    if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: Error initializing WMI 0x%x\n", status));
-        return status;
-    }
 
     {
         // initialize DEVICE_CONTEXT struct with PdoName
@@ -82,7 +58,7 @@ Arguments:
         attributes.ParentObject = device;
 
         WDFMEMORY memory = 0;
-        status = WdfDeviceAllocAndQueryProperty(device,
+        NTSTATUS status = WdfDeviceAllocAndQueryProperty(device,
             DevicePropertyPhysicalDeviceObjectName,
             NonPagedPoolNx,
             &attributes,
@@ -103,6 +79,30 @@ Arguments:
         deviceContext->PdoName.Length = (USHORT)bufferLength - sizeof(UNICODE_NULL);
 
         KdPrint(("TailLight: PdoName: %wZ\n", deviceContext->PdoName)); // outputs "\Device\00000083
+    }
+
+    {
+        // create queue to process IOCTLs
+        WDF_IO_QUEUE_CONFIG queueConfig = {};
+        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel); // don't synchronize
+        //queueConfig.EvtIoRead // pass-through read requests 
+        //queueConfig.EvtIoWrite // pass-through write requests
+        queueConfig.EvtIoDeviceControl = EvtIoDeviceControlFilter; // filter I/O device control requests
+
+        WDFQUEUE queue = 0; // auto-deleted when parent is deleted
+        NTSTATUS status = WdfIoQueueCreate(device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
+
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("TailLight: WdfIoQueueCreate failed 0x%x\n", status));
+            return status;
+        }
+    }
+
+    // Initialize WMI provider
+    NTSTATUS status = WmiInitialize(device);
+    if (!NT_SUCCESS(status)) {
+        KdPrint(("TailLight: Error initializing WMI 0x%x\n", status));
+        return status;
     }
 
     return status;
