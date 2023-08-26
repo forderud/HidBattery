@@ -226,10 +226,10 @@ Arguments:
     if (!packet->SafetyCheck()) {
         // log safety violation to Windows Event Viewer "System" log
         WCHAR color_requested[16] = {};
-        swprintf(color_requested, L"%u,%u,%u", r, g, b);
+        swprintf_s(color_requested, L"%u,%u,%u", r, g, b);
 
         WCHAR color_adjusted[16] = {};
-        swprintf(color_adjusted, L"%u,%u,%u", packet->Red, packet->Green, packet->Blue);
+        swprintf_s(color_adjusted, L"%u,%u,%u", packet->Red, packet->Green, packet->Blue);
 
 
         WriteToSystemLog(Device, TailLight_SAFETY, color_requested, color_adjusted);
