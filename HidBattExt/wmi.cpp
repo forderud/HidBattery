@@ -2,7 +2,7 @@
 
 
 // Register our GUID and Datablock generated from the TailLight.mof file.
-NTSTATUS WmiInitialize(WDFDEVICE Device)
+NTSTATUS WmiInitialize(_In_ WDFDEVICE Device)
 {
     DECLARE_CONST_UNICODE_STRING(mofRsrcName, MOFRESOURCENAME);
 
