@@ -142,7 +142,7 @@ Arguments:
     UNREFERENCED_PARAMETER(OutputBufferLength);
     UNREFERENCED_PARAMETER(InputBufferLength);
 
-    KdPrint(("TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%u)\n", IoControlCode, InputBufferLength));
+    KdPrint(("TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu)\n", IoControlCode, InputBufferLength));
 
     WDFDEVICE device = WdfIoQueueGetDevice(Queue);
 

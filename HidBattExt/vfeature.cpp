@@ -149,7 +149,7 @@ NTSTATUS SetFeatureColor (
         //KdPrint(("TailLight: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage));
 
         if (caps.FeatureReportByteLength != sizeof(TailLightReport)) {
-            KdPrint(("TailLight: FeatureReportByteLength mismatch (%u, %u).\n", caps.FeatureReportByteLength, sizeof(TailLightReport)));
+            KdPrint(("TailLight: FeatureReportByteLength mismatch (%u, %Iu).\n", caps.FeatureReportByteLength, sizeof(TailLightReport)));
             return status;
         }
     }
@@ -208,7 +208,7 @@ Arguments:
     TailLightReport* packet = nullptr;
     NTSTATUS status = WdfRequestRetrieveInputBuffer(Request, sizeof(TailLightReport), (void**)&packet, NULL);
     if (!NT_SUCCESS(status) || !packet) {
-        KdPrint(("TailLight: WdfRequestRetrieveInputBuffer failed 0x%x, packet=0x%x\n", status, packet));
+        KdPrint(("TailLight: WdfRequestRetrieveInputBuffer failed 0x%x, packet=0x%p\n", status, packet));
         return status;
     }
 
