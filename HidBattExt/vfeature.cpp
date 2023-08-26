@@ -50,8 +50,8 @@ private:
 
 
 NTSTATUS SetFeatureColor (
-    IN  WDFDEVICE Device,
-    IN  ULONG     Color
+    _In_ WDFDEVICE Device,
+    _In_ ULONG     Color
     )
 /*++
     This routine sets the HID feature by sending HID ioctls to our device.

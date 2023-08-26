@@ -3,8 +3,8 @@
 // Main driver entry, initialize the framework, register
 // driver event handlers
 NTSTATUS DriverEntry(
-    IN PDRIVER_OBJECT  DriverObject,
-    IN PUNICODE_STRING RegistryPath
+    _In_ PDRIVER_OBJECT  DriverObject,
+    _In_ PUNICODE_STRING RegistryPath
     )
 {
     KdPrint(("TailLight: DriverEntry - WDF version built on %s %s\n", __DATE__, __TIME__));

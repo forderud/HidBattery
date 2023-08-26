@@ -53,8 +53,8 @@ static_assert(sizeof(TailLightReport) == 73);
 
 
 NTSTATUS SetFeatureColor (
-    IN  WDFDEVICE Device,
-    IN  ULONG     Color
+    _In_  WDFDEVICE Device,
+    _In_  ULONG     Color
     );
 
 NTSTATUS SetFeatureFilter(
