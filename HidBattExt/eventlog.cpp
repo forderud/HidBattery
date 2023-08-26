@@ -7,13 +7,13 @@ constexpr USHORT IO_ERROR_LOG_PACKET_size() {
 
 
 void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1, WCHAR* InsertionStr2) {
-    // determine length of insertion strings
+    // determine length of each insertion string
     UCHAR InsertionStr1Len = 0;
     if (InsertionStr1)
-        InsertionStr1Len = sizeof(WCHAR)*((UCHAR)wcslen(InsertionStr1)+1); // in bytes
+        InsertionStr1Len = sizeof(WCHAR)*(UCHAR)(wcslen(InsertionStr1)+1); // in bytes (incl. null-termination)
     UCHAR InsertionStr2Len = 0;
     if (InsertionStr2)
-        InsertionStr2Len = sizeof(WCHAR) * ((UCHAR)wcslen(InsertionStr2) + 1); // in bytes
+        InsertionStr2Len = sizeof(WCHAR)*(UCHAR)(wcslen(InsertionStr2)+1); // in bytes (incl. null-termination)
 
 
     USHORT total_size = IO_ERROR_LOG_PACKET_size() + InsertionStr1Len + InsertionStr2Len;
