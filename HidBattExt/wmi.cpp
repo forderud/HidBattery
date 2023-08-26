@@ -43,10 +43,10 @@ NTSTATUS WmiInitialize(WDFDEVICE Device)
 }
 
 NTSTATUS EvtWmiInstanceQueryInstance(
-    IN  WDFWMIINSTANCE WmiInstance,
-    IN  ULONG OutBufferSize,
-    IN  PVOID OutBuffer,
-    OUT PULONG BufferUsed
+    _In_  WDFWMIINSTANCE WmiInstance,
+    _In_  ULONG OutBufferSize,
+    _Out_writes_bytes_to_(OutBufferSize, *BufferUsed)  PVOID OutBuffer,
+    _Out_ PULONG BufferUsed
     )
 {
     PAGED_CODE();
@@ -68,9 +68,9 @@ NTSTATUS EvtWmiInstanceQueryInstance(
 }
 
 NTSTATUS EvtWmiInstanceSetInstance(
-    IN  WDFWMIINSTANCE WmiInstance,
-    IN  ULONG InBufferSize,
-    IN  PVOID InBuffer
+    _In_  WDFWMIINSTANCE WmiInstance,
+    _In_  ULONG InBufferSize,
+    _In_reads_bytes_(InBufferSize)  PVOID InBuffer
     )
 {
     PAGED_CODE();
@@ -98,10 +98,10 @@ NTSTATUS EvtWmiInstanceSetInstance(
 }
 
 NTSTATUS EvtWmiInstanceSetItem(
-    IN  WDFWMIINSTANCE WmiInstance,
-    IN  ULONG DataItemId,
-    IN  ULONG InBufferSize,
-    IN  PVOID InBuffer
+    _In_  WDFWMIINSTANCE WmiInstance,
+    _In_  ULONG DataItemId,
+    _In_  ULONG InBufferSize,
+    _In_reads_bytes_(InBufferSize)  PVOID InBuffer
     )
 {
     PAGED_CODE();
