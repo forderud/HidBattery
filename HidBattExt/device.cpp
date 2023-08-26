@@ -5,8 +5,8 @@ EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
 
 
 NTSTATUS EvtDeviceAdd(
-    WDFDRIVER Driver,
-    PWDFDEVICE_INIT DeviceInit
+    _In_    WDFDRIVER Driver,
+    _Inout_ PWDFDEVICE_INIT DeviceInit
     )
 /*++
 Routine Description:
