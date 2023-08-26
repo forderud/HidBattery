@@ -1,7 +1,13 @@
 #include "driver.h"
 #include <Hidport.h>
 
+extern "C"
 EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
+
+#ifdef ALLOC_PRAGMA
+#pragma alloc_text(PAGE, EvtDeviceAdd)
+#pragma alloc_text(PAGE, EvtIoDeviceControlFilter)
+#endif
 
 
 NTSTATUS EvtDeviceAdd(

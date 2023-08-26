@@ -1,5 +1,12 @@
 #include "driver.h"
 
+#ifdef ALLOC_PRAGMA
+#pragma alloc_text(PAGE, WmiInitialize)
+#pragma alloc_text(PAGE, EvtWmiInstanceQueryInstance)
+#pragma alloc_text(PAGE, EvtWmiInstanceSetInstance)
+#pragma alloc_text(PAGE, EvtWmiInstanceSetItem)
+#endif
+
 
 // Register our GUID and Datablock generated from the TailLight.mof file.
 NTSTATUS WmiInitialize(_In_ WDFDEVICE Device)

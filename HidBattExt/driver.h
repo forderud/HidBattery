@@ -18,4 +18,5 @@
 extern "C"
 DRIVER_INITIALIZE DriverEntry;
 
+extern "C"
 EVT_WDF_DRIVER_DEVICE_ADD EvtDeviceAdd;

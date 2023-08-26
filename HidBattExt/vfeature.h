@@ -52,6 +52,7 @@ struct TailLightReport {
 static_assert(sizeof(TailLightReport) == 73);
 
 
+extern "C"
 NTSTATUS SetFeatureColor (
     _In_  WDFDEVICE Device,
     _In_  ULONG     Color
