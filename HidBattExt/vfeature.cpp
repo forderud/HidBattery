@@ -89,16 +89,14 @@ NTSTATUS SetFeatureColor (
     HID_COLLECTION_INFORMATION collectionInformation = {};
     {
         // populate "collectionInformation"
-        WDF_MEMORY_DESCRIPTOR      outputDescriptor = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDescriptor, // out (mapped to collectionInformation)
-                                          (PVOID) &collectionInformation,
-                                          sizeof(HID_COLLECTION_INFORMATION));
+        WDF_MEMORY_DESCRIPTOR collectionInformationDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&collectionInformationDesc, &collectionInformation, sizeof(HID_COLLECTION_INFORMATION));
 
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
             NULL,
             IOCTL_HID_GET_COLLECTION_INFORMATION,
             NULL,
-            &outputDescriptor,
+            &collectionInformationDesc,
             NULL,
             NULL);
 
@@ -117,16 +115,14 @@ NTSTATUS SetFeatureColor (
 
     {
         // populate "preparsedData"
-        WDF_MEMORY_DESCRIPTOR      outputDescriptor = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDescriptor, // out (mapped to preparsedData)
-            static_cast<PHIDP_PREPARSED_DATA>(preparsedData),
-            collectionInformation.DescriptorSize);
+        WDF_MEMORY_DESCRIPTOR preparsedDataDescriptor = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&preparsedDataDescriptor, static_cast<PHIDP_PREPARSED_DATA>(preparsedData), collectionInformation.DescriptorSize);
 
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
             NULL,
             IOCTL_HID_GET_COLLECTION_DESCRIPTOR, // same as HidD_GetPreparsedData in user-mode
             NULL,
-            &outputDescriptor,
+            &preparsedDataDescriptor,
             NULL,
             NULL);
 
@@ -157,14 +153,12 @@ NTSTATUS SetFeatureColor (
 
     {
         // send TailLightReport to device
-        WDF_MEMORY_DESCRIPTOR inputDescriptor = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&inputDescriptor,
-            &report,
-            sizeof(report));
+        WDF_MEMORY_DESCRIPTOR reportDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&reportDesc, &report, sizeof(report));
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
             NULL,
             IOCTL_HID_SET_FEATURE,
-            &inputDescriptor,
+            &reportDesc,
             NULL,
             NULL,
             NULL);
