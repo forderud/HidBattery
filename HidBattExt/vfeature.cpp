@@ -86,21 +86,21 @@ NTSTATUS SetFeatureColor (
         }
     }
 
-    HID_COLLECTION_INFORMATION collectionInformation = {};
+    HID_COLLECTION_INFORMATION collectionInfo = {};
     {
         // populate "collectionInformation"
-        WDF_MEMORY_DESCRIPTOR collectionInformationDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&collectionInformationDesc, &collectionInformation, sizeof(HID_COLLECTION_INFORMATION));
+        WDF_MEMORY_DESCRIPTOR collectionInfoDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&collectionInfoDesc, &collectionInfo, sizeof(HID_COLLECTION_INFORMATION));
 
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
             NULL,
             IOCTL_HID_GET_COLLECTION_INFORMATION,
             NULL,
-            &collectionInformationDesc,
+            &collectionInfoDesc,
             NULL,
             NULL);
 
-        KdPrint(("TailLight: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInformation.ProductID, collectionInformation.VendorID, collectionInformation.VersionNumber, collectionInformation.DescriptorSize));
+        KdPrint(("TailLight: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInfo.ProductID, collectionInfo.VendorID, collectionInfo.VersionNumber, collectionInfo.DescriptorSize));
 
         if (!NT_SUCCESS(status)) {
             KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously1 failed 0x%x\n", status));
@@ -108,7 +108,7 @@ NTSTATUS SetFeatureColor (
         }
     }
 
-    PHIDP_PREPARSED_DATA_Wrap preparsedData((PHIDP_PREPARSED_DATA)ExAllocatePool2(POOL_FLAG_NON_PAGED, collectionInformation.DescriptorSize, 'ffly'));
+    PHIDP_PREPARSED_DATA_Wrap preparsedData((PHIDP_PREPARSED_DATA)ExAllocatePool2(POOL_FLAG_NON_PAGED, collectionInfo.DescriptorSize, 'ffly'));
     if (!preparsedData) {
         return STATUS_INSUFFICIENT_RESOURCES;
     }
@@ -116,7 +116,7 @@ NTSTATUS SetFeatureColor (
     {
         // populate "preparsedData"
         WDF_MEMORY_DESCRIPTOR preparsedDataDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&preparsedDataDesc, static_cast<PHIDP_PREPARSED_DATA>(preparsedData), collectionInformation.DescriptorSize);
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&preparsedDataDesc, static_cast<PHIDP_PREPARSED_DATA>(preparsedData), collectionInfo.DescriptorSize);
 
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
             NULL,
