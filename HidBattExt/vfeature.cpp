@@ -115,14 +115,14 @@ NTSTATUS SetFeatureColor (
 
     {
         // populate "preparsedData"
-        WDF_MEMORY_DESCRIPTOR preparsedDataDescriptor = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&preparsedDataDescriptor, static_cast<PHIDP_PREPARSED_DATA>(preparsedData), collectionInformation.DescriptorSize);
+        WDF_MEMORY_DESCRIPTOR preparsedDataDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&preparsedDataDesc, static_cast<PHIDP_PREPARSED_DATA>(preparsedData), collectionInformation.DescriptorSize);
 
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
             NULL,
             IOCTL_HID_GET_COLLECTION_DESCRIPTOR, // same as HidD_GetPreparsedData in user-mode
             NULL,
-            &preparsedDataDescriptor,
+            &preparsedDataDesc,
             NULL,
             NULL);
 
