@@ -1,13 +1,7 @@
 #include "driver.h"
 #include <Hidport.h>
 
-extern "C"
 EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
-
-#ifdef ALLOC_PRAGMA
-#pragma alloc_text(PAGE, EvtDeviceAdd)
-#pragma alloc_text(PAGE, EvtIoDeviceControlFilter)
-#endif
 
 
 NTSTATUS EvtDeviceAdd(
@@ -27,8 +21,6 @@ Arguments:
 --*/    
 {
     UNREFERENCED_PARAMETER(Driver);
-
-    PAGED_CODE();
 
     // Configure the device as a filter driver
     WdfFdoInitSetFilter(DeviceInit);
@@ -143,8 +135,6 @@ Arguments:
     IoControlCode - The driver or system defined IOCTL associated with the request
 --*/
 {
-    PAGED_CODE();
-
     UNREFERENCED_PARAMETER(OutputBufferLength);
     UNREFERENCED_PARAMETER(InputBufferLength);
 

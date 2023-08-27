@@ -3,9 +3,6 @@
 #include <hidclass.h>
 #include "eventlog.h"
 
-#ifdef ALLOC_PRAGMA
-#pragma alloc_text(PAGE, SetFeatureColor)
-#endif
 
 
 /** RAII wrapper of PHIDP_PREPARSED_DATA. */
@@ -62,8 +59,6 @@ NTSTATUS SetFeatureColor (
     and send to the device.
 --*/
 {
-    PAGED_CODE();
-
     KdPrint(("TailLight: SetFeatureColor\n"));
 
     WDFIOTARGET_Wrap hidTarget;

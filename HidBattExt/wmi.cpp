@@ -1,19 +1,10 @@
 #include "driver.h"
 
-#ifdef ALLOC_PRAGMA
-#pragma alloc_text(PAGE, WmiInitialize)
-#pragma alloc_text(PAGE, EvtWmiInstanceQueryInstance)
-#pragma alloc_text(PAGE, EvtWmiInstanceSetInstance)
-#pragma alloc_text(PAGE, EvtWmiInstanceSetItem)
-#endif
-
 
 // Register our GUID and Datablock generated from the TailLight.mof file.
 NTSTATUS WmiInitialize(_In_ WDFDEVICE Device)
 {
     DECLARE_CONST_UNICODE_STRING(mofRsrcName, MOFRESOURCENAME);
-
-    PAGED_CODE();
 
     NTSTATUS status = WdfDeviceAssignMofResourceName(Device, &mofRsrcName);
     if (!NT_SUCCESS(status)) {
@@ -56,8 +47,6 @@ NTSTATUS EvtWmiInstanceQueryInstance(
     _Out_ PULONG BufferUsed
     )
 {
-    PAGED_CODE();
-
     UNREFERENCED_PARAMETER(OutBufferSize);
 
     KdPrint(("TailLight: WMI QueryInstance\n"));
@@ -80,8 +69,6 @@ NTSTATUS EvtWmiInstanceSetInstance(
     _In_reads_bytes_(InBufferSize)  PVOID InBuffer
     )
 {
-    PAGED_CODE();
-
     UNREFERENCED_PARAMETER(InBufferSize);
 
     KdPrint(("TailLight: WMI SetInstance\n"));
@@ -111,8 +98,6 @@ NTSTATUS EvtWmiInstanceSetItem(
     _In_reads_bytes_(InBufferSize)  PVOID InBuffer
     )
 {
-    PAGED_CODE();
-
     KdPrint(("TailLight: WMI SetItem\n"));
 
     if (DataItemId != 1)
