@@ -14,6 +14,10 @@
 #include "wmi.h"
 #include "vfeature.h"
 
+
+/** Memory allocation tag name (for debugging leaks). */
+static constexpr ULONG TAG_NAME = 'ffly';
+
 // WDFDRIVER Object Events
 extern "C"
 DRIVER_INITIALIZE DriverEntry;

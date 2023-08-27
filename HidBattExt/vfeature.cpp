@@ -108,7 +108,7 @@ NTSTATUS SetFeatureColor (
         }
     }
 
-    PHIDP_PREPARSED_DATA_Wrap preparsedData((PHIDP_PREPARSED_DATA)ExAllocatePool2(POOL_FLAG_NON_PAGED, collectionInfo.DescriptorSize, 'ffly'));
+    PHIDP_PREPARSED_DATA_Wrap preparsedData((PHIDP_PREPARSED_DATA)ExAllocatePool2(POOL_FLAG_NON_PAGED, collectionInfo.DescriptorSize, TAG_NAME));
     if (!preparsedData) {
         return STATUS_INSUFFICIENT_RESOURCES;
     }
