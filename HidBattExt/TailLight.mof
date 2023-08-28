@@ -1,20 +1,16 @@
 #PRAGMA AUTORECOVER
 
-[Dynamic, Provider("WMIProv"),
- WMI,
+[Dynamic, Provider("WMIProv"), WMI,
  Description("TailLight driver information"),
  guid("{1F351B73-03F0-4F7E-87FF-D783FFBBBAB3}"),
  locale("MS\\0x409")]
-class TailLightDeviceInformation
-{
+class TailLightDeviceInformation {
     [key, read]
     string InstanceName;
 
     [read]
     boolean Active;
 
-    [WmiDataId(1),
-     read, write,
-     Description("Tail-light in RGB COLORREF format.")]
+    [WmiDataId(1), read, write, Description("Tail-light in RGB COLORREF format.")]
     uint32 TailLight;
 };
