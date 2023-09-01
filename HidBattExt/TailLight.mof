@@ -2,8 +2,7 @@
 
 [Dynamic, Provider("WMIProv"), WMI,
  Description("TailLight driver information"),
- guid("{1F351B73-03F0-4F7E-87FF-D783FFBBBAB3}"),
- locale("MS\\0x409")]
+ guid("{07982702-2086-4B83-9444-34989BB10554}")]
 class TailLightDeviceInformation {
     [key, read]
     string InstanceName;
