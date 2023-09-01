@@ -1,7 +1,7 @@
 #include "driver.h"
 
-// Main driver entry, initialize the framework, register
-// driver event handlers
+/** Driver entry point.
+    Initialize the framework and register driver event handlers. */
 NTSTATUS DriverEntry(
     _In_ PDRIVER_OBJECT  DriverObject,
     _In_ PUNICODE_STRING RegistryPath
@@ -11,6 +11,7 @@ NTSTATUS DriverEntry(
 
     WDF_DRIVER_CONFIG params = {};
     WDF_DRIVER_CONFIG_INIT(/*out*/&params, EvtDeviceAdd);
+    params.EvtDriverUnload = EvtDriverUnload;
 
     // Create the framework WDFDRIVER object, with the handle to it returned in Driver.
     NTSTATUS status = WdfDriverCreate(DriverObject, 
@@ -24,4 +25,15 @@ NTSTATUS DriverEntry(
     }
 
     return status;
+}
+
+
+/** Driver unload callback.
+    Used to perform operations that must take place before the driver is unloaded.  */
+VOID EvtDriverUnload(
+    _In_ WDFDRIVER Driver
+    )
+{
+    UNREFERENCED_PARAMETER(Driver);
+    KdPrint(("TailLight: DriverUnload.\n"));
 }
