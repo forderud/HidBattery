@@ -149,7 +149,8 @@ NTSTATUS SetFeatureColor (
     }
 
     // Create a report to send to the device.
-    TailLightReport report(Color);
+    TailLightReport report;
+    report.SetColor(Color);
 
     {
         // send TailLightReport to device
