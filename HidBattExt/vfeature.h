@@ -1,6 +1,6 @@
 #pragma once
 
-/** Tail-light set feature report values as observed in USBPcap/Wireshark. */
+/** Tail-light feature report as observed in USBPcap/Wireshark. */
 struct TailLightReport {
     TailLightReport(ULONG Color) {
         Red = (Color) & 0xFF; // red;
