@@ -11,4 +11,7 @@ devcon /r remove "HID\VID_045E&PID_082A&MI_01&Col05"
 PNPUTIL /delete-driver TailLight.inf /uninstall /force /reboot
 ::PNPUTIL /remove-device "HID\VID_045E&PID_082A&MI_01&Col05"
 
+:: Delete TailLightDeviceInformation WMI class security descriptor
+reg delete "HKLM\SYSTEM\CurrentControlSet\Control\WMI\Security" /v "07982702-2086-4B83-9444-34989BB10554" /f
+
 pause
