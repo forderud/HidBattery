@@ -1,6 +1,11 @@
 #PRAGMA AUTORECOVER
 
+// Documentation resources:
+// https://learn.microsoft.com/en-us/windows/win32/wmisdk/mof-data-types
 // https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/wmi-class-qualifiers
+// https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/wmi-property-qualifiers
+
+
 [Dynamic, Provider("WMIProv"), WMI,
  Description("TailLight driver information"),
  guid("{07982702-2086-4B83-9444-34989BB10554}")]
