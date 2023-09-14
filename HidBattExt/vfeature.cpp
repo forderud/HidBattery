@@ -2,28 +2,28 @@
 #include <hidpddi.h>
 #include <hidclass.h>
 #include "eventlog.h"
-
+#include "CppAllocator.hpp"
 
 
 /** RAII wrapper of PHIDP_PREPARSED_DATA. */
 class PHIDP_PREPARSED_DATA_Wrap {
 public:
-    PHIDP_PREPARSED_DATA_Wrap(PHIDP_PREPARSED_DATA ptr) {
-        m_ptr = ptr;
+    PHIDP_PREPARSED_DATA_Wrap(size_t size) {
+        m_ptr = new BYTE[size];
     }
     ~PHIDP_PREPARSED_DATA_Wrap() {
         if (m_ptr) {
-            ExFreePool(m_ptr);
+            delete[] m_ptr;
             m_ptr = nullptr;
         }
     }
 
     operator PHIDP_PREPARSED_DATA () const {
-        return m_ptr;
+        return (PHIDP_PREPARSED_DATA)m_ptr;
     }
 
 private:
-    PHIDP_PREPARSED_DATA m_ptr = nullptr;
+    BYTE* m_ptr = nullptr;
 };
 
 /** RAII wrapper of WDFIOTARGET. */
@@ -108,7 +108,7 @@ NTSTATUS SetFeatureColor (
         }
     }
 
-    PHIDP_PREPARSED_DATA_Wrap preparsedData((PHIDP_PREPARSED_DATA)ExAllocatePool2(POOL_FLAG_NON_PAGED, collectionInfo.DescriptorSize, TAG_NAME));
+    PHIDP_PREPARSED_DATA_Wrap preparsedData(collectionInfo.DescriptorSize);
     if (!preparsedData) {
         return STATUS_INSUFFICIENT_RESOURCES;
     }
