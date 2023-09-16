@@ -14,7 +14,7 @@
 #define VER_FILETYPE              VFT_DRV
 #define VER_FILESUBTYPE           VFT2_DRV_SYSTEM
 #define VER_COMPANYNAME_STR       "" // doesn't show up in file properties
-#define VER_FILEDESCRIPTION_STR   "Filter Driver for the TailLight Device (Framework Version)"
+#define VER_FILEDESCRIPTION_STR   "IntelliMouse TailLight filter driver"
 #define VER_INTERNALNAME_STR      "" // doesn't show up in file properties
 #define VER_LEGALCOPYRIGHT_STR   L"\251 IntelliMouse sample project"
 #define VER_ORIGINALFILENAME_STR  "TailLight.sys"
