@@ -192,6 +192,7 @@ Arguments:
 --*/
 {
     KdPrint(("TailLight: SetFeatureFilter\n"));
+    DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     if (InputBufferLength != sizeof(TailLightReport)) {
         KdPrint(("TailLight: SetFeatureFilter: Incorrect InputBufferLength\n"));
@@ -220,14 +221,15 @@ Arguments:
         // log safety violation to Windows Event Viewer "System" log
         WCHAR color_requested[16] = {};
         swprintf_s(color_requested, L"%u,%u,%u", r, g, b);
-
         WCHAR color_adjusted[16] = {};
         swprintf_s(color_adjusted, L"%u,%u,%u", packet->Red, packet->Green, packet->Blue);
 
-
         WriteToSystemLog(Device, TailLight_SAFETY, color_requested, color_adjusted);
-        return STATUS_CONTENT_BLOCKED;
+        status =  STATUS_CONTENT_BLOCKED;
     }
+
+    // update last written color
+    deviceContext->TailLight = packet->GetColor();
 
     return status;
 }

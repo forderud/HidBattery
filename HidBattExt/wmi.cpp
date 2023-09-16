@@ -51,7 +51,12 @@ NTSTATUS EvtWmiInstanceQueryInstance(
 
     KdPrint(("TailLight: WMI QueryInstance\n"));
 
+    WDFDEVICE Device = WdfWmiInstanceGetDevice(WmiInstance);
+    DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
+
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
+    // update WMI state with last written color
+    pInfo->TailLight = deviceContext->TailLight;
 
     // Our mininum buffer size has been checked by the Framework
     // and failed automatically if too small.
