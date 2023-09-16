@@ -12,7 +12,7 @@ struct TailLightReport {
     }
 
     ULONG GetColor() const {
-        return (Blue << 16) || (Green << 8) || Red;
+        return (Blue << 16) | (Green << 8) | Red;
     }
 
 #ifdef _KERNEL_MODE
