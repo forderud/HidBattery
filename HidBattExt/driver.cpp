@@ -10,7 +10,7 @@ NTSTATUS DriverEntry(
     KdPrint(("TailLight: DriverEntry - WDF version built on %s %s\n", __DATE__, __TIME__));
 
     WDF_DRIVER_CONFIG params = {};
-    WDF_DRIVER_CONFIG_INIT(/*out*/&params, EvtDeviceAdd);
+    WDF_DRIVER_CONFIG_INIT(/*out*/&params, EvtDriverDeviceAdd);
     params.EvtDriverUnload = EvtDriverUnload;
 
     // Create the framework WDFDRIVER object, with the handle to it returned in Driver.

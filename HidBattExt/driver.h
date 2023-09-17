@@ -21,4 +21,4 @@ DRIVER_INITIALIZE         DriverEntry;
 
 EVT_WDF_DRIVER_UNLOAD     EvtDriverUnload;
 
-EVT_WDF_DRIVER_DEVICE_ADD EvtDeviceAdd;
+EVT_WDF_DRIVER_DEVICE_ADD EvtDriverDeviceAdd;

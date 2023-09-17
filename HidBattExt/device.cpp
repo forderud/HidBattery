@@ -4,13 +4,10 @@
 EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
 
 
-NTSTATUS EvtDeviceAdd(
-    _In_    WDFDRIVER Driver,
-    _Inout_ PWDFDEVICE_INIT DeviceInit
-    )
+NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT DeviceInit)
 /*++
 Routine Description:
-    EvtDeviceAdd is called by the framework in response to AddDevice
+    EvtDriverDeviceAdd is called by the framework in response to AddDevice
     call from the PnP manager. We create and initialize a device object to
     represent to be part of the device stack as a filter.
 
