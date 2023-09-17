@@ -144,7 +144,7 @@ Arguments:
 
     NTSTATUS status = STATUS_SUCCESS; //unhandled
     switch (IoControlCode) {
-      case IOCTL_HID_SET_FEATURE:
+      case IOCTL_HID_SET_FEATURE: // 0xb0191
         status = SetFeatureFilter(device, Request, InputBufferLength);
         break;
     }
