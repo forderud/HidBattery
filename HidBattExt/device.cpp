@@ -47,10 +47,7 @@ Arguments:
         // sets the filobject in the stack location.
         WDF_OBJECT_ATTRIBUTES attributes = {};
         WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-
-        // By parenting it to device, we don't have to worry about
-        // deleting explicitly. It will be deleted along witht the device.
-        attributes.ParentObject = device;
+        attributes.ParentObject = device; // auto-delete with device
 
         WDFMEMORY memory = 0;
         NTSTATUS status = WdfDeviceAllocAndQueryProperty(device,
