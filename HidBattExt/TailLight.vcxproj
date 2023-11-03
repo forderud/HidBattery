@@ -45,7 +45,6 @@
     <MofComp Include="TailLight.mof">
       <CreateBinaryMofFile>".\$(IntDir)\TailLight.bmf"</CreateBinaryMofFile>
     </MofComp>
-    <Wmimofck Include=".\$(IntDir)\TailLight.bmf" />
     <Wmimofck Include=".\$(IntDir)\TailLight.bmf">
       <HeaderOutputFile>.\$(IntDir)\TailLightmof.h</HeaderOutputFile>
     </Wmimofck>
