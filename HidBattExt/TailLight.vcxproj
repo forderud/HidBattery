@@ -43,10 +43,10 @@
   </ImportGroup>
   <ItemGroup Label="WrappedTaskItems">
     <MofComp Include="TailLight.mof">
-      <CreateBinaryMofFile>".\$(IntDir)\TailLight.bmf"</CreateBinaryMofFile>
+      <CreateBinaryMofFile>"$(IntDir)\TailLight.bmf"</CreateBinaryMofFile>
     </MofComp>
-    <Wmimofck Include=".\$(IntDir)\TailLight.bmf">
-      <HeaderOutputFile>.\$(IntDir)\TailLightmof.h</HeaderOutputFile>
+    <Wmimofck Include="$(IntDir)\TailLight.bmf">
+      <HeaderOutputFile>$(IntDir)\TailLightmof.h</HeaderOutputFile>
     </Wmimofck>
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
