@@ -41,7 +41,7 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
-  <ItemGroup Label="WrappedTaskItems">
+  <ItemGroup>
     <MofComp Include="TailLight.mof">
       <CreateBinaryMofFile>"$(IntDir)\TailLight.bmf"</CreateBinaryMofFile>
     </MofComp>
