@@ -112,7 +112,7 @@ VOID EvtIoDeviceControlFilter(
 Routine Description:
     This event callback function is called when the driver receives an
 
-    (KMDF) IOCTL_HID_Xxx code when handlng IRP_MJ_INTERNAL_DEVICE_CONTROL
+    (KMDF) IOCTL_HID_Xxx code when handling IRP_MJ_INTERNAL_DEVICE_CONTROL
     (UMDF) IOCTL_HID_Xxx, IOCTL_UMDF_HID_Xxx when handling IRP_MJ_DEVICE_CONTROL
 
 Arguments:
@@ -151,7 +151,7 @@ Arguments:
     BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(device), &options);
     if (ret == FALSE) {
         status = WdfRequestGetStatus(Request);
-        KdPrint(("TailLight: WdfRequestSend failed: 0x%x\n", status));
+        KdPrint(("TailLight: WdfRequestSend failed with status: 0x%x\n", status));
         WdfRequestComplete(Request, status);
     }
 }
