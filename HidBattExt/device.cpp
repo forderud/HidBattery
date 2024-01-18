@@ -4,6 +4,22 @@
 EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
 
 
+VOID EvtSetBlackTimer(_In_ WDFTIMER  Timer) {
+    KdPrint(("TailLight: EvtSetBlackTimer begin\n"));
+
+    WDFDEVICE device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
+    NT_ASSERTMSG("EvtSetBlackTimer device NULL\n", device);
+
+    NTSTATUS status = SetFeatureColor(device, 0);
+    if (!NT_SUCCESS(status)) {
+        KdPrint(("TailLight: EvtSetBlackTimer failure NTSTATUS=0x%x\n", status));
+        return;
+    }
+
+    KdPrint(("TailLight: EvtSetBlackTimer end\n"));
+}
+
+
 NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT DeviceInit)
 /*++
 Routine Description:
@@ -95,6 +111,30 @@ Arguments:
     if (!NT_SUCCESS(status)) {
         KdPrint(("TailLight: Error initializing WMI 0x%x\n", status));
         return status;
+    }
+
+    {
+        // Initialize tail-light to black to have control over HW state
+        WDF_TIMER_CONFIG timerCfg = {};
+        WDF_TIMER_CONFIG_INIT(&timerCfg, EvtSetBlackTimer);
+
+        WDF_OBJECT_ATTRIBUTES attribs = {};
+        WDF_OBJECT_ATTRIBUTES_INIT(&attribs);
+        attribs.ParentObject = device;
+        attribs.ExecutionLevel = WdfExecutionLevelPassive; // required to access HID functions
+
+        WDFTIMER timer = nullptr;
+        status = WdfTimerCreate(&timerCfg, &attribs, &timer);
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("WdfTimerCreate failed 0x%x\n", status));
+            return status;
+        }
+
+        status = WdfTimerStart(timer, WDF_REL_TIMEOUT_IN_MS(100)); // wait 100ms
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("WdfTimerStart failed 0x%x\n", status));
+            return status;
+        }
     }
 
     return status;
