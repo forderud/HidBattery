@@ -55,7 +55,7 @@ NTSTATUS EvtWmiInstanceQueryInstance(
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
-    // update WMI state with last written color
+    // update WMI state from device context
     pInfo->TailLight = deviceContext->TailLight;
 
     // Our mininum buffer size has been checked by the Framework
@@ -74,23 +74,16 @@ NTSTATUS EvtWmiInstanceSetInstance(
     _In_reads_bytes_(InBufferSize)  PVOID InBuffer
     )
 {
-    UNREFERENCED_PARAMETER(InBufferSize);
+    UNREFERENCED_PARAMETER(InBufferSize); // mininum buffer size already checked by WDF
 
     KdPrint(("TailLight: WMI SetInstance\n"));
 
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
+    RtlCopyMemory(/*dst*/pInfo, /*src*/InBuffer, sizeof(*pInfo));
 
-    // Our mininum buffer size has been checked by the Framework
-    // and failed automatically if too small.
-    ULONG length = sizeof(*pInfo);
-
-    RtlMoveMemory(/*dst*/pInfo, /*src*/InBuffer, length);
-
-    // Tell the HID device about the new tail-light state
-    NTSTATUS status = SetFeatureColor(
-        WdfWmiInstanceGetDevice(WmiInstance),
-        pInfo->TailLight
-        );
+    // Don't update deviceContext->TailLight directly here.
+    // Instead, call SetFeatureColor that will internally update deviceContext->TailLight after filtering.
+    NTSTATUS status = SetFeatureColor(WdfWmiInstanceGetDevice(WmiInstance), pInfo->TailLight);
 
     KdPrint(("TailLight: WMI SetInstance completed\n"));
     return status;
@@ -114,7 +107,8 @@ NTSTATUS EvtWmiInstanceSetItem(
 
         pInfo->TailLight = *(ULONG*)InBuffer;
 
-        // Tell the HID device about the new tail-light state
+        // Don't update deviceContext->TailLight directly here.
+        // Instead, call SetFeatureColor that will internally update deviceContext->TailLight after filtering.
         status = SetFeatureColor(WdfWmiInstanceGetDevice(WmiInstance), pInfo->TailLight);
     } else {
         return STATUS_INVALID_DEVICE_REQUEST;
