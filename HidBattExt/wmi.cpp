@@ -46,7 +46,7 @@ NTSTATUS EvtWmiInstanceQueryInstance(
     _Out_ PULONG BufferUsed
     )
 {
-    UNREFERENCED_PARAMETER(OutBufferSize); // // mininum buffer size already checked by WDF
+    UNREFERENCED_PARAMETER(OutBufferSize); // mininum buffer size already checked by WDF
 
     KdPrint(("TailLight: WMI QueryInstance\n"));
 
@@ -71,8 +71,7 @@ NTSTATUS EvtWmiInstanceSetInstance(
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
     RtlCopyMemory(/*dst*/pInfo, /*src*/InBuffer, sizeof(*pInfo));
 
-    // Don't update deviceContext->TailLight directly here.
-    // Instead, call SetFeatureColor that will internally update deviceContext->TailLight after filtering.
+    // call SetFeatureColor to trigger tail-light update
     NTSTATUS status = SetFeatureColor(WdfWmiInstanceGetDevice(WmiInstance), pInfo->TailLight);
 
     KdPrint(("TailLight: WMI SetInstance completed\n"));
@@ -97,8 +96,7 @@ NTSTATUS EvtWmiInstanceSetItem(
 
         pInfo->TailLight = *(ULONG*)InBuffer;
 
-        // Don't update deviceContext->TailLight directly here.
-        // Instead, call SetFeatureColor that will internally update deviceContext->TailLight after filtering.
+        // call SetFeatureColor to trigger tail-light update
         status = SetFeatureColor(WdfWmiInstanceGetDevice(WmiInstance), pInfo->TailLight);
     } else {
         return STATUS_INVALID_DEVICE_REQUEST;
