@@ -26,16 +26,15 @@ NTSTATUS WmiInitialize(_In_ WDFDEVICE Device)
     WDF_OBJECT_ATTRIBUTES woa = {};
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&woa, TailLightDeviceInformation);
 
-    // No need to store the WDFWMIINSTANCE in the device context because it is
-    // passed back in the WMI instance callbacks and is not referenced outside
-    // of those callbacks.
     WDFWMIINSTANCE WmiInstance = 0;
     status = WdfWmiInstanceCreate(Device, &instanceConfig, &woa, &WmiInstance);
-
-    if (NT_SUCCESS(status)) {
-        TailLightDeviceInformation* info = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
-        info->TailLight = 0x000000; // black
+    if (!NT_SUCCESS(status)) {
+        KdPrint(("TailLight: WdfWmiInstanceCreate error %x\n", status));
+        return status;
     }
+
+    DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
+    deviceContext->WmiInstance = WmiInstance;
 
     return status;
 }
@@ -47,22 +46,13 @@ NTSTATUS EvtWmiInstanceQueryInstance(
     _Out_ PULONG BufferUsed
     )
 {
-    UNREFERENCED_PARAMETER(OutBufferSize);
+    UNREFERENCED_PARAMETER(OutBufferSize); // // mininum buffer size already checked by WDF
 
     KdPrint(("TailLight: WMI QueryInstance\n"));
 
-    WDFDEVICE Device = WdfWmiInstanceGetDevice(WmiInstance);
-    DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
-
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
-    // update WMI state from device context
-    pInfo->TailLight = deviceContext->TailLight;
-
-    // Our mininum buffer size has been checked by the Framework
-    // and failed automatically if too small.
-    *BufferUsed = sizeof(*pInfo);
-
     RtlCopyMemory(/*dst*/OutBuffer, /*src*/pInfo, sizeof(*pInfo));
+    *BufferUsed = sizeof(*pInfo);
 
     KdPrint(("TailLight: WMI QueryInstance completed\n"));
     return STATUS_SUCCESS;
