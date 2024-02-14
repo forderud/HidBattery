@@ -105,20 +105,20 @@ NTSTATUS EvtWmiInstanceSetItem(
 {
     KdPrint(("TailLight: WMI SetItem\n"));
 
-    if (DataItemId != TailLightDeviceInformation_TailLight_ID)
-        return STATUS_INVALID_DEVICE_REQUEST;
-
-    if (InBufferSize < TailLightDeviceInformation_TailLight_SIZE)
-        return STATUS_BUFFER_TOO_SMALL;
-
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
-    pInfo->TailLight = ((TailLightDeviceInformation*)InBuffer)->TailLight;
+    NTSTATUS status = STATUS_SUCCESS;
 
-    // Tell the HID device about the new tail-light state
-    NTSTATUS status = SetFeatureColor(
-        WdfWmiInstanceGetDevice(WmiInstance),
-        pInfo->TailLight
-        );
+    if (DataItemId == TailLightDeviceInformation_TailLight_ID) {
+        if (InBufferSize < TailLightDeviceInformation_TailLight_SIZE)
+            return STATUS_BUFFER_TOO_SMALL;
+
+        pInfo->TailLight = *(ULONG*)InBuffer;
+
+        // Tell the HID device about the new tail-light state
+        status = SetFeatureColor(WdfWmiInstanceGetDevice(WmiInstance), pInfo->TailLight);
+    } else {
+        return STATUS_INVALID_DEVICE_REQUEST;
+    }
 
     KdPrint(("TailLight: WMI SetItem completed\n"));
     return status;
