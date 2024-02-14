@@ -105,7 +105,7 @@ NTSTATUS EvtWmiInstanceSetItem(
 {
     KdPrint(("TailLight: WMI SetItem\n"));
 
-    if (DataItemId != 1)
+    if (DataItemId != TailLightDeviceInformation_TailLight_ID)
         return STATUS_INVALID_DEVICE_REQUEST;
 
     if (InBufferSize < TailLightDeviceInformation_TailLight_SIZE)
