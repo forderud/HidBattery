@@ -76,7 +76,8 @@
     <PostBuildEvent>
       <Command>copy *.bat $(PackageDir)
 copy ..\TailLight.ps1 $(OutDir)
-copy "$(WDKBinRoot_x64)\certmgr.exe" $(OutDir)</Command>
+copy $(OutDir)\TailLight.cer $(PackageDir)
+copy "$(WDKBinRoot_x64)\certmgr.exe" $(PackageDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -100,7 +101,8 @@ copy "$(WDKBinRoot_x64)\certmgr.exe" $(OutDir)</Command>
     <PostBuildEvent>
       <Command>copy *.bat $(PackageDir)
 copy ..\TailLight.ps1 $(OutDir)
-copy "$(WDKBinRoot_x64)\certmgr.exe" $(OutDir)</Command>
+copy $(OutDir)\TailLight.cer $(PackageDir)
+copy "$(WDKBinRoot_x64)\certmgr.exe" $(PackageDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
