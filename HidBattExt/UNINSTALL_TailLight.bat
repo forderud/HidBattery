@@ -2,11 +2,6 @@
 :: Goto current directory
 cd /d "%~dp0"
 
-:: delete the devnode
-devcon /r remove "HID\VID_045E&PID_082A&MI_01&Col05"
-:: TODO: Switch to PNPUTIL in Win11 21H2
-::PNPUTIL /remove-device /deviceid "HID\VID_045E&PID_082A&MI_01&Col05"
-
 :: uninstall driver
 PNPUTIL /delete-driver TailLight.inf /uninstall /force /reboot
 
