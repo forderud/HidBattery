@@ -75,7 +75,8 @@
     </DriverSign>
     <PostBuildEvent>
       <Command>copy *.bat $(PackageDir)
-copy ..\TailLight.ps1 $(OutDir)</Command>
+copy ..\TailLight.ps1 $(OutDir)
+copy "$(WDKBinRoot_x64)\certmgr.exe" $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -98,7 +99,8 @@ copy ..\TailLight.ps1 $(OutDir)</Command>
     </DriverSign>
     <PostBuildEvent>
       <Command>copy *.bat $(PackageDir)
-copy ..\TailLight.ps1 $(OutDir)</Command>
+copy ..\TailLight.ps1 $(OutDir)
+copy "$(WDKBinRoot_x64)\certmgr.exe" $(OutDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
