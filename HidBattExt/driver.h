@@ -14,7 +14,7 @@
 
 
 /** Memory allocation tag name (for debugging leaks). */
-static constexpr ULONG POOL_TAG = 'ffly';
+static constexpr ULONG POOL_TAG = 'iLaT'; // displayed as "TaLi"
 
 extern "C"
 DRIVER_INITIALIZE         DriverEntry;
