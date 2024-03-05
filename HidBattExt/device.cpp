@@ -123,6 +123,16 @@ Arguments:
 
         KdPrint(("TailLight: PdoName: %wZ\n", deviceContext->PdoName)); // outputs "\Device\00000083"
     }
+    {
+        // initialize DEVICE_CONTEXT struct with HardwareId
+        deviceContext->HardwareId = GetDevicePropertyString(device, DevicePropertyHardwareID);
+        if (!deviceContext->HardwareId.Buffer) {
+            KdPrint(("TailLight: HardwareId query failed\n"));
+            return STATUS_UNSUCCESSFUL;
+        }
+
+        KdPrint(("TailLight: HardwareId: %wZ\n", deviceContext->HardwareId));
+    }
 
     {
         // create queue for filtering
