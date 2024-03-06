@@ -46,6 +46,31 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE device) {
 }
 
 
+static UNICODE_STRING GetDevicePropertyString(WDFDEVICE device, DEVICE_REGISTRY_PROPERTY DeviceProperty) {
+    WDF_OBJECT_ATTRIBUTES attributes = {};
+    WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
+    attributes.ParentObject = device; // auto-delete with device
+
+    WDFMEMORY memory = 0;
+    NTSTATUS status = WdfDeviceAllocAndQueryProperty(device, DeviceProperty, NonPagedPoolNx, &attributes, &memory);
+    if (!NT_SUCCESS(status)) {
+        KdPrint(("TailLight: WdfDeviceAllocAndQueryProperty with property=0x%x failed 0x%x\n", DeviceProperty, status));
+        return {};
+    }
+
+    // initialize string based on memory
+    size_t bufferLength = 0;
+    UNICODE_STRING result = {};
+    result.Buffer = (WCHAR*)WdfMemoryGetBuffer(memory, &bufferLength);
+    if (result.Buffer == NULL)
+        return {};
+
+    result.MaximumLength = (USHORT)bufferLength;
+    result.Length = (USHORT)bufferLength - sizeof(UNICODE_NULL);
+    return result;
+}
+
+
 NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT DeviceInit)
 /*++
 Routine Description:
@@ -90,37 +115,13 @@ Arguments:
 
     {
         // initialize DEVICE_CONTEXT struct with PdoName
-
-        // In order to send ioctls to our PDO, we have open to open it
-        // by name so that we have a valid filehandle (fileobject).
-        // When we send ioctls using the IoTarget, framework automatically 
-        // sets the filobject in the stack location.
-        WDF_OBJECT_ATTRIBUTES attributes = {};
-        WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-        attributes.ParentObject = device; // auto-delete with device
-
-        WDFMEMORY memory = 0;
-        NTSTATUS status = WdfDeviceAllocAndQueryProperty(device,
-            DevicePropertyPhysicalDeviceObjectName,
-            NonPagedPoolNx,
-            &attributes,
-            &memory);
-
-        if (!NT_SUCCESS(status)) {
-            KdPrint(("TailLight: WdfDeviceAllocAndQueryProperty failed 0x%x\n", status));
+        deviceContext->PdoName = GetDevicePropertyString(device, DevicePropertyPhysicalDeviceObjectName);
+        if (!deviceContext->PdoName.Buffer) {
+            KdPrint(("TailLight: PdoName query failed\n"));
             return STATUS_UNSUCCESSFUL;
         }
 
-        // initialize pDeviceContext->PdoName based on memory
-        size_t bufferLength = 0;
-        deviceContext->PdoName.Buffer = (WCHAR*)WdfMemoryGetBuffer(memory, &bufferLength);
-        if (deviceContext->PdoName.Buffer == NULL)
-            return STATUS_UNSUCCESSFUL;
-
-        deviceContext->PdoName.MaximumLength = (USHORT)bufferLength;
-        deviceContext->PdoName.Length = (USHORT)bufferLength - sizeof(UNICODE_NULL);
-
-        KdPrint(("TailLight: PdoName: %wZ\n", deviceContext->PdoName)); // outputs "\Device\00000083
+        KdPrint(("TailLight: PdoName: %wZ\n", deviceContext->PdoName)); // outputs "\Device\00000083"
     }
 
     {
