@@ -46,15 +46,15 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE device) {
 }
 
 
-static UNICODE_STRING GetDevicePropertyString(WDFDEVICE device, DEVICE_REGISTRY_PROPERTY DeviceProperty) {
+static UNICODE_STRING GetTargetPropertyString(WDFIOTARGET target, DEVICE_REGISTRY_PROPERTY DeviceProperty) {
     WDF_OBJECT_ATTRIBUTES attributes = {};
     WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-    attributes.ParentObject = device; // auto-delete with device
+    attributes.ParentObject = target; // auto-delete with I/O target
 
     WDFMEMORY memory = 0;
-    NTSTATUS status = WdfDeviceAllocAndQueryProperty(device, DeviceProperty, NonPagedPoolNx, &attributes, &memory);
+    NTSTATUS status = WdfIoTargetAllocAndQueryTargetProperty(target, DeviceProperty, NonPagedPoolNx, &attributes, &memory);
     if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: WdfDeviceAllocAndQueryProperty with property=0x%x failed 0x%x\n", DeviceProperty, status));
+        KdPrint(("TailLight: WdfIoTargetAllocAndQueryTargetProperty with property=0x%x failed 0x%x\n", DeviceProperty, status));
         return {};
     }
 
@@ -115,7 +115,7 @@ Arguments:
 
     {
         // initialize DEVICE_CONTEXT struct with PdoName
-        deviceContext->PdoName = GetDevicePropertyString(device, DevicePropertyPhysicalDeviceObjectName);
+        deviceContext->PdoName = GetTargetPropertyString(WdfDeviceGetIoTarget(device), DevicePropertyPhysicalDeviceObjectName);
         if (!deviceContext->PdoName.Buffer) {
             KdPrint(("TailLight: PdoName query failed\n"));
             return STATUS_UNSUCCESSFUL;
@@ -125,7 +125,7 @@ Arguments:
     }
     {
         // initialize DEVICE_CONTEXT struct with HardwareId
-        deviceContext->HardwareId = GetDevicePropertyString(device, DevicePropertyHardwareID);
+        deviceContext->HardwareId = GetTargetPropertyString(WdfDeviceGetIoTarget(device), DevicePropertyHardwareID);
         if (!deviceContext->HardwareId.Buffer) {
             KdPrint(("TailLight: HardwareId query failed\n"));
             return STATUS_UNSUCCESSFUL;
