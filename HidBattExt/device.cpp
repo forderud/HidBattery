@@ -46,7 +46,7 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE device) {
 }
 
 
-static UNICODE_STRING GetTargetPropertyString(WDFIOTARGET target, DEVICE_REGISTRY_PROPERTY DeviceProperty) {
+UNICODE_STRING GetTargetPropertyString(WDFIOTARGET target, DEVICE_REGISTRY_PROPERTY DeviceProperty) {
     WDF_OBJECT_ATTRIBUTES attributes = {};
     WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
     attributes.ParentObject = target; // auto-delete with I/O target
@@ -82,7 +82,7 @@ Arguments:
     Driver - Handle to a framework driver object created in DriverEntry
 
     DeviceInit - Pointer to a framework-allocated WDFDEVICE_INIT structure.
---*/    
+--*/
 {
     UNREFERENCED_PARAMETER(Driver);
 
