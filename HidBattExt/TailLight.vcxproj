@@ -142,7 +142,7 @@ copy "$(WDKBinRoot)\$(Platform)\certmgr.exe" $(PackageDir)</Command>
     <ResourceCompile Include="module.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Inf Exclude="@(Inf)" Include="*.inx" />
+    <Inf Include="TailLight.inx" />
     <FilesToPackage Include="$(TargetPath)" Condition="'$(ConfigurationType)'=='Driver' or '$(ConfigurationType)'=='DynamicLibrary'" />
   </ItemGroup>
   <ItemGroup>
