@@ -10,6 +10,7 @@ public:
     ~WDFIOTARGET_Wrap() {
         if (m_obj != NULL) {
             WdfObjectDelete(m_obj);
+            m_obj = NULL;
         }
     }
 
