@@ -23,7 +23,7 @@ struct TailLightReport {
         }
 
         if ((Unknown1 != 0xB2) || (Unknown2 != 0x03)) {
-            KdPrint(("TailLight: TailLightReport: Unknown control Code 0x%x 0x%x\n", Unknown1, Unknown2));
+            //KdPrint(("TailLight: TailLightReport: Unknown control Code 0x%x 0x%x\n", Unknown1, Unknown2));
             return false;
         }
 
@@ -48,7 +48,7 @@ struct TailLightReport {
 #endif
 
     //report ID of the collection to which the control request is sent
-    UCHAR    ReportId = 36; // (0x24)
+    UCHAR   ReportId = 36; // (0x24)
 
     // control codes (user-defined)
     UCHAR   Unknown1 = 0xB2; // magic value
