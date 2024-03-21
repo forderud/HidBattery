@@ -2,9 +2,9 @@
 :: Goto current directory
 cd /d "%~dp0"
 
-:: Install driver certificate
-certmgr.exe /add TailLight.cer /s /r localMachine root
-certmgr.exe /add TailLight.cer /s /r localMachine trustedpublisher
+:: Trust driver certificate
+certutil.exe -addstore root TailLight.cer
+certutil.exe -addstore trustedpublisher TailLight.cer
 
 :: Use PnpUtil for installation
 PNPUTIL /add-driver TailLight.inf /install /reboot
