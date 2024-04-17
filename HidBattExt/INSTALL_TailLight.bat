@@ -7,6 +7,6 @@ certutil.exe -addstore root TailLight.cer
 certutil.exe -addstore trustedpublisher TailLight.cer
 
 :: Use PnpUtil for installation
-PNPUTIL /add-driver TailLight.inf /install /reboot
+PNPUTIL /add-driver TailLight.inf /install
 
 pause
