@@ -18,4 +18,7 @@ class TailLightDeviceInformation {
 
     [WmiDataId(1), read, write, Description("Tail-light in RGB COLORREF format.")]
     uint32 TailLight;
+
+    [WmiMethodId(1), Implemented, Description("Trigger HW self-test")]
+    void SelfTest();
 };

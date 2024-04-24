@@ -4,6 +4,7 @@
 struct DEVICE_CONTEXT {
     UNICODE_STRING PdoName;
     WDFWMIINSTANCE WmiInstance;
+    WDFTIMER       SelfTestTimer;
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
 

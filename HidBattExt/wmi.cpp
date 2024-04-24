@@ -1,4 +1,72 @@
 #include "driver.h"
+#include <stdlib.h>
+
+
+/** Fake self-test that gradually dims the tail-light color. */
+VOID SelfTestTimerProc (_In_ WDFTIMER timer) {
+    WDFDEVICE device = (WDFDEVICE)WdfTimerGetParentObject(timer);
+    DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(device);
+    TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(deviceContext->WmiInstance);
+
+    {
+        // gradually dim color
+        BYTE* rgb = reinterpret_cast<BYTE*>(&pInfo->TailLight);
+        rgb[0] = max(rgb[0] - 16, 0);
+        rgb[1] = max(rgb[1] - 16, 0);
+        rgb[2] = max(rgb[2] - 16, 0);
+    }
+
+    NTSTATUS status = SetFeatureColor(device, pInfo->TailLight);
+    if (!NT_SUCCESS(status)) {
+        KdPrint(("TailLight: %s: failed 0x%x\n", __func__, status));
+    }
+
+    if (!WdfObjectGet_SELF_TEST_CONTEXT(timer)->Advance()) {
+        KdPrint(("TailLight: Self-test completed\n"));
+        return;
+    }
+
+    // enqueue the next callback
+    BOOLEAN timerInQueue = WdfTimerStart(timer, WDF_REL_TIMEOUT_IN_MS(200));
+    NT_ASSERTMSG("Previous active timer overwritten", !timerInQueue);
+}
+
+static NTSTATUS EvtWmiInstanceExecuteMethod(
+    _In_    WDFWMIINSTANCE WmiInstance,
+    _In_    ULONG MethodId,
+    _In_    ULONG InBufferSize,
+    _In_    ULONG OutBufferSize,
+    _Inout_ PVOID Buffer,
+    _Out_   PULONG BufferUsed
+) {
+    UNREFERENCED_PARAMETER(InBufferSize);
+    UNREFERENCED_PARAMETER(OutBufferSize);
+    UNREFERENCED_PARAMETER(Buffer);
+
+    *BufferUsed = 0;
+    WDFDEVICE device = WdfWmiInstanceGetDevice(WmiInstance);
+
+    switch (MethodId) {
+    case SelfTest:
+        {
+            WDFTIMER timer = WdfObjectGet_DEVICE_CONTEXT(device)->SelfTestTimer;
+            SELF_TEST_CONTEXT* stCtx = WdfObjectGet_SELF_TEST_CONTEXT(timer);
+            if (stCtx->IsBusy())
+                return STATUS_DEVICE_BUSY; // self-test already in progress
+
+            KdPrint(("TailLight: Starting self-test\n"));
+            TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
+            pInfo->TailLight = 0x00D0D0D0; // start color
+            stCtx->Start();
+            SelfTestTimerProc(timer);
+            return STATUS_SUCCESS;
+        }
+    default:
+        break;
+    }
+
+    return STATUS_NOT_IMPLEMENTED;
+}
 
 
 // Register our GUID and Datablock generated from the TailLight.mof file.
@@ -22,6 +90,7 @@ NTSTATUS WmiInitialize(_In_ WDFDEVICE Device)
     instanceConfig.EvtWmiInstanceQueryInstance = EvtWmiInstanceQueryInstance;
     instanceConfig.EvtWmiInstanceSetInstance = EvtWmiInstanceSetInstance;
     instanceConfig.EvtWmiInstanceSetItem = EvtWmiInstanceSetItem;
+    instanceConfig.EvtWmiInstanceExecuteMethod = EvtWmiInstanceExecuteMethod;
 
     WDF_OBJECT_ATTRIBUTES woa = {};
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&woa, TailLightDeviceInformation);
@@ -35,6 +104,24 @@ NTSTATUS WmiInitialize(_In_ WDFDEVICE Device)
 
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
     deviceContext->WmiInstance = WmiInstance;
+
+    {
+        // Initialize self-test timer
+        WDF_TIMER_CONFIG timerCfg = {};
+        WDF_TIMER_CONFIG_INIT(&timerCfg, SelfTestTimerProc);
+
+        WDF_OBJECT_ATTRIBUTES attribs = {};
+        WDF_OBJECT_ATTRIBUTES_INIT(&attribs);
+        WDF_OBJECT_ATTRIBUTES_SET_CONTEXT_TYPE(&attribs, SELF_TEST_CONTEXT);
+        attribs.ExecutionLevel = WdfExecutionLevelPassive; // required to access HID functions
+        attribs.ParentObject = Device;
+
+        status = WdfTimerCreate(&timerCfg, &attribs, &deviceContext->SelfTestTimer);
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("TailLight: %s: WdfTimerCreate failed 0x%x\n", __func__, status));
+            return status;
+        }
+    }
 
     return status;
 }
