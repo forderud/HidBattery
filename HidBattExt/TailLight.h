@@ -35,8 +35,8 @@ struct TailLightReport {
     bool SafetyCheck() {
         // RGB check
         unsigned int color_sum = Red + Green + Blue;
-        if (color_sum > 2 * 256) {
-            KdPrint(("TailLight: Color saturation %u exceeded 512 threshold. Reseting color to RED to signal error\n", color_sum));
+        if (color_sum > 640) {
+            KdPrint(("TailLight: Color saturation %u exceeded 640 threshold. Reseting color to RED to signal error\n", color_sum));
             Red = 255;
             Green = 0;
             Blue = 0;
