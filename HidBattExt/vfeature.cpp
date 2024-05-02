@@ -193,6 +193,8 @@ Arguments:
     UCHAR r = packet->Red;
     UCHAR g = packet->Green;
     UCHAR b = packet->Blue;
+    KdPrint(("TailLight: Red=%u, Green=%u, Blue=%u\n", r, g, b));
+
     // Enforce safety limits (sets color to RED on failure)
     if (!packet->SafetyCheck()) {
         // log safety violation to Windows Event Viewer "System" log
