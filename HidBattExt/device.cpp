@@ -145,6 +145,8 @@ Arguments:
         return status;
     }
 
+    KeInitializeEvent(&deviceContext->SelfTestCompleted, SynchronizationEvent, FALSE);
+
     return status;
 }
 

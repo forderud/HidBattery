@@ -20,11 +20,17 @@ VOID SelfTestTimerProc (_In_ WDFTIMER timer) {
     NTSTATUS status = SetFeatureColor(device, pInfo->TailLight);
     if (!NT_SUCCESS(status)) {
         KdPrint(("TailLight: %s: failed 0x%x\n", __func__, status));
+        stCtx->Result = status;
+        LONG wasSignaled = KeSetEvent(&deviceContext->SelfTestCompleted, IO_MOUSE_INCREMENT, FALSE);
+        NT_ASSERTMSG("TailLight: SelfTest method set to signaled while already signaled.\n", wasSignaled == 0);
         return; // abort self-test
     }
 
     if (!stCtx->Advance()) {
         KdPrint(("TailLight: Self-test completed\n"));
+        stCtx->Result = STATUS_SUCCESS;
+        LONG wasSignaled = KeSetEvent(&deviceContext->SelfTestCompleted, IO_MOUSE_INCREMENT, FALSE);
+        NT_ASSERTMSG("TailLight: SelfTest method set to signaled while already signaled.\n", wasSignaled == 0);
         return;
     }
 
@@ -42,10 +48,10 @@ static NTSTATUS EvtWmiInstanceExecuteMethod(
     _Out_   PULONG BufferUsed
 ) {
     UNREFERENCED_PARAMETER(InBufferSize);
-    UNREFERENCED_PARAMETER(OutBufferSize);
-    UNREFERENCED_PARAMETER(Buffer);
 
-    *BufferUsed = 0;
+    if (OutBufferSize < SelfTest_OUT_SIZE)
+        return STATUS_BUFFER_TOO_SMALL;
+
     WDFDEVICE device = WdfWmiInstanceGetDevice(WmiInstance);
 
     switch (MethodId) {
@@ -63,7 +69,25 @@ static NTSTATUS EvtWmiInstanceExecuteMethod(
             }
             stCtx->Start();
             SelfTestTimerProc(devCtx->SelfTestTimer);
-            return STATUS_SUCCESS;
+            
+            {
+                unsigned int SLACK = 500;
+                LARGE_INTEGER timeout = {};
+                timeout.QuadPart = WDF_REL_TIMEOUT_IN_MS(SELF_TEST_CONTEXT::STEP_COUNT*SELF_TEST_CONTEXT::DURATION_MS + SLACK);
+                NTSTATUS waitStatus = KeWaitForSingleObject(&devCtx->SelfTestCompleted, Executive, KernelMode, FALSE, &timeout);
+                switch (waitStatus) {
+                case STATUS_ALERTED:
+                case STATUS_USER_APC:
+                    NT_ASSERTMSG("TailLight: SelfTestCompleted KEVENT was interrupted.\n", FALSE);
+                    return STATUS_INTERNAL_ERROR;
+                }
+
+                // WMI method output arguments
+                auto* out = (SelfTest_OUT*)Buffer;
+                out->result = stCtx->Result;
+                *BufferUsed = sizeof(SelfTest_OUT);
+                return STATUS_SUCCESS;
+            }
         }
     default:
         break;

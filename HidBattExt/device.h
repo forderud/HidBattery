@@ -5,6 +5,7 @@ struct DEVICE_CONTEXT {
     UNICODE_STRING PdoName;
     WDFWMIINSTANCE WmiInstance;
     WDFTIMER       SelfTestTimer;
+    KEVENT         SelfTestCompleted;
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
 

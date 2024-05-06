@@ -20,5 +20,5 @@ class TailLightDeviceInformation {
     uint32 TailLight;
 
     [WmiMethodId(1), Implemented, Description("Trigger HW self-test")]
-    void SelfTest();
+    void SelfTest([out] sint32 result);
 };

@@ -3,7 +3,8 @@
 
 /** Self-test context that counts down until completion. */
 struct SELF_TEST_CONTEXT {
-    ULONG State = 0;
+    NTSTATUS Result = STATUS_UNSUCCESSFUL;
+    ULONG    State = 0;
 
     bool IsBusy() const {
         return (State != 0);
