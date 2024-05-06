@@ -10,13 +10,16 @@ struct SELF_TEST_CONTEXT {
     }
 
     void Start() {
-        State = 16;
+        State = STEP_COUNT;
     }
 
     bool Advance() {
         State -= 1;
         return (State != 0);
     }
+
+    static const unsigned int STEP_COUNT = 16;  // how many steps to go through
+    static const unsigned int DURATION_MS = 200; // duration per step
 };
 
 WDF_DECLARE_CONTEXT_TYPE(SELF_TEST_CONTEXT);
