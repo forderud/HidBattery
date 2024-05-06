@@ -16,12 +16,13 @@ VOID SelfTestTimerProc (_In_ WDFTIMER timer) {
         rgb[2] = max(rgb[2] - 16, 0);
     }
 
+    auto* stContext = WdfObjectGet_SELF_TEST_CONTEXT(timer);
     NTSTATUS status = SetFeatureColor(device, pInfo->TailLight);
     if (!NT_SUCCESS(status)) {
         KdPrint(("TailLight: %s: failed 0x%x\n", __func__, status));
     }
 
-    if (!WdfObjectGet_SELF_TEST_CONTEXT(timer)->Advance()) {
+    if (!stContext->Advance()) {
         KdPrint(("TailLight: Self-test completed\n"));
         return;
     }
