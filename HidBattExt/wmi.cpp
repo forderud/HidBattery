@@ -51,8 +51,8 @@ static NTSTATUS EvtWmiInstanceExecuteMethod(
     switch (MethodId) {
     case SelfTest:
         {
-            WDFTIMER timer = WdfObjectGet_DEVICE_CONTEXT(device)->SelfTestTimer;
-            SELF_TEST_CONTEXT* stCtx = WdfObjectGet_SELF_TEST_CONTEXT(timer);
+            DEVICE_CONTEXT* devCtx = WdfObjectGet_DEVICE_CONTEXT(device);
+            SELF_TEST_CONTEXT* stCtx = WdfObjectGet_SELF_TEST_CONTEXT(devCtx->SelfTestTimer);
             if (stCtx->IsBusy())
                 return STATUS_DEVICE_BUSY; // self-test already in progress
 
@@ -60,7 +60,7 @@ static NTSTATUS EvtWmiInstanceExecuteMethod(
             TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
             pInfo->TailLight = 0x00D0D0D0; // start color
             stCtx->Start();
-            SelfTestTimerProc(timer);
+            SelfTestTimerProc(devCtx->SelfTestTimer);
             return STATUS_SUCCESS;
         }
     default:
