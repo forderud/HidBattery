@@ -20,6 +20,7 @@ VOID SelfTestTimerProc (_In_ WDFTIMER timer) {
     NTSTATUS status = SetFeatureColor(device, pInfo->TailLight);
     if (!NT_SUCCESS(status)) {
         KdPrint(("TailLight: %s: failed 0x%x\n", __func__, status));
+        return; // abort self-test
     }
 
     if (!stContext->Advance()) {
