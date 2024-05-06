@@ -65,7 +65,7 @@ static NTSTATUS EvtWmiInstanceExecuteMethod(
         break;
     }
 
-    return STATUS_NOT_IMPLEMENTED;
+    return STATUS_WMI_ITEMID_NOT_FOUND;
 }
 
 
