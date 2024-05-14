@@ -36,11 +36,8 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE device) {
         return status;
     }
 
-    BOOLEAN ok = WdfTimerStart(timer, 0); // no wait
-    if (!ok) {
-        KdPrint(("WdfTimerStart failed 0x%x\n", status));
-        return STATUS_UNSUCCESSFUL;
-    }
+    BOOLEAN inQueue = WdfTimerStart(timer, 0); // no wait
+    NT_ASSERTMSG("TailLight: timer already in queue", !inQueue);
 
     return status;
 }
