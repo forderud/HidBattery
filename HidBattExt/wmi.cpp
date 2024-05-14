@@ -57,8 +57,10 @@ static NTSTATUS EvtWmiInstanceExecuteMethod(
                 return STATUS_DEVICE_BUSY; // self-test already in progress
 
             KdPrint(("TailLight: Starting self-test\n"));
-            TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
-            pInfo->TailLight = 0x00D0D0D0; // start color
+            {
+                TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
+                pInfo->TailLight = 0x00D0D0D0; // start color
+            }
             stCtx->Start();
             SelfTestTimerProc(devCtx->SelfTestTimer);
             return STATUS_SUCCESS;
