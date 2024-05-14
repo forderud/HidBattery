@@ -29,8 +29,8 @@ VOID SelfTestTimerProc (_In_ WDFTIMER timer) {
     }
 
     // enqueue the next callback
-    BOOLEAN timerInQueue = WdfTimerStart(timer, WDF_REL_TIMEOUT_IN_MS(SELF_TEST_CONTEXT::DURATION_MS));
-    NT_ASSERTMSG("Previous active timer overwritten", !timerInQueue);
+    BOOLEAN inQueue = WdfTimerStart(timer, WDF_REL_TIMEOUT_IN_MS(SELF_TEST_CONTEXT::DURATION_MS));
+    NT_ASSERTMSG("TailLight: Previous active timer overwritten", !inQueue);
 }
 
 static NTSTATUS EvtWmiInstanceExecuteMethod(
