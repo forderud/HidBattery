@@ -36,10 +36,10 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE device) {
         return status;
     }
 
-    status = WdfTimerStart(timer, 0); // no wait
-    if (!NT_SUCCESS(status)) {
+    BOOLEAN ok = WdfTimerStart(timer, 0); // no wait
+    if (!ok) {
         KdPrint(("WdfTimerStart failed 0x%x\n", status));
-        return status;
+        return STATUS_UNSUCCESSFUL;
     }
 
     return status;
