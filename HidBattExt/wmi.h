@@ -10,11 +10,19 @@ struct SELF_TEST_CONTEXT {
         return (State != 0);
     }
 
-    void Start() {
+    void Start(ULONG& TailLight) {
+        TailLight = 0x00D0D0D0; // start color
+
         State = STEP_COUNT;
     }
 
-    bool Advance() {
+    bool Advance(ULONG& TailLight) {
+        // gradually dim color
+        BYTE* rgb = reinterpret_cast<BYTE*>(&TailLight);
+        rgb[0] = max(rgb[0] - 16, 0);
+        rgb[1] = max(rgb[1] - 16, 0);
+        rgb[2] = max(rgb[2] - 16, 0);
+
         State -= 1;
         return (State != 0);
     }

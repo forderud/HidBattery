@@ -8,14 +8,6 @@ VOID SelfTestTimerProc (_In_ WDFTIMER timer) {
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(device);
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(deviceContext->WmiInstance);
 
-    {
-        // gradually dim color
-        BYTE* rgb = reinterpret_cast<BYTE*>(&pInfo->TailLight);
-        rgb[0] = max(rgb[0] - 16, 0);
-        rgb[1] = max(rgb[1] - 16, 0);
-        rgb[2] = max(rgb[2] - 16, 0);
-    }
-
     auto* stCtx = WdfObjectGet_SELF_TEST_CONTEXT(timer);
     NTSTATUS status = SetFeatureColor(device, pInfo->TailLight);
     if (!NT_SUCCESS(status)) {
@@ -26,7 +18,7 @@ VOID SelfTestTimerProc (_In_ WDFTIMER timer) {
         return; // abort self-test
     }
 
-    if (!stCtx->Advance()) {
+    if (!stCtx->Advance(pInfo->TailLight)) {
         KdPrint(("TailLight: Self-test completed\n"));
         stCtx->Result = STATUS_SUCCESS;
         LONG wasSignaled = KeSetEvent(&deviceContext->SelfTestCompleted, IO_MOUSE_INCREMENT, FALSE);
@@ -65,9 +57,9 @@ static NTSTATUS EvtWmiInstanceExecuteMethod(
             KdPrint(("TailLight: Starting self-test\n"));
             {
                 TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
-                pInfo->TailLight = 0x00D0D0D0; // start color
+                stCtx->Start(pInfo->TailLight);
             }
-            stCtx->Start();
+            
             SelfTestTimerProc(devCtx->SelfTestTimer);
             
             {
