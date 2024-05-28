@@ -11,17 +11,17 @@ struct SELF_TEST_CONTEXT {
     }
 
     void Start(ULONG& TailLight) {
-        TailLight = 0x00D0D0D0; // start color
+        TailLight = 0x000000FF; // red start color
 
         State = STEP_COUNT;
     }
 
     bool Advance(ULONG& TailLight) {
-        // gradually dim color
+        // cross-fade from red to green
         BYTE* rgb = reinterpret_cast<BYTE*>(&TailLight);
-        rgb[0] = max(rgb[0] - 16, 0);
-        rgb[1] = max(rgb[1] - 16, 0);
-        rgb[2] = max(rgb[2] - 16, 0);
+        rgb[0] = max(rgb[0] - 16, 0);   // red
+        rgb[1] = min(rgb[1] + 16, 255); // green
+        rgb[2]; // blue
 
         State -= 1;
         return (State != 0);
