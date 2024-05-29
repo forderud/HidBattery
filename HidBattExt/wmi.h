@@ -17,10 +17,10 @@ struct SELF_TEST_CONTEXT {
     }
 
     bool Advance(ULONG& TailLight) {
-        // cross-fade from red to green
+        // cross-fade from red to green with wrap-around
         BYTE* rgb = reinterpret_cast<BYTE*>(&TailLight);
-        rgb[0] = max(rgb[0] - 16, 0);   // red
-        rgb[1] = min(rgb[1] + 16, 255); // green
+        rgb[0] = rgb[0] - 32; // red
+        rgb[1] = rgb[1] + 32; // green
         rgb[2]; // blue
 
         State -= 1;
