@@ -44,6 +44,7 @@ const byte bCapacityGranularity2 = 1;
 byte iFullChargeCapacity = 100;
 
 byte iRemaining =0, iPrevRemaining=0;
+bool bCharging = false;
 
 int iRes=0;
 
@@ -97,12 +98,16 @@ void setup() {
 
 void loop() {
   //*********** Measurements Unit ****************************
-  bool bCharging = digitalRead(CHGDCHPIN);
   int iBattSoc = analogRead(BATTSOCPIN); // potensiometer value in [0,1024)
 
   iRemaining = (byte)(round((float)iFullChargeCapacity*iBattSoc/1024));
   iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining/iFullChargeCapacity);
 
+  if (iRemaining > iPrevRemaining + 1) // add a bit hysteresis
+    bCharging = true;
+  else if (iRemaining < iPrevRemaining - 1) // add a bit hysteresis
+    bCharging = false;
+  
   // Charging
   iPresentStatus.Charging = bCharging;
   iPresentStatus.ACPresent = bCharging; // assume charging implies AC present
