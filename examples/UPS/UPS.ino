@@ -20,7 +20,7 @@ const byte bOEMVendor = IOEMVENDOR;
 PresentStatus iPresentStatus = {}, iPreviousStatus = {};
 
 byte bRechargable = 1;
-byte bCapacityMode = 2;  // units are in %%
+byte bCapacityMode = 0;  // unit: 0=mAh, 1=mWh, 2=%
 
 // Physical parameters
 const uint16_t iConfigVoltage = 1380; // centiVolt
