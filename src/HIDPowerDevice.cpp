@@ -225,15 +225,12 @@ HIDPowerDevice_::HIDPowerDevice_(void) {
     static HIDSubDescriptor node(_hidReportDescriptor, sizeof (_hidReportDescriptor));
 
     AppendDescriptor(&node);
-}
 
-void HIDPowerDevice_::begin(void) {
     // set string ID here
     
     SetFeature(HID_PD_IPRODUCT, &bProduct, sizeof(bProduct));
     SetFeature(HID_PD_SERIAL, &bSerial, sizeof(bSerial));
     SetFeature(HID_PD_MANUFACTURER, &bManufacturer, sizeof(bManufacturer));
-    
 }
 
 int HIDPowerDevice_::sendDate(uint16_t id, uint16_t year, uint8_t month, uint8_t day) {

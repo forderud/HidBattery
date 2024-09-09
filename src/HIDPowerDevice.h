@@ -112,7 +112,6 @@ private:
     
 public:
   HIDPowerDevice_(void);
-  void begin(void);
   
 
   int sendDate(uint16_t id, uint16_t year, uint8_t month, uint8_t day);
