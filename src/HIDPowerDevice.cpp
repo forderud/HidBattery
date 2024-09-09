@@ -228,8 +228,6 @@ HIDPowerDevice_::HIDPowerDevice_(void) {
 }
 
 void HIDPowerDevice_::begin(void) {
-    HID_::begin();
-    
     // set string ID here
     
     SetFeature(HID_PD_IPRODUCT, &bProduct, sizeof(bProduct));
