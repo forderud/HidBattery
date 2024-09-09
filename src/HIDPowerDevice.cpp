@@ -238,9 +238,6 @@ void HIDPowerDevice_::begin(void) {
     
 }
 
-void HIDPowerDevice_::end(void) {
-}
-
 int HIDPowerDevice_::sendDate(uint16_t id, uint16_t year, uint8_t month, uint8_t day) {
     uint16_t bval = (year - 1980)*512 + month * 32 + day;
     return SendReport(id, &bval, sizeof (bval));

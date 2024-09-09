@@ -114,8 +114,7 @@ public:
   HIDPowerDevice_(void);
   void begin(void);
   
-  void end(void);
-  
+
   int sendDate(uint16_t id, uint16_t year, uint8_t month, uint8_t day);
   
   int setStringFeature(uint8_t id, const uint8_t* index, const char* data);
