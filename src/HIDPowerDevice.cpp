@@ -75,14 +75,6 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0x09, 0x66, //     USAGE (RemainingCapacity)
     0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
 
-    0x85, HID_PD_REMNCAPACITYLIMIT, //     REPORT_ID (16)
-    0x09, 0x29, //     USAGE (RemainingCapacityLimit)
-    0xB1, 0xA2, //     FEATURE (Data, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
-
-    0x85, HID_PD_WARNCAPACITYLIMIT, //     REPORT_ID (17)
-    0x09, 0x8C, //     USAGE (WarningCapacityLimit)
-    0xB1, 0xA2, //     FEATURE (Data, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
-
     0x85, HID_PD_MANUFACTUREDATE, //     REPORT_ID (9)
     0x09, 0x85, //     USAGE (ManufacturerDate)
     0x75, 0x10, //     REPORT_SIZE (16)
