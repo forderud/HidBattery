@@ -22,10 +22,7 @@ uint16_t iRunTimeToEmpty = 0; // maps to BatteryEstimatedTime on Windows
 uint16_t iAvgTimeToFull = 7200;
 uint16_t iAvgTimeToEmpty = 7200;
 uint16_t iRemainTimeLimit = 600;
-int16_t  iDelayBe4Reboot = -1;
-int16_t  iDelayBe4ShutDown = -1;
 uint16_t iManufacturerDate = 0; // initialized in setup function
-
 
 // Parameters for ACPI compliancy
 const uint16_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
@@ -63,8 +60,6 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_AVERAGETIME2FULL, &iAvgTimeToFull, sizeof(iAvgTimeToFull));
     PowerDevice[i].SetFeature(HID_PD_AVERAGETIME2EMPTY, &iAvgTimeToEmpty, sizeof(iAvgTimeToEmpty));
     PowerDevice[i].SetFeature(HID_PD_REMAINTIMELIMIT, &iRemainTimeLimit, sizeof(iRemainTimeLimit));
-    PowerDevice[i].SetFeature(HID_PD_DELAYBE4REBOOT, &iDelayBe4Reboot, sizeof(iDelayBe4Reboot));
-    PowerDevice[i].SetFeature(HID_PD_DELAYBE4SHUTDOWN, &iDelayBe4ShutDown, sizeof(iDelayBe4ShutDown));
 
     PowerDevice[i].SetFeature(HID_PD_RECHARGEABLE, &bRechargable, sizeof(bRechargable));
     PowerDevice[i].SetFeature(HID_PD_CAPACITYMODE, &bCapacityMode, sizeof(bCapacityMode));
@@ -136,16 +131,6 @@ void loop() {
   } else {
     iPresentStatus.Discharging = 0;
     iPresentStatus.RemainingTimeLimitExpired = 0;
-  }
-
-  // Shutdown requested
-  if(iDelayBe4ShutDown > 0 ) {
-      iPresentStatus.ShutdownRequested = 1;
-#ifdef CDC_ENABLED
-      Serial.println("shutdown requested");
-#endif
-  } else {
-    iPresentStatus.ShutdownRequested = 0;
   }
 
   // Shutdown imminent
