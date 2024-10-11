@@ -26,7 +26,6 @@ uint16_t iManufacturerDate = 0; // initialized in setup function
 
 // Parameters for ACPI compliancy
 const uint16_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
-byte iRemnCapacityLimit = 5; // low at 5%
 const byte bCapacityGranularity1 = 1;
 const byte bCapacityGranularity2 = 1;
 uint16_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
@@ -71,7 +70,6 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_DESIGNCAPACITY, &iDesignCapacity, sizeof(iDesignCapacity));
     PowerDevice[i].SetFeature(HID_PD_FULLCHRGECAPACITY, &iFullChargeCapacity, sizeof(iFullChargeCapacity));
     PowerDevice[i].SetFeature(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
-    PowerDevice[i].SetFeature(HID_PD_REMNCAPACITYLIMIT, &iRemnCapacityLimit, sizeof(iRemnCapacityLimit));
     PowerDevice[i].SetFeature(HID_PD_CPCTYGRANULARITY1, &bCapacityGranularity1, sizeof(bCapacityGranularity1));
     PowerDevice[i].SetFeature(HID_PD_CPCTYGRANULARITY2, &bCapacityGranularity2, sizeof(bCapacityGranularity2));
 
@@ -111,7 +109,6 @@ void loop() {
   // Discharging
   if(!iPresentStatus.Charging) { // assume not charging implies discharging
     iPresentStatus.Discharging = 1;
-    // if(iRemaining[0] < iRemnCapacityLimit) iPresentStatus.BelowRemainingCapacityLimit = 1;
 
     iPresentStatus.RemainingTimeLimitExpired = (iRunTimeToEmpty < iRemainTimeLimit);
   } else {
