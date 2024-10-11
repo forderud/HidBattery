@@ -32,7 +32,6 @@
 
 #define HID_PD_RECHARGEABLE          0x06 // FEATURE ONLY
 #define HID_PD_PRESENTSTATUS         0x07 // INPUT OR FEATURE(required by Windows)
-#define HID_PD_REMAINTIMELIMIT       0x08 // INPUT OR FEATURE
 #define HID_PD_MANUFACTUREDATE       0x09 // FEATURE ONLY
 #define HID_PD_CONFIGVOLTAGE         0x0A // 10 FEATURE ONLY
 #define HID_PD_VOLTAGE               0x0B // 11 INPUT (NA) OR FEATURE(implemented)

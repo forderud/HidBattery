@@ -21,7 +21,6 @@ uint16_t iVoltage =1499; // centiVolt
 uint16_t iRunTimeToEmpty = 0; // maps to BatteryEstimatedTime on Windows
 uint16_t iAvgTimeToFull = 7200;
 uint16_t iAvgTimeToEmpty = 7200;
-uint16_t iRemainTimeLimit = 600;
 uint16_t iManufacturerDate = 0; // initialized in setup function
 
 // Parameters for ACPI compliancy
@@ -59,7 +58,6 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
     PowerDevice[i].SetFeature(HID_PD_AVERAGETIME2FULL, &iAvgTimeToFull, sizeof(iAvgTimeToFull));
     PowerDevice[i].SetFeature(HID_PD_AVERAGETIME2EMPTY, &iAvgTimeToEmpty, sizeof(iAvgTimeToEmpty));
-    PowerDevice[i].SetFeature(HID_PD_REMAINTIMELIMIT, &iRemainTimeLimit, sizeof(iRemainTimeLimit));
 
     PowerDevice[i].SetFeature(HID_PD_RECHARGEABLE, &bRechargable, sizeof(bRechargable));
     PowerDevice[i].SetFeature(HID_PD_CAPACITYMODE, &bCapacityMode, sizeof(bCapacityMode));
@@ -125,9 +123,6 @@ void loop() {
   // Discharging
   if(!iPresentStatus.Charging) { // assume not charging implies discharging
     iPresentStatus.Discharging = 1;
-    // if(iRemaining[0] < iRemnCapacityLimit) iPresentStatus.BelowRemainingCapacityLimit = 1;
-
-    iPresentStatus.RemainingTimeLimitExpired = (iRunTimeToEmpty < iRemainTimeLimit);
   } else {
     iPresentStatus.Discharging = 0;
     iPresentStatus.RemainingTimeLimitExpired = 0;
