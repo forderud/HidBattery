@@ -30,7 +30,6 @@
 #define IDEVICECHEMISTRY             0x04
 #define IOEMVENDOR                   0x05
 
-#define HID_PD_RECHARGEABLE          0x06 // FEATURE ONLY
 #define HID_PD_PRESENTSTATUS         0x07 // INPUT OR FEATURE(required by Windows)
 #define HID_PD_MANUFACTUREDATE       0x09 // FEATURE ONLY
 #define HID_PD_CONFIGVOLTAGE         0x0A // 10 FEATURE ONLY

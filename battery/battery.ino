@@ -12,7 +12,6 @@ const char STRING_SERIAL[] PROGMEM = "1234";
 
 PresentStatus iPresentStatus = {};
 
-byte bRechargable = 1;
 byte bCapacityMode = 0;  // unit: 0=mAh, 1=mWh, 2=%
 
 // Physical parameters
@@ -59,7 +58,6 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_AVERAGETIME2FULL, &iAvgTimeToFull, sizeof(iAvgTimeToFull));
     PowerDevice[i].SetFeature(HID_PD_AVERAGETIME2EMPTY, &iAvgTimeToEmpty, sizeof(iAvgTimeToEmpty));
 
-    PowerDevice[i].SetFeature(HID_PD_RECHARGEABLE, &bRechargable, sizeof(bRechargable));
     PowerDevice[i].SetFeature(HID_PD_CAPACITYMODE, &bCapacityMode, sizeof(bCapacityMode));
     PowerDevice[i].SetFeature(HID_PD_CONFIGVOLTAGE, &iConfigVoltage, sizeof(iConfigVoltage));
     PowerDevice[i].SetFeature(HID_PD_VOLTAGE, &iVoltage, sizeof(iVoltage));
