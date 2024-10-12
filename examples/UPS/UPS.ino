@@ -23,8 +23,8 @@ byte bRechargable = 1;
 byte bCapacityMode = 2;  // units are in %%
 
 // Physical parameters
-const uint16_t iConfigVoltage = 1380;
-uint16_t iVoltage =1300, iPrevVoltage = 0;
+const uint16_t iConfigVoltage = 1380; // centiVolt
+uint16_t iVoltage =1300; // centiVolt
 uint16_t iRunTimeToEmpty = 0, iPrevRunTimeToEmpty = 0;
 uint16_t iAvgTimeToFull = 7200;
 uint16_t iAvgTimeToEmpty = 7200;
