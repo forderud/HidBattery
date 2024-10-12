@@ -56,11 +56,6 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0x79, IDEVICECHEMISTRY, //     STRING INDEX (4)
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
 
-    0x85, HID_PD_IOEMINFORMATION,  //     REPORT_ID (32)
-    0x09, 0x8F, //     USAGE (iOEMInformation)
-    0x79, IOEMVENDOR, //     STRING INDEX (5)
-    0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
-
     0x85, HID_PD_CAPACITYMODE, //     REPORT_ID (22)
     0x09, 0x2C, //     USAGE (CapacityMode)
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)

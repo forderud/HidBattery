@@ -6,7 +6,6 @@ const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
 const byte bDeviceChemistry = IDEVICECHEMISTRY;
 
 const char STRING_OEMVENDOR[] PROGMEM = "BatteryVendor";
-const byte bOEMVendor = IOEMVENDOR;
 
 const char STRING_SERIAL[] PROGMEM = "1234";
 
@@ -63,7 +62,6 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_VOLTAGE, &iVoltage, sizeof(iVoltage));
 
     PowerDevice[i].SetStringIdxFeature(HID_PD_IDEVICECHEMISTRY, &bDeviceChemistry, STRING_DEVICECHEMISTRY);
-    PowerDevice[i].SetStringIdxFeature(HID_PD_IOEMINFORMATION, &bOEMVendor, STRING_OEMVENDOR);
 
     PowerDevice[i].SetFeature(HID_PD_DESIGNCAPACITY, &iDesignCapacity, sizeof(iDesignCapacity));
     PowerDevice[i].SetFeature(HID_PD_FULLCHRGECAPACITY, &iFullChargeCapacity, sizeof(iFullChargeCapacity));

@@ -28,7 +28,6 @@
 #define HID_PD_SERIAL                0x02 // FEATURE ONLY
 #define HID_PD_MANUFACTURER          0x03 // FEATURE ONLY
 #define IDEVICECHEMISTRY             0x04
-#define IOEMVENDOR                   0x05
 
 #define HID_PD_PRESENTSTATUS         0x07 // INPUT OR FEATURE(required by Windows)
 #define HID_PD_MANUFACTUREDATE       0x09 // FEATURE ONLY
@@ -47,7 +46,6 @@
 #define HID_PD_AVERAGETIME2FULL      0x1C // 27 FEATURE ONLY
 
 #define HID_PD_IDEVICECHEMISTRY      0x1F // Feature
-#define HID_PD_IOEMINFORMATION       0x20 // Feature
 
 
 // PresentStatus dynamic flags
