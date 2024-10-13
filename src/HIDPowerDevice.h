@@ -58,12 +58,12 @@ struct PresentStatus {
   
   uint8_t FullyCharged : 1;               // bit 0x08
   uint8_t FullyDischarged : 1;            // bit 0x09
-  uint8_t ShutdownRequested : 1;          // bit 0x0A
-  uint8_t ShutdownImminent : 1;           // bit 0x0B
   uint8_t unused1 : 1;
   uint8_t unused2 : 1;
   uint8_t unused3 : 1;
   uint8_t unused4 : 1;
+  uint8_t unused5 : 1;
+  uint8_t unused6 : 1;
   
   operator uint16_t () {
       return *(uint16_t*)(this); // switch to std::bit_cast after migrating to C++20

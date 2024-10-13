@@ -105,16 +105,6 @@ void loop() {
     iPresentStatus.RemainingTimeLimitExpired = 0;
   }
 
-  // Shutdown imminent
-  if((iPresentStatus.ShutdownRequested) || (iPresentStatus.RemainingTimeLimitExpired)) {
-    iPresentStatus.ShutdownImminent = 1;
-#ifdef CDC_ENABLED
-    Serial.println("shutdown imminent");
-#endif
-  } else {
-    iPresentStatus.ShutdownImminent = 0;
-  }
-
   iPresentStatus.BatteryPresent = 1;
 
 
