@@ -57,21 +57,12 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0x09, 0x2C, //     USAGE (CapacityMode)
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
 
-    0x85, HID_PD_CPCTYGRANULARITY1, //     REPORT_ID (18)
-    0x09, 0x8D, //     USAGE (CapacityGranularity1)
+    0x85, HID_PD_FULLCHRGECAPACITY, //     REPORT_ID (14)
+    0x09, 0x67, //     USAGE (FullChargeCapacity)
     0x75, 0x10, //     REPORT_SIZE (16)
     0x95, 0x01, //     REPORT_COUNT (1)
     0x67, 0x01, 0x10, 0x10, 0x00, //     UNIT (AmpSec)
     0x55, 0x00, //     UNIT_EXPONENT (0)
-    0xB1, 0x22, //     FEATURE (Data, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
-
-    0x85, HID_PD_CPCTYGRANULARITY2, //     REPORT_ID (19)
-    0x09, 0x8E, //     USAGE (CapacityGranularity2)
-    0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
-
-    0x85, HID_PD_FULLCHRGECAPACITY, //     REPORT_ID (14)
-    0x09, 0x67, //     USAGE (FullChargeCapacity)
-    0x95, 0x01, //     REPORT_COUNT (1)
     0xB1, 0x83, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
 
     0x85, HID_PD_DESIGNCAPACITY, //     REPORT_ID (15)
