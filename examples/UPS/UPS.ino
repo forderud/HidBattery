@@ -36,12 +36,12 @@ byte iAudibleAlarmCtrl = 2; // 1 - Disabled, 2 - Enabled, 3 - Muted
 
 
 // Parameters for ACPI compliancy
-const byte iDesignCapacity = 100;
+const uint16_t iDesignCapacity = 100;
 byte iWarnCapacityLimit = 10; // warning at 10% 
 byte iRemnCapacityLimit = 5; // low at 5% 
 const byte bCapacityGranularity1 = 1;
 const byte bCapacityGranularity2 = 1;
-byte iFullChargeCapacity = 100;
+uint16_t iFullChargeCapacity = 100;
 
 uint32_t iRemaining =0, iPrevRemaining=0;
 bool bCharging = false;
