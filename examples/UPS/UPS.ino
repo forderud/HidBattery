@@ -43,7 +43,7 @@ const byte bCapacityGranularity1 = 1;
 const byte bCapacityGranularity2 = 1;
 byte iFullChargeCapacity = 100;
 
-byte iRemaining =0, iPrevRemaining=0;
+uint32_t iRemaining =0, iPrevRemaining=0;
 bool bCharging = false;
 
 int iRes=0;
@@ -100,7 +100,7 @@ void loop() {
   //*********** Measurements Unit ****************************
   int iBattSoc = analogRead(BATTSOCPIN); // potensiometer value in [0,1024)
 
-  iRemaining = (byte)(round((float)iFullChargeCapacity*iBattSoc/1024));
+  iRemaining = (uint32_t)(round((float)iFullChargeCapacity*iBattSoc/1024));
   iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining/iFullChargeCapacity);
 
   if (iRemaining > iPrevRemaining + 1) // add a bit hysteresis
