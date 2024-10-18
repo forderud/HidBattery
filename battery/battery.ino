@@ -24,7 +24,6 @@ byte bCapacityMode = 0;  // unit: 0=mAh, 1=mWh, 2=%
 // Physical parameters
 const uint16_t iConfigVoltage = 1509; // centiVolt
 uint16_t iVoltage =1499; // centiVolt
-uint16_t iRunTimeToEmpty = 0, iPrevRunTimeToEmpty = 0;
 uint16_t iManufacturerDate = 0; // initialized in setup function
 
 // Parameters for ACPI compliancy
@@ -62,8 +61,6 @@ void setup() {
   for (int i = 0; i < BATTERY_COUNT; i++) {
     PowerDevice[i].SetFeature(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
 
-    PowerDevice[i].SetFeature(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
-
     PowerDevice[i].SetFeature(HID_PD_CAPACITYMODE, &bCapacityMode, sizeof(bCapacityMode));
     PowerDevice[i].SetFeature(HID_PD_CONFIGVOLTAGE, &iConfigVoltage, sizeof(iConfigVoltage));
     PowerDevice[i].SetFeature(HID_PD_VOLTAGE, &iVoltage, sizeof(iVoltage));
@@ -88,9 +85,6 @@ void loop() {
   for (int i = BATTERY_COUNT-1; i > 0; i--)
     iRemaining[i] = iRemaining[i-1]; // propagate charge level from first to last battery
   iRemaining[0] = (uint32_t)(round((float)iFullChargeCapacity*iBattSoc/1024));
-
-  uint16_t iAvgTimeToEmpty = 7200;
-  iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining[0]/iFullChargeCapacity);
 
   if (iRemaining[0] > iPrevRemaining + 1) // add a bit hysteresis
     bCharging = true;
@@ -123,12 +117,9 @@ void loop() {
 
   //************ Bulk send or interrupt ***********************
 
-  if((iPresentStatus != iPreviousStatus) || (iRemaining[0] != iPrevRemaining) || (iRunTimeToEmpty != iPrevRunTimeToEmpty) || (iIntTimer>MINUPDATEINTERVAL) ) {
+  if((iPresentStatus != iPreviousStatus) || (iRemaining[0] != iPrevRemaining) || (iIntTimer>MINUPDATEINTERVAL) ) {
     for (int i = 0; i < BATTERY_COUNT; i++) {
       PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
-
-      if(!bCharging)
-        PowerDevice[i].SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
 
       iRes = PowerDevice[i].SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
     }
@@ -141,12 +132,10 @@ void loop() {
     iIntTimer = 0;
     iPreviousStatus = iPresentStatus;
     iPrevRemaining = iRemaining[0];
-    iPrevRunTimeToEmpty = iRunTimeToEmpty;
   }
 
 #ifdef CDC_ENABLED
   Serial.println(iRemaining[0]);
-  Serial.println(iRunTimeToEmpty);
   Serial.println(iRes);
 #endif
 }

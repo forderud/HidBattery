@@ -77,11 +77,6 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0x75, 0x10, //     REPORT_SIZE (16)
     0x27, 0xFF, 0xFF, 0x00, 0x00, //     LOGICAL_MAXIMUM (65534)
     0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
-    0x85, HID_PD_RUNTIMETOEMPTY, //     REPORT_ID (13)    
-    0x09, 0x68, //     USAGE (RunTimeToEmpty)  
-    0x81, 0xA3, //     INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
-    0x09, 0x68, //     USAGE (RunTimeToEmpty)
-    0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)      
     0x05, 0x84, //     USAGE_PAGE (Power Device) ====================
     0x85, HID_PD_CONFIGVOLTAGE, //     REPORT_ID (10)
     0x09, 0x40, //     USAGE (ConfigVoltage)
