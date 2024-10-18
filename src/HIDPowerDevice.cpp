@@ -89,12 +89,6 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0x27, 0xFF, 0xFF, 0x00, 0x00, //     LOGICAL_MAXIMUM (65534)
     0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
 
-    0x85, HID_PD_RUNTIMETOEMPTY, //     REPORT_ID (13)
-    0x09, 0x68, //     USAGE (RunTimeToEmpty)
-    0x81, 0xA3, //     INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
-    0x09, 0x68, //     USAGE (RunTimeToEmpty)
-    0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
-
     0x85, HID_PD_CYCLE_COUNT, //     REPORT_ID (20)
     0x09, 0x6B, //     USAGE (CycleCount)
     0x75, 0x10, //     REPORT_SIZE (16)
