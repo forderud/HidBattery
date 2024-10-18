@@ -16,7 +16,6 @@ byte bCapacityMode = 0;  // unit: 0=mAh, 1=mWh, 2=%
 // Physical parameters
 const uint16_t iConfigVoltage = 1509; // centiVolt
 uint16_t iVoltage =1499; // centiVolt
-uint16_t iRunTimeToEmpty = 0;
 uint16_t iManufacturerDate = 0; // initialized in setup function
 
 // Parameters for ACPI compliancy
@@ -45,8 +44,6 @@ void setup() {
 
   for (int i = 0; i < MAX_BATTERIES; i++) {
     PowerDevice[i].SetFeature(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
-
-    PowerDevice[i].SetFeature(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
 
     PowerDevice[i].SetFeature(HID_PD_CAPACITYMODE, &bCapacityMode, sizeof(bCapacityMode));
     PowerDevice[i].SetFeature(HID_PD_CONFIGVOLTAGE, &iConfigVoltage, sizeof(iConfigVoltage));
@@ -81,9 +78,6 @@ void loop() {
     iRemaining[0] = 0.20f*iFullChargeCapacity; // reset to 20%
 #endif
 
-  uint16_t iAvgTimeToEmpty = 7200;
-  iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining[0]/iFullChargeCapacity);
-
   if (iRemaining[0] > iPrevRemaining + 1) // add a bit hysteresis
     iPresentStatus.Charging = true;
   else if (iRemaining[0] < iPrevRemaining - 1) // add a bit hysteresis
@@ -115,9 +109,6 @@ void loop() {
   for (int i = 0; i < MAX_BATTERIES; i++) {
     if (res >= 0)
       res = PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
-
-    if((res >= 0) && !iPresentStatus.Charging)
-      res = PowerDevice[i].SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
 
     if (res >= 0)
       res = PowerDevice[i].SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
