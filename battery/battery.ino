@@ -93,9 +93,6 @@ void loop() {
     iPresentStatus.RemainingTimeLimitExpired = 0;
   }
 
-  iPresentStatus.BatteryPresent = 1;
-
-
   //************ Delay ****************************************
   delay(1000);
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level);
