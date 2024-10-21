@@ -14,7 +14,6 @@ PresentStatus iPresentStatus = {};
 byte bCapacityMode = 0;  // unit: 0=mAh, 1=mWh, 2=%
 
 // Physical parameters
-const uint16_t iConfigVoltage = 1509; // centiVolt
 uint16_t iVoltage =1499; // centiVolt
 uint16_t iManufacturerDate = 0; // initialized in setup function
 
@@ -46,7 +45,6 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
 
     PowerDevice[i].SetFeature(HID_PD_CAPACITYMODE, &bCapacityMode, sizeof(bCapacityMode));
-    PowerDevice[i].SetFeature(HID_PD_CONFIGVOLTAGE, &iConfigVoltage, sizeof(iConfigVoltage));
     PowerDevice[i].SetFeature(HID_PD_VOLTAGE, &iVoltage, sizeof(iVoltage));
 
     PowerDevice[i].SetStringIdxFeature(HID_PD_IDEVICECHEMISTRY, &bDeviceChemistry, STRING_DEVICECHEMISTRY);
