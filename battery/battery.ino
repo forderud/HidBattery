@@ -92,8 +92,6 @@ void loop() {
   // Charging
   iPresentStatus.Charging = bCharging;
   iPresentStatus.ACPresent = bCharging; // assume charging implies AC present
-  iPresentStatus.FullyCharged = (iRemaining[0] == iFullChargeCapacity);
-
   // Discharging
   if(!bCharging) { // assume not charging implies discharging
     iPresentStatus.Discharging = 1;
