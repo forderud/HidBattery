@@ -60,20 +60,20 @@ struct PresentStatus {
   uint8_t Charging : 1;                   // bit 0x00
   uint8_t Discharging : 1;                // bit 0x01
   uint8_t ACPresent : 1;                  // bit 0x02
-  uint8_t BatteryPresent : 1;             // bit 0x03
-  uint8_t BelowRemainingCapacityLimit : 1;// bit 0x04
-  uint8_t RemainingTimeLimitExpired : 1;  // bit 0x05
-  uint8_t NeedReplacement : 1;            // bit 0x06
-  uint8_t VoltageNotRegulated : 1;        // bit 0x07
+  uint8_t BelowRemainingCapacityLimit : 1;// bit 0x03
+  uint8_t RemainingTimeLimitExpired : 1;  // bit 0x04
+  uint8_t NeedReplacement : 1;            // bit 0x05
+  uint8_t VoltageNotRegulated : 1;        // bit 0x06
+  uint8_t FullyCharged : 1;               // bit 0x07
   
-  uint8_t FullyCharged : 1;               // bit 0x08
-  uint8_t FullyDischarged : 1;            // bit 0x09
+  uint8_t FullyDischarged : 1;            // bit 0x08
   uint8_t unused1 : 1;
   uint8_t unused2 : 1;
   uint8_t unused3 : 1;
   uint8_t unused4 : 1;
   uint8_t unused5 : 1;
   uint8_t unused6 : 1;
+  uint8_t unused7 : 1;
   
   operator uint16_t () {
       return *(uint16_t*)(this); // switch to std::bit_cast after migrating to C++20
