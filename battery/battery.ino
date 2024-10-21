@@ -97,7 +97,6 @@ void loop() {
     iPresentStatus.Discharging = 1;
   } else {
     iPresentStatus.Discharging = 0;
-    iPresentStatus.RemainingTimeLimitExpired = 0;
   }
 
   //************ Delay ****************************************
