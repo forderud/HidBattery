@@ -153,22 +153,14 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0x81, 0xA3, //       INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
     0x09, 0xDB, //       USAGE (VoltageNotRegulated)
     0xB1, 0xA3, //       FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
-    0x09, 0x46, //       USAGE (FullyCharged)
-    0x81, 0xA3, //       INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
-    0x09, 0x46, //       USAGE (FullyCharged)
-    0xB1, 0xA3, //       FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
-    0x09, 0x47, //       USAGE (FullyDischarged)
-    0x81, 0xA3, //       INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
-    0x09, 0x47, //       USAGE (FullyDischarged)
-    0xB1, 0xA3, //       FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
     0x05, 0x84, //       USAGE_PAGE (Power Device) =================
     0x09, 0x69, //       USAGE (ShutdownImminent)
     0x81, 0xA3, //       INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
     0x09, 0x69, //       USAGE (ShutdownImminent)
     0xB1, 0xA3, //       FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
-    0x95, 0x06, //       REPORT_COUNT (6) // padding bits to make the report byte aligned
-    0x81, 0x01, //       INPUT (Constant, Array, Absolute)
-    0xB1, 0x01, //       FEATURE (Constant, Array, Absolute, No Wrap, Linear, Preferred State, No Null Position, Nonvolatile, Bitfield)
+    //0x95, 0x00, //       REPORT_COUNT (0) // padding bits to make the report byte aligned
+    //0x81, 0x01, //       INPUT (Constant, Array, Absolute)
+    //0xB1, 0x01, //       FEATURE (Constant, Array, Absolute, No Wrap, Linear, Preferred State, No Null Position, Nonvolatile, Bitfield)
     0xC0,       //     END_COLLECTION
     0xC0,       //   END_COLLECTION
     0xC0        // END_COLLECTION
