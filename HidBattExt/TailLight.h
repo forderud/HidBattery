@@ -58,6 +58,6 @@ struct TailLightReport {
     UCHAR   Green = 0;
     UCHAR   Blue = 0;
 
-    UCHAR  padding[67] = {};
+    UCHAR  padding[68] = {};
 };
-static_assert(sizeof(TailLightReport) == 73);
+static_assert(sizeof(TailLightReport) == 74);
