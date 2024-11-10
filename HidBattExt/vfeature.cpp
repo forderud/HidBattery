@@ -120,7 +120,7 @@ NTSTATUS SetFeatureColor (
 
         //KdPrint(("TailLight: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage));
 
-        if (caps.FeatureReportByteLength != sizeof(TailLightReport) + 1) {
+        if (caps.FeatureReportByteLength + 1 != sizeof(TailLightReport)) {
             KdPrint(("TailLight: FeatureReportByteLength mismatch (%u, %Iu).\n", caps.FeatureReportByteLength, sizeof(TailLightReport)));
             return status;
         }
