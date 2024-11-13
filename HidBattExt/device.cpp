@@ -38,6 +38,7 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE device) {
 
     BOOLEAN inQueue = WdfTimerStart(timer, 0); // no wait
     NT_ASSERTMSG("TailLight: timer already in queue", !inQueue);
+    UNREFERENCED_PARAMETER(inQueue);
 
     return status;
 }

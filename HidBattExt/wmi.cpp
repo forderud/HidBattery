@@ -15,6 +15,7 @@ VOID SelfTestTimerProc (_In_ WDFTIMER timer) {
         stCtx->Result = status;
         LONG wasSignaled = KeSetEvent(&deviceContext->SelfTestCompleted, IO_MOUSE_INCREMENT, FALSE);
         NT_ASSERTMSG("TailLight: SelfTest method set to signaled while already signaled.\n", wasSignaled == 0);
+        UNREFERENCED_PARAMETER(wasSignaled);
         return; // abort self-test
     }
 
@@ -23,12 +24,14 @@ VOID SelfTestTimerProc (_In_ WDFTIMER timer) {
         stCtx->Result = STATUS_SUCCESS;
         LONG wasSignaled = KeSetEvent(&deviceContext->SelfTestCompleted, IO_MOUSE_INCREMENT, FALSE);
         NT_ASSERTMSG("TailLight: SelfTest method set to signaled while already signaled.\n", wasSignaled == 0);
+        UNREFERENCED_PARAMETER(wasSignaled);
         return;
     }
 
     // enqueue the next callback
     BOOLEAN inQueue = WdfTimerStart(timer, WDF_REL_TIMEOUT_IN_MS(SELF_TEST_CONTEXT::DURATION_MS));
     NT_ASSERTMSG("TailLight: Previous active timer overwritten", !inQueue);
+    UNREFERENCED_PARAMETER(inQueue);
 }
 
 static NTSTATUS EvtWmiInstanceExecuteMethod(
