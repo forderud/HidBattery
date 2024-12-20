@@ -84,8 +84,6 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0x27, 0xFF, 0xFF, 0x00, 0x00, //     LOGICAL_MAXIMUM (65535)
     0x67, 0x21, 0xD1, 0xF0, 0x00, //     UNIT (Centivolts)
     0x55, 0x05, //     UNIT_EXPONENT (5)
-    0x81, 0xA3, //     INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
-    0x09, 0x30, //     USAGE (Voltage)
     0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
     0x09, 0x02, //     USAGE (PresentStatus)
     0xA1, 0x02, //     COLLECTION (Logical)
