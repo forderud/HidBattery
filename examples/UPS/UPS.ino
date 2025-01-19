@@ -43,7 +43,8 @@ const byte bCapacityGranularity1 = 1;
 const byte bCapacityGranularity2 = 1;
 uint32_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
 
-uint32_t iRemaining =0, iPrevRemaining=0;
+uint32_t iRemaining[BATTERY_COUNT] = {}; // remaining charge
+uint32_t iPrevRemaining=0;
 bool bCharging = false;
 
 int iRes=0;
@@ -55,6 +56,9 @@ void setup() {
 #endif
 
   for (int i = 0; i < BATTERY_COUNT; i++) {
+    // initialize each battery with 50% charge
+    iRemaining[i] = 0.50f*iFullChargeCapacity;
+
 #ifdef CDC_ENABLED
     // Used for debugging purposes. 
     PowerDevice[i].setOutput(Serial);
@@ -90,7 +94,7 @@ void setup() {
 
     PowerDevice[i].SetFeature(HID_PD_DESIGNCAPACITY, &iDesignCapacity, sizeof(iDesignCapacity));
     PowerDevice[i].SetFeature(HID_PD_FULLCHRGECAPACITY, &iFullChargeCapacity, sizeof(iFullChargeCapacity));
-    PowerDevice[i].SetFeature(HID_PD_REMAININGCAPACITY, &iRemaining, sizeof(iRemaining));
+    PowerDevice[i].SetFeature(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
     PowerDevice[i].SetFeature(HID_PD_WARNCAPACITYLIMIT, &iWarnCapacityLimit, sizeof(iWarnCapacityLimit));
     PowerDevice[i].SetFeature(HID_PD_REMNCAPACITYLIMIT, &iRemnCapacityLimit, sizeof(iRemnCapacityLimit));
     PowerDevice[i].SetFeature(HID_PD_CPCTYGRANULARITY1, &bCapacityGranularity1, sizeof(bCapacityGranularity1));
@@ -106,23 +110,26 @@ void loop() {
   //*********** Measurements Unit ****************************
   int iBattSoc = analogRead(BATTSOCPIN); // potensiometer value in [0,1024)
 
-  iRemaining = (uint32_t)(round((float)iFullChargeCapacity*iBattSoc/1024));
-  iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining/iFullChargeCapacity);
+  for (int i = BATTERY_COUNT-1; i > 0; i--)
+    iRemaining[i] = iRemaining[i-1]; // propagate charge level from first to last battery
+  iRemaining[0] = (uint32_t)(round((float)iFullChargeCapacity*iBattSoc/1024));
 
-  if (iRemaining > iPrevRemaining + 1) // add a bit hysteresis
+  iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining[0]/iFullChargeCapacity);
+
+  if (iRemaining[0] > iPrevRemaining + 1) // add a bit hysteresis
     bCharging = true;
-  else if (iRemaining < iPrevRemaining - 1) // add a bit hysteresis
+  else if (iRemaining[0] < iPrevRemaining - 1) // add a bit hysteresis
     bCharging = false;
 
   // Charging
   iPresentStatus.Charging = bCharging;
   iPresentStatus.ACPresent = bCharging; // assume charging implies AC present
-  iPresentStatus.FullyCharged = (iRemaining == iFullChargeCapacity);
+  iPresentStatus.FullyCharged = (iRemaining[0] == iFullChargeCapacity);
 
   // Discharging
   if(!bCharging) { // assume not charging implies discharging
     iPresentStatus.Discharging = 1;
-    // if(iRemaining < iRemnCapacityLimit) iPresentStatus.BelowRemainingCapacityLimit = 1;
+    // if(iRemaining[0] < iRemnCapacityLimit) iPresentStatus.BelowRemainingCapacityLimit = 1;
 
     iPresentStatus.RemainingTimeLimitExpired = (iRunTimeToEmpty < iRemainTimeLimit);
   } else {
@@ -163,9 +170,9 @@ void loop() {
 
   //************ Bulk send or interrupt ***********************
 
-  if((iPresentStatus != iPreviousStatus) || (iRemaining != iPrevRemaining) || (iRunTimeToEmpty != iPrevRunTimeToEmpty) || (iIntTimer>MINUPDATEINTERVAL) ) {
+  if((iPresentStatus != iPreviousStatus) || (iRemaining[0] != iPrevRemaining) || (iRunTimeToEmpty != iPrevRunTimeToEmpty) || (iIntTimer>MINUPDATEINTERVAL) ) {
     for (int i = 0; i < BATTERY_COUNT; i++) {
-      PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining, sizeof(iRemaining));
+      PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining[0], sizeof(iRemaining[0]));
 
       if(!bCharging)
         PowerDevice[i].SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
@@ -180,12 +187,12 @@ void loop() {
 
     iIntTimer = 0;
     iPreviousStatus = iPresentStatus;
-    iPrevRemaining = iRemaining;
+    iPrevRemaining = iRemaining[0];
     iPrevRunTimeToEmpty = iRunTimeToEmpty;
   }
 
 #ifdef CDC_ENABLED
-  Serial.println(iRemaining);
+  Serial.println(iRemaining[0]);
   Serial.println(iRunTimeToEmpty);
   Serial.println(iRes);
 #endif
