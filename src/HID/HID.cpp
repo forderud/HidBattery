@@ -145,20 +145,6 @@ int HID_::SetFeature(uint16_t id, const void* data, int len)
     return reportCount;
 }
 
-bool HID_::LockFeature(uint16_t id, bool lock) {
-    if(rootReport) {
-        HIDReport* current;
-        for(current = rootReport;current; current=current->next) {
-            if(current->id == id) {
-                current->lock = lock;
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-
 int HID_::SendReport(uint16_t id, const void* data, int len)
 {
     auto ret = USB_Send(pluggedEndpoint, &id, 1);
