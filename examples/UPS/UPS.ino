@@ -155,10 +155,6 @@ void loop() {
   iIntTimer++;
   digitalWrite(RUNSTATUSPIN, LOW);   // turn the LED off;
 
-  //************ Check if we are still online ******************
-
-
-
   //************ Bulk send or interrupt ***********************
 
   if((iPresentStatus != iPreviousStatus) || (iRemaining != iPrevRemaining) || (iRunTimeToEmpty != iPrevRunTimeToEmpty) || (iIntTimer>MINUPDATEINTERVAL) ) {
