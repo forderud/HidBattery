@@ -10,7 +10,7 @@ int iIntTimer=0;
 
 
 // String constants 
-const char STRING_DEVICECHEMISTRY[] PROGMEM = "PbAc";
+const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
 const char STRING_OEMVENDOR[] PROGMEM = "MyCoolUPS";
 const char STRING_SERIAL[] PROGMEM = "UPS10"; 
 
@@ -23,8 +23,8 @@ byte bRechargable = 1;
 byte bCapacityMode = 0;  // unit: 0=mAh, 1=mWh, 2=%
 
 // Physical parameters
-const uint16_t iConfigVoltage = 1380; // centiVolt
-uint16_t iVoltage =1300; // centiVolt
+const uint16_t iConfigVoltage = 1509; // centiVolt
+uint16_t iVoltage =1499; // centiVolt
 uint16_t iRunTimeToEmpty = 0, iPrevRunTimeToEmpty = 0;
 uint16_t iAvgTimeToFull = 7200;
 uint16_t iAvgTimeToEmpty = 7200;
@@ -36,14 +36,14 @@ byte iAudibleAlarmCtrl = 2; // 1 - Disabled, 2 - Enabled, 3 - Muted
 
 
 // Parameters for ACPI compliancy
-const byte iDesignCapacity = 100;
+const uint32_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
 byte iWarnCapacityLimit = 10; // warning at 10% 
 byte iRemnCapacityLimit = 5; // low at 5% 
 const byte bCapacityGranularity1 = 1;
 const byte bCapacityGranularity2 = 1;
-byte iFullChargeCapacity = 100;
+uint32_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
 
-byte iRemaining =0, iPrevRemaining=0;
+uint32_t iRemaining =0, iPrevRemaining=0;
 bool bCharging = false;
 
 int iRes=0;
@@ -100,7 +100,7 @@ void loop() {
   //*********** Measurements Unit ****************************
   int iBattSoc = analogRead(BATTSOCPIN); // potensiometer value in [0,1024)
 
-  iRemaining = (byte)(round((float)iFullChargeCapacity*iBattSoc/1024));
+  iRemaining = (uint32_t)(round((float)iFullChargeCapacity*iBattSoc/1024));
   iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining/iFullChargeCapacity);
 
   if (iRemaining > iPrevRemaining + 1) // add a bit hysteresis
