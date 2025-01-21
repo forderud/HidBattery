@@ -9,10 +9,10 @@
 int iIntTimer=0;
 
 
-// String constants 
+// String constants
 const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
 const char STRING_OEMVENDOR[] PROGMEM = "MyCoolUPS";
-const char STRING_SERIAL[] PROGMEM = "UPS10"; 
+const char STRING_SERIAL[] PROGMEM = "UPS10";
 
 const byte bDeviceChemistry = IDEVICECHEMISTRY;
 const byte bOEMVendor = IOEMVENDOR;
@@ -37,8 +37,8 @@ byte iAudibleAlarmCtrl = 2; // 1 - Disabled, 2 - Enabled, 3 - Muted
 
 // Parameters for ACPI compliancy
 const uint32_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
-byte iWarnCapacityLimit = 10; // warning at 10% 
-byte iRemnCapacityLimit = 5; // low at 5% 
+byte iWarnCapacityLimit = 10; // warning at 10%
+byte iRemnCapacityLimit = 5; // low at 5%
 const byte bCapacityGranularity1 = 1;
 const byte bCapacityGranularity2 = 1;
 uint32_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
@@ -52,27 +52,27 @@ int iRes=0;
 void setup() {
 #ifdef CDC_ENABLED
   Serial.begin(57600);
-  // Used for debugging purposes. 
+  // Used for debugging purposes.
   PowerDevice.setOutput(Serial);
 #endif
-  
+
   // Serial No is set in a special way as it forms Arduino port name
-  PowerDevice.setSerial(STRING_SERIAL); 
-  
-  pinMode(CHGDCHPIN, INPUT_PULLUP); // ground this pin to simulate power failure. 
-  pinMode(RUNSTATUSPIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running. 
+  PowerDevice.setSerial(STRING_SERIAL);
+
+  pinMode(CHGDCHPIN, INPUT_PULLUP); // ground this pin to simulate power failure.
+  pinMode(RUNSTATUSPIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running.
   pinMode(COMMLOSTPIN, OUTPUT); // output is on once communication is lost with the host, otherwise off.
 
 
   PowerDevice.SetFeature(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
-  
+
   PowerDevice.SetFeature(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
   PowerDevice.SetFeature(HID_PD_AVERAGETIME2FULL, &iAvgTimeToFull, sizeof(iAvgTimeToFull));
   PowerDevice.SetFeature(HID_PD_AVERAGETIME2EMPTY, &iAvgTimeToEmpty, sizeof(iAvgTimeToEmpty));
   PowerDevice.SetFeature(HID_PD_REMAINTIMELIMIT, &iRemainTimeLimit, sizeof(iRemainTimeLimit));
   PowerDevice.SetFeature(HID_PD_DELAYBE4REBOOT, &iDelayBe4Reboot, sizeof(iDelayBe4Reboot));
   PowerDevice.SetFeature(HID_PD_DELAYBE4SHUTDOWN, &iDelayBe4ShutDown, sizeof(iDelayBe4ShutDown));
-  
+
   PowerDevice.SetFeature(HID_PD_RECHARGEABLE, &bRechargable, sizeof(bRechargable));
   PowerDevice.SetFeature(HID_PD_CAPACITYMODE, &bCapacityMode, sizeof(bCapacityMode));
   PowerDevice.SetFeature(HID_PD_CONFIGVOLTAGE, &iConfigVoltage, sizeof(iConfigVoltage));
@@ -107,21 +107,19 @@ void loop() {
     bCharging = true;
   else if (iRemaining < iPrevRemaining - 1) // add a bit hysteresis
     bCharging = false;
-  
+
   // Charging
   iPresentStatus.Charging = bCharging;
   iPresentStatus.ACPresent = bCharging; // assume charging implies AC present
   iPresentStatus.FullyCharged = (iRemaining == iFullChargeCapacity);
-    
+
   // Discharging
   if(!bCharging) { // assume not charging implies discharging
     iPresentStatus.Discharging = 1;
     // if(iRemaining < iRemnCapacityLimit) iPresentStatus.BelowRemainingCapacityLimit = 1;
-    
-    iPresentStatus.RemainingTimeLimitExpired = (iRunTimeToEmpty < iRemainTimeLimit);
 
-  }
-  else {
+    iPresentStatus.RemainingTimeLimitExpired = (iRunTimeToEmpty < iRemainTimeLimit);
+  } else {
     iPresentStatus.Discharging = 0;
     iPresentStatus.RemainingTimeLimitExpired = 0;
   }
@@ -132,25 +130,24 @@ void loop() {
 #ifdef CDC_ENABLED
       Serial.println("shutdown requested");
 #endif
-  }
-  else
+  } else {
     iPresentStatus.ShutdownRequested = 0;
+  }
 
   // Shutdown imminent
-  if((iPresentStatus.ShutdownRequested) || 
-     (iPresentStatus.RemainingTimeLimitExpired)) {
+  if((iPresentStatus.ShutdownRequested) || (iPresentStatus.RemainingTimeLimitExpired)) {
     iPresentStatus.ShutdownImminent = 1;
 #ifdef CDC_ENABLED
     Serial.println("shutdown imminent");
 #endif
-  }
-  else
+  } else {
     iPresentStatus.ShutdownImminent = 0;
-  
-  iPresentStatus.BatteryPresent = 1;
-  
+  }
 
-  //************ Delay ****************************************  
+  iPresentStatus.BatteryPresent = 1;
+
+
+  //************ Delay ****************************************
   delay(1000);
   iIntTimer++;
   digitalWrite(RUNSTATUSPIN, HIGH);   // turn the LED on (HIGH is the voltage level);
@@ -158,30 +155,27 @@ void loop() {
   iIntTimer++;
   digitalWrite(RUNSTATUSPIN, LOW);   // turn the LED off;
 
-  //************ Check if we are still online ******************
-
-  
-
   //************ Bulk send or interrupt ***********************
 
   if((iPresentStatus != iPreviousStatus) || (iRemaining != iPrevRemaining) || (iRunTimeToEmpty != iPrevRunTimeToEmpty) || (iIntTimer>MINUPDATEINTERVAL) ) {
-
     PowerDevice.SendReport(HID_PD_REMAININGCAPACITY, &iRemaining, sizeof(iRemaining));
-    if(!bCharging) PowerDevice.SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
+
+    if(!bCharging)
+      PowerDevice.SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
+
     iRes = PowerDevice.SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
 
-    if(iRes <0 ) {
+    if(iRes <0 )
       digitalWrite(COMMLOSTPIN, HIGH);
-    }
     else
       digitalWrite(COMMLOSTPIN, LOW);
-        
+
     iIntTimer = 0;
     iPreviousStatus = iPresentStatus;
     iPrevRemaining = iRemaining;
     iPrevRunTimeToEmpty = iRunTimeToEmpty;
   }
-  
+
 #ifdef CDC_ENABLED
   Serial.println(iRemaining);
   Serial.println(iRunTimeToEmpty);
