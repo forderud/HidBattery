@@ -130,20 +130,19 @@ protected:
 private:
     uint8_t epType[1];
 
-    HIDSubDescriptor* rootNode;
-    uint16_t descriptorSize;
+    HIDSubDescriptor* rootNode = nullptr;
+    uint16_t descriptorSize = 0;
 
-    uint8_t protocol;
-    uint8_t idle;
+    uint8_t protocol = HID_REPORT_PROTOCOL;
+    uint8_t idle = 1;
   
     // Buffer pointer to hold the feature data
-    HIDReport* rootReport;
+    HIDReport* rootReport = nullptr;
     uint16_t reportCount;
     
-    Serial_ *dbg;
+    Serial_ *dbg = nullptr;
     
-    const char *serial;
-    
+    const char *serial = nullptr; 
 };
 
 #define D_HIDREPORT(length) { 9, 0x21, 0x01, 0x01, 0, 1, 0x22, lowByte(length), highByte(length) }
