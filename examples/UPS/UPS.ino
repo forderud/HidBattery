@@ -119,9 +119,7 @@ void loop() {
     // if(iRemaining < iRemnCapacityLimit) iPresentStatus.BelowRemainingCapacityLimit = 1;
 
     iPresentStatus.RemainingTimeLimitExpired = (iRunTimeToEmpty < iRemainTimeLimit);
-
-  }
-  else {
+  } else {
     iPresentStatus.Discharging = 0;
     iPresentStatus.RemainingTimeLimitExpired = 0;
   }
@@ -132,9 +130,9 @@ void loop() {
 #ifdef CDC_ENABLED
       Serial.println("shutdown requested");
 #endif
-  }
-  else
+  } else {
     iPresentStatus.ShutdownRequested = 0;
+  }
 
   // Shutdown imminent
   if((iPresentStatus.ShutdownRequested) ||
@@ -143,9 +141,9 @@ void loop() {
 #ifdef CDC_ENABLED
     Serial.println("shutdown imminent");
 #endif
-  }
-  else
+  } else {
     iPresentStatus.ShutdownImminent = 0;
+  }
 
   iPresentStatus.BatteryPresent = 1;
 
@@ -165,14 +163,15 @@ void loop() {
   //************ Bulk send or interrupt ***********************
 
   if((iPresentStatus != iPreviousStatus) || (iRemaining != iPrevRemaining) || (iRunTimeToEmpty != iPrevRunTimeToEmpty) || (iIntTimer>MINUPDATEINTERVAL) ) {
-
     PowerDevice.SendReport(HID_PD_REMAININGCAPACITY, &iRemaining, sizeof(iRemaining));
-    if(!bCharging) PowerDevice.SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
+
+    if(!bCharging)
+      PowerDevice.SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
+
     iRes = PowerDevice.SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
 
-    if(iRes <0 ) {
+    if(iRes <0 )
       digitalWrite(COMMLOSTPIN, HIGH);
-    }
     else
       digitalWrite(COMMLOSTPIN, LOW);
 
