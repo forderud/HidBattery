@@ -96,12 +96,8 @@ void setup() {
 }
 
 void loop() {
-  
-  
   //*********** Measurements Unit ****************************
   bool bCharging = digitalRead(CHGDCHPIN);
-  bool bACPresent = bCharging;    // TODO - replace with sensor
-  bool bDischarging = !bCharging; // TODO - replace with sensor
   int iBattSoc = analogRead(BATTSOCPIN); // potensiometer value in [0,1024)
 
   iRemaining = (byte)(round((float)iFullChargeCapacity*iBattSoc/1024));
@@ -109,11 +105,11 @@ void loop() {
 
   // Charging
   iPresentStatus.Charging = bCharging;
-  iPresentStatus.ACPresent = bACPresent;
+  iPresentStatus.ACPresent = bCharging; // assume charging implies AC present
   iPresentStatus.FullyCharged = (iRemaining == iFullChargeCapacity);
     
   // Discharging
-  if(bDischarging) {
+  if(!bCharging) { // assume not charging implies discharging
     iPresentStatus.Discharging = 1;
     // if(iRemaining < iRemnCapacityLimit) iPresentStatus.BelowRemainingCapacityLimit = 1;
     
@@ -165,7 +161,7 @@ void loop() {
   if((iPresentStatus != iPreviousStatus) || (iRemaining != iPrevRemaining) || (iRunTimeToEmpty != iPrevRunTimeToEmpty) || (iIntTimer>MINUPDATEINTERVAL) ) {
 
     PowerDevice.SendReport(HID_PD_REMAININGCAPACITY, &iRemaining, sizeof(iRemaining));
-    if(bDischarging) PowerDevice.SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
+    if(!bCharging) PowerDevice.SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
     iRes = PowerDevice.SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
 
     if(iRes <0 ) {
