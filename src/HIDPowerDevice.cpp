@@ -236,11 +236,6 @@ HIDPowerDevice_::HIDPowerDevice_(void) {
     SetFeature(HID_PD_MANUFACTURER, &bManufacturer, sizeof(bManufacturer));
 }
 
-int HIDPowerDevice_::sendDate(uint8_t id, uint16_t year, uint8_t month, uint8_t day) {
-    uint16_t bval = (year - 1980)*512 + month * 32 + day;
-    return SendReport(id, &bval, sizeof (bval));
-}
-
 int HIDPowerDevice_::setStringFeature(uint8_t id, const uint8_t* index, const char* data) {
     
     int res = SetFeature(id, index, 1);
