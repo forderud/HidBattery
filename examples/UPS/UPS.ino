@@ -50,14 +50,14 @@ int iRes=0;
 
 
 void setup() {
-
+#ifdef CDC_ENABLED
   Serial.begin(57600);
+  // Used for debugging purposes. 
+  PowerDevice.setOutput(Serial);
+#endif
   
   // Serial No is set in a special way as it forms Arduino port name
   PowerDevice.setSerial(STRING_SERIAL); 
-  
-  // Used for debugging purposes. 
-  PowerDevice.setOutput(Serial);
   
   pinMode(CHGDCHPIN, INPUT_PULLUP); // ground this pin to simulate power failure. 
   pinMode(RUNSTATUSPIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running. 
@@ -129,7 +129,9 @@ void loop() {
   // Shutdown requested
   if(iDelayBe4ShutDown > 0 ) {
       iPresentStatus.ShutdownRequested = 1;
+#ifdef CDC_ENABLED
       Serial.println("shutdown requested");
+#endif
   }
   else
     iPresentStatus.ShutdownRequested = 0;
@@ -138,15 +140,14 @@ void loop() {
   if((iPresentStatus.ShutdownRequested) || 
      (iPresentStatus.RemainingTimeLimitExpired)) {
     iPresentStatus.ShutdownImminent = 1;
+#ifdef CDC_ENABLED
     Serial.println("shutdown imminent");
+#endif
   }
   else
     iPresentStatus.ShutdownImminent = 0;
-
-
   
   iPresentStatus.BatteryPresent = 1;
-
   
 
   //************ Delay ****************************************  
@@ -181,9 +182,9 @@ void loop() {
     iPrevRunTimeToEmpty = iRunTimeToEmpty;
   }
   
-
+#ifdef CDC_ENABLED
   Serial.println(iRemaining);
   Serial.println(iRunTimeToEmpty);
   Serial.println(iRes);
-  
+#endif
 }
