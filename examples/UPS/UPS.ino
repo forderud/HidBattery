@@ -11,11 +11,12 @@ int iIntTimer=0;
 
 // String constants
 const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
-const char STRING_OEMVENDOR[] PROGMEM = "MyCoolUPS";
-const char STRING_SERIAL[] PROGMEM = "UPS10";
-
 const byte bDeviceChemistry = IDEVICECHEMISTRY;
+
+const char STRING_OEMVENDOR[] PROGMEM = "MyCoolUPS";
 const byte bOEMVendor = IOEMVENDOR;
+
+const char STRING_SERIAL[] PROGMEM = "UPS10";
 
 PresentStatus iPresentStatus = {}, iPreviousStatus = {};
 
