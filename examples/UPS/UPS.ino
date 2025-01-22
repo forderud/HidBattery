@@ -172,7 +172,7 @@ void loop() {
 
   if((iPresentStatus != iPreviousStatus) || (iRemaining[0] != iPrevRemaining) || (iRunTimeToEmpty != iPrevRunTimeToEmpty) || (iIntTimer>MINUPDATEINTERVAL) ) {
     for (int i = 0; i < BATTERY_COUNT; i++) {
-      PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining[0], sizeof(iRemaining[0]));
+      PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
 
       if(!bCharging)
         PowerDevice[i].SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
