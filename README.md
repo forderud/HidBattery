@@ -8,10 +8,10 @@ The project is based on Alexander Bratchik's [HIDPowerDevice](https://github.com
 * Leonardo
 
 ## Setup & Usage
-Clone this repository to your Arduino libraries folder (`C:\Users\<username>\Documents\Arduino\libraries` on Windows). Then, open the `examples/UPS/UPS.ino` sketch in Arduino IDE and press "Upload". The Operating System will afterwards detect one or more new batteries.
+Clone this repository to your Arduino libraries folder (`C:\Users\<username>\Documents\Arduino\libraries` on Windows). Then, open the `battery/battery.ino` sketch in Arduino IDE and press "Upload". The Operating System will afterwards detect one or more new batteries.
 
 ### Additional setup on Linux
-Copy `linux/98-upower-hid.rules` file to the `/etc/udev/rules.d/` folder and reboot. This is required for Linux device manager (udev) to recognize the Arduino board as UPS. 
+Copy `linux/98-upower-hid.rules` file to the `/etc/udev/rules.d/` folder and reboot. This is required for Linux device manager (udev) to recognize the Arduino board as a battery. 
 
 ## Tested on the following Operating Systems
 * Mac OS 14 Sonoma
