@@ -30,15 +30,15 @@ byte iAudibleAlarmCtrl = 2; // 1 - Disabled, 2 - Enabled, 3 - Muted
 
 
 // Parameters for ACPI compliancy
-const uint32_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
+const uint16_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
 byte iWarnCapacityLimit = 10; // warning at 10%
 byte iRemnCapacityLimit = 5; // low at 5%
 const byte bCapacityGranularity1 = 1;
 const byte bCapacityGranularity2 = 1;
-uint32_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
+uint16_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
 
-uint32_t iRemaining[BATTERY_COUNT] = {}; // remaining charge
-uint32_t iPrevRemaining=0;
+uint16_t iRemaining[BATTERY_COUNT] = {}; // remaining charge
+uint16_t iPrevRemaining=0;
 bool bCharging = false;
 
 int iRes=0;
@@ -105,7 +105,7 @@ void loop() {
 
   for (int i = BATTERY_COUNT-1; i > 0; i--)
     iRemaining[i] = iRemaining[i-1]; // propagate charge level from first to last battery
-  iRemaining[0] = (uint32_t)(round((float)iFullChargeCapacity*iBattSoc/1024));
+  iRemaining[0] = (uint16_t)(round((float)iFullChargeCapacity*iBattSoc/1024));
 
   iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining[0]/iFullChargeCapacity);
 
