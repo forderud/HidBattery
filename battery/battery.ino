@@ -1,7 +1,5 @@
 #include <HIDPowerDevice.h>
 
-#define COMMLOSTPIN         10
-
 // String constants
 const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
 const byte bDeviceChemistry = IDEVICECHEMISTRY;
@@ -41,9 +39,6 @@ uint16_t iRemaining[BATTERY_COUNT] = {}; // remaining charge
 uint16_t iPrevRemaining=0;
 bool bCharging = false;
 
-int iRes=0;
-
-
 void setup() {
 #ifdef CDC_ENABLED
   Serial.begin(57600);
@@ -61,8 +56,7 @@ void setup() {
     PowerDevice[i].SetFeature(0xFF00 | PowerDevice[i].bSerial, STRING_SERIAL, strlen_P(STRING_SERIAL));
   }
 
-  pinMode(LED_BUILTIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running. 
-  pinMode(COMMLOSTPIN, OUTPUT); // output is on once communication is lost with the host, otherwise off.
+  pinMode(LED_BUILTIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running.
 
   for (int i = 0; i < BATTERY_COUNT; i++) {
     PowerDevice[i].SetFeature(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
@@ -160,26 +154,25 @@ void loop() {
   digitalWrite(LED_BUILTIN, LOW);   // turn the LED off;
 
   //************ Bulk send or interrupt ***********************
-
+  int res = 0;
   for (int i = 0; i < BATTERY_COUNT; i++) {
-    PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
+    if (res >= 0)
+      res = PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
 
-    if(!bCharging)
-      PowerDevice[i].SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
+    if((res >= 0) && !bCharging)
+      res = PowerDevice[i].SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
 
-    iRes = PowerDevice[i].SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
+    if (res >= 0)
+      res = PowerDevice[i].SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
   }
-
-  if(iRes <0 )
-    digitalWrite(COMMLOSTPIN, HIGH);
-  else
-    digitalWrite(COMMLOSTPIN, LOW);
 
   iPrevRemaining = iRemaining[0];
 
 #ifdef CDC_ENABLED
   Serial.println(iRemaining[0]);
   Serial.println(iRunTimeToEmpty);
-  Serial.println(iRes);
+
+  Serial.print("SendReport res=");
+  Serial.println(res);
 #endif
 }
