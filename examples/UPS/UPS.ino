@@ -13,7 +13,7 @@ int iIntTimer=0;
 const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
 const byte bDeviceChemistry = IDEVICECHEMISTRY;
 
-const char STRING_OEMVENDOR[] PROGMEM = "MyCoolUPS";
+const char STRING_OEMVENDOR[] PROGMEM = "BatteryVendor";
 const byte bOEMVendor = IOEMVENDOR;
 
 const char STRING_SERIAL[] PROGMEM = "UPS10";
@@ -90,6 +90,7 @@ void setup() {
 
     PowerDevice[i].setStringFeature(HID_PD_IDEVICECHEMISTRY, &bDeviceChemistry, STRING_DEVICECHEMISTRY);
     PowerDevice[i].setStringFeature(HID_PD_IOEMINFORMATION, &bOEMVendor, STRING_OEMVENDOR);
+    PowerDevice[i].SetFeature(0xFF00 | PowerDevice[i].bManufacturer, STRING_OEMVENDOR, strlen_P(STRING_OEMVENDOR));
 
     PowerDevice[i].SetFeature(HID_PD_AUDIBLEALARMCTRL, &iAudibleAlarmCtrl, sizeof(iAudibleAlarmCtrl));
 
