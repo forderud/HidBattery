@@ -3,7 +3,6 @@
 #define MINUPDATEINTERVAL   26
 #define RUNSTATUSPIN        5
 #define COMMLOSTPIN         10
-#define BATTSOCPIN          A7
 
 int iIntTimer=0;
 
@@ -107,7 +106,7 @@ void setup() {
 
 void loop() {
   //*********** Measurements Unit ****************************
-  int iBattSoc = analogRead(BATTSOCPIN); // potensiometer value in [0,1024)
+  int iBattSoc = analogRead(PIN_A7); // potensiometer value in [0,1024)
 
   for (int i = BATTERY_COUNT-1; i > 0; i--)
     iRemaining[i] = iRemaining[i-1]; // propagate charge level from first to last battery
