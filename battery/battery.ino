@@ -1,10 +1,6 @@
 #include <HIDPowerDevice.h>
 
-#define MINUPDATEINTERVAL   26
 #define COMMLOSTPIN         10
-
-int iIntTimer=0;
-
 
 // String constants
 const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
@@ -15,7 +11,7 @@ const byte bOEMVendor = IOEMVENDOR;
 
 const char STRING_SERIAL[] PROGMEM = "1234";
 
-PresentStatus iPresentStatus = {}, iPreviousStatus = {};
+PresentStatus iPresentStatus = {};
 
 byte bRechargable = 1;
 byte bCapacityMode = 0;  // unit: 0=mAh, 1=mWh, 2=%
@@ -23,7 +19,7 @@ byte bCapacityMode = 0;  // unit: 0=mAh, 1=mWh, 2=%
 // Physical parameters
 const uint16_t iConfigVoltage = 1509; // centiVolt
 uint16_t iVoltage =1499; // centiVolt
-uint16_t iRunTimeToEmpty = 0, iPrevRunTimeToEmpty = 0;
+uint16_t iRunTimeToEmpty = 0;
 uint16_t iAvgTimeToFull = 7200;
 uint16_t iAvgTimeToEmpty = 7200;
 uint16_t iRemainTimeLimit = 600;
@@ -159,34 +155,27 @@ void loop() {
 
   //************ Delay ****************************************
   delay(1000);
-  iIntTimer++;
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level);
   delay(1000);
-  iIntTimer++;
   digitalWrite(LED_BUILTIN, LOW);   // turn the LED off;
 
   //************ Bulk send or interrupt ***********************
 
-  if((iPresentStatus != iPreviousStatus) || (iRemaining[0] != iPrevRemaining) || (iRunTimeToEmpty != iPrevRunTimeToEmpty) || (iIntTimer>MINUPDATEINTERVAL) ) {
-    for (int i = 0; i < BATTERY_COUNT; i++) {
-      PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
+  for (int i = 0; i < BATTERY_COUNT; i++) {
+    PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
 
-      if(!bCharging)
-        PowerDevice[i].SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
+    if(!bCharging)
+      PowerDevice[i].SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
 
-      iRes = PowerDevice[i].SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
-    }
-
-    if(iRes <0 )
-      digitalWrite(COMMLOSTPIN, HIGH);
-    else
-      digitalWrite(COMMLOSTPIN, LOW);
-
-    iIntTimer = 0;
-    iPreviousStatus = iPresentStatus;
-    iPrevRemaining = iRemaining[0];
-    iPrevRunTimeToEmpty = iRunTimeToEmpty;
+    iRes = PowerDevice[i].SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
   }
+
+  if(iRes <0 )
+    digitalWrite(COMMLOSTPIN, HIGH);
+  else
+    digitalWrite(COMMLOSTPIN, LOW);
+
+  iPrevRemaining = iRemaining[0];
 
 #ifdef CDC_ENABLED
   Serial.println(iRemaining[0]);
