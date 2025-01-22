@@ -13,7 +13,7 @@ int iIntTimer=0;
 const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
 const byte bDeviceChemistry = IDEVICECHEMISTRY;
 
-const char STRING_OEMVENDOR[] PROGMEM = "MyCoolUPS";
+const char STRING_OEMVENDOR[] PROGMEM = "BatteryVendor";
 const byte bOEMVendor = IOEMVENDOR;
 
 const char STRING_SERIAL[] PROGMEM = "UPS10";
