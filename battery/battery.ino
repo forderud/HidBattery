@@ -45,8 +45,8 @@ void setup() {
 #endif
 
   for (int i = 0; i < BATTERY_COUNT; i++) {
-    // initialize each battery with 50% charge
-    iRemaining[i] = 0.50f*iFullChargeCapacity;
+    // initialize batteries with 30% charge
+    iRemaining[i] = 0.30f*iFullChargeCapacity;
 
 #ifdef CDC_ENABLED
     // Used for debugging purposes. 
