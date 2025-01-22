@@ -16,7 +16,7 @@ const byte bDeviceChemistry = IDEVICECHEMISTRY;
 const char STRING_OEMVENDOR[] PROGMEM = "BatteryVendor";
 const byte bOEMVendor = IOEMVENDOR;
 
-const char STRING_SERIAL[] PROGMEM = "UPS10";
+const char STRING_SERIAL[] PROGMEM = "1234";
 
 PresentStatus iPresentStatus = {}, iPreviousStatus = {};
 
