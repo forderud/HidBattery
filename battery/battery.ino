@@ -1,7 +1,6 @@
 #include <HIDPowerDevice.h>
 
 #define MINUPDATEINTERVAL   26
-#define RUNSTATUSPIN        5
 #define COMMLOSTPIN         10
 
 int iIntTimer=0;
@@ -66,7 +65,7 @@ void setup() {
     PowerDevice[i].SetFeature(0xFF00 | PowerDevice[i].bSerial, STRING_SERIAL, strlen_P(STRING_SERIAL));
   }
 
-  pinMode(RUNSTATUSPIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running. 
+  pinMode(LED_BUILTIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running. 
   pinMode(COMMLOSTPIN, OUTPUT); // output is on once communication is lost with the host, otherwise off.
 
   for (int i = 0; i < BATTERY_COUNT; i++) {
@@ -161,10 +160,10 @@ void loop() {
   //************ Delay ****************************************
   delay(1000);
   iIntTimer++;
-  digitalWrite(RUNSTATUSPIN, HIGH);   // turn the LED on (HIGH is the voltage level);
+  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level);
   delay(1000);
   iIntTimer++;
-  digitalWrite(RUNSTATUSPIN, LOW);   // turn the LED off;
+  digitalWrite(LED_BUILTIN, LOW);   // turn the LED off;
 
   //************ Bulk send or interrupt ***********************
 
