@@ -1,7 +1,6 @@
 #include <HIDPowerDevice.h>
 
 #define MINUPDATEINTERVAL   26
-#define CHGDCHPIN           4
 #define RUNSTATUSPIN        5
 #define COMMLOSTPIN         10
 #define BATTSOCPIN          A7
@@ -68,7 +67,6 @@ void setup() {
     PowerDevice[i].SetFeature(0xFF00 | PowerDevice[i].bSerial, STRING_SERIAL, strlen_P(STRING_SERIAL));
   }
 
-  pinMode(CHGDCHPIN, INPUT_PULLUP); // ground this pin to simulate power failure. 
   pinMode(RUNSTATUSPIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running. 
   pinMode(COMMLOSTPIN, OUTPUT); // output is on once communication is lost with the host, otherwise off.
 
