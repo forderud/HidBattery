@@ -19,6 +19,9 @@ Copy `linux/98-upower-hid.rules` file to the `/etc/udev/rules.d/` folder and reb
 * Windows 2000 - 11
 
 ### Screenshots
+Windows 10:  
+![image](https://github.com/user-attachments/assets/1ed60c05-b280-4781-a16f-40c1f56f2a1c)
+
 Windows 2000:  
 ![image](https://github.com/user-attachments/assets/e1bae398-1769-468a-80fb-083cc57f32b3)
 
