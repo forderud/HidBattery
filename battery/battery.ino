@@ -1,4 +1,5 @@
 #include <HIDPowerDevice.h>
+//#define ENABLE_POTENTIOMETER // uncomment to enable potentiometer
 
 // String constants
 const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
@@ -94,12 +95,20 @@ void setup() {
 }
 
 void loop() {
-  //*********** Measurements Unit ****************************
-  int iBattSoc = analogRead(PIN_A7); // potensiometer value in [0,1024)
-
+  // propagate charge level from first to last battery
   for (int i = BATTERY_COUNT-1; i > 0; i--)
-    iRemaining[i] = iRemaining[i-1]; // propagate charge level from first to last battery
+    iRemaining[i] = iRemaining[i-1];
+
+#ifdef ENABLE_POTENTIOMETER
+  // read charge level from potentiometer
+  int iBattSoc = analogRead(PIN_A7); // potentiometer value in [0,1024)
   iRemaining[0] = (uint16_t)(round((float)iFullChargeCapacity*iBattSoc/1024));
+#else
+  // auto-increment charge
+  iRemaining[0] += 0.01f*iFullChargeCapacity;; // incr. 1%
+  if (iRemaining[0] > iFullChargeCapacity)
+    iRemaining[0] = 0.20f*iFullChargeCapacity; // reset to 20%
+#endif
 
   iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining[0]/iFullChargeCapacity);
 
