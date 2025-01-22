@@ -16,7 +16,7 @@ const byte bDeviceChemistry = IDEVICECHEMISTRY;
 const char STRING_OEMVENDOR[] PROGMEM = "BatteryVendor";
 const byte bOEMVendor = IOEMVENDOR;
 
-const char STRING_SERIAL[] PROGMEM = "UPS10";
+const char STRING_SERIAL[] PROGMEM = "1234";
 
 PresentStatus iPresentStatus = {}, iPreviousStatus = {};
 
@@ -65,8 +65,7 @@ void setup() {
     PowerDevice[i].setOutput(Serial);
 #endif
 
-    // Serial No is set in a special way as it forms Arduino port name
-    PowerDevice[i].setSerial(STRING_SERIAL); 
+    PowerDevice[i].SetFeature(0xFF00 | PowerDevice[i].bSerial, STRING_SERIAL, strlen_P(STRING_SERIAL));
   }
 
   pinMode(CHGDCHPIN, INPUT_PULLUP); // ground this pin to simulate power failure. 

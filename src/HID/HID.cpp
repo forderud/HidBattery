@@ -91,21 +91,13 @@ int HID_::getDescriptor(USBSetup& setup)
 
 uint8_t HID_::getShortName(char *name)
 {
-    if(serial) {
-        for(byte i=0; i<strlen_P(serial); i++) {
-            name[i] = pgm_read_byte_near(serial + i);
-        }
-        return strlen_P(serial);
-    }
-    else {
-        // default serial number
-        name[0] = 'H';
-        name[1] = 'I';
-        name[2] = 'D';
-        name[3] = 'A' + (descriptorSize & 0x0F);
-        name[4] = 'A' + ((descriptorSize >> 4) & 0x0F);
-        return 5;
-    }
+    // default serial number
+    name[0] = 'H';
+    name[1] = 'I';
+    name[2] = 'D';
+    name[3] = 'A' + (descriptorSize & 0x0F);
+    name[4] = 'A' + ((descriptorSize >> 4) & 0x0F);
+    return 5;
 }
 
 void HID_::AppendDescriptor(HIDSubDescriptor *node)

@@ -114,10 +114,6 @@ public:
         dbg = &out;
     }
     
-    void setSerial(const char* s) {
-        serial = s;
-    }
-    
     HIDReport* GetFeature(uint16_t id);
     
 protected:
@@ -141,8 +137,6 @@ private:
     uint16_t reportCount;
     
     Serial_ *dbg = nullptr;
-    
-    const char *serial = nullptr; 
 };
 
 #define D_HIDREPORT(length) { 9, 0x21, 0x01, 0x01, 0, 1, 0x22, lowByte(length), highByte(length) }
