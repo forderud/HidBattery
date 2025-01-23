@@ -110,10 +110,6 @@ public:
     
     void AppendDescriptor(HIDSubDescriptor* node);
     
-    void setOutput(Serial_& out) {
-        dbg = &out;
-    }
-    
     HIDReport* GetFeature(uint16_t id);
     
 protected:
@@ -135,8 +131,6 @@ private:
     // Buffer pointer to hold the feature data
     HIDReport* rootReport = nullptr;
     uint16_t reportCount;
-    
-    Serial_ *dbg = nullptr;
 };
 
 #define D_HIDREPORT(length) { 9, 0x21, 0x01, 0x01, 0, 1, 0x22, lowByte(length), highByte(length) }

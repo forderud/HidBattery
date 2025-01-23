@@ -49,11 +49,6 @@ void setup() {
     // initialize batteries with 30% charge
     iRemaining[i] = 0.30f*iFullChargeCapacity;
 
-#ifdef CDC_ENABLED
-    // Used for debugging purposes. 
-    PowerDevice[i].setOutput(Serial);
-#endif
-
     PowerDevice[i].SetFeature(0xFF00 | PowerDevice[i].bSerial, STRING_SERIAL, strlen_P(STRING_SERIAL));
   }
 
