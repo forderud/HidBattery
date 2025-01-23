@@ -69,8 +69,8 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_CONFIGVOLTAGE, &iConfigVoltage, sizeof(iConfigVoltage));
     PowerDevice[i].SetFeature(HID_PD_VOLTAGE, &iVoltage, sizeof(iVoltage));
 
-    PowerDevice[i].setStringFeature(HID_PD_IDEVICECHEMISTRY, &bDeviceChemistry, STRING_DEVICECHEMISTRY);
-    PowerDevice[i].setStringFeature(HID_PD_IOEMINFORMATION, &bOEMVendor, STRING_OEMVENDOR);
+    PowerDevice[i].SetStringIdxFeature(HID_PD_IDEVICECHEMISTRY, &bDeviceChemistry, STRING_DEVICECHEMISTRY);
+    PowerDevice[i].SetStringIdxFeature(HID_PD_IOEMINFORMATION, &bOEMVendor, STRING_OEMVENDOR);
     PowerDevice[i].SetFeature(0xFF00 | PowerDevice[i].bManufacturer, STRING_OEMVENDOR, strlen_P(STRING_OEMVENDOR));
 
     PowerDevice[i].SetFeature(HID_PD_AUDIBLEALARMCTRL, &iAudibleAlarmCtrl, sizeof(iAudibleAlarmCtrl));

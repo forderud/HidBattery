@@ -109,7 +109,7 @@ public:
 public:
   HIDPowerDevice_(void);
   
-  int setStringFeature(uint8_t id, const uint8_t* index, const char* data);
+  int SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data);
 };
 
 // max number of batteries supported by the HW
