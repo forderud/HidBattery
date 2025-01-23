@@ -27,6 +27,7 @@ Copy `linux/98-upower-hid.rules` file to the `/etc/udev/rules.d/` folder and reb
 
 ### macOS: (shows up as a UPS)
 ![image](https://github.com/user-attachments/assets/ec24ff0f-f7c7-46ef-9882-22ae3cd5c4bf)  
+Limitation: The mac UI only displays aggregated information, and not per-battery.
 
 ### Linux
 ![image](https://github.com/user-attachments/assets/26d1babd-27d4-40c8-beef-d3f7f88c0dc1)  
