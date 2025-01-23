@@ -40,8 +40,6 @@
 
 // HID Keyboard/Mouse bios compatible protocols HID1.11 Page 9 4.3 Protocols
 #define HID_PROTOCOL_NONE 0
-#define HID_PROTOCOL_KEYBOARD 1
-#define HID_PROTOCOL_MOUSE 2
 
 // Normal or bios protocol (Keyboard/Mouse) HID1.11 Page 54 7.2.5 Get_Protocol Request
 // "protocol" variable is used for this purpose.
