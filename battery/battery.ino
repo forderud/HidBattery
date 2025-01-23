@@ -29,12 +29,12 @@ byte iAudibleAlarmCtrl = 2; // 1 - Disabled, 2 - Enabled, 3 - Muted
 
 
 // Parameters for ACPI compliancy
-const uint16_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
+const uint16_t iDesignCapacity = 100; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
 byte iWarnCapacityLimit = 10; // warning at 10%
 byte iRemnCapacityLimit = 5; // low at 5%
 const byte bCapacityGranularity1 = 1;
 const byte bCapacityGranularity2 = 1;
-uint16_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
+uint16_t iFullChargeCapacity = 100; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
 
 uint16_t iRemaining[MAX_BATTERIES] = {}; // remaining charge
 uint16_t iPrevRemaining=0;
