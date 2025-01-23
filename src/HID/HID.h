@@ -121,7 +121,7 @@ protected:
     uint8_t getShortName(char* name) override;
     
 private:
-    int SetFeatureInternal(uint16_t id, const void* data, int len);
+    int SetFeatureInternal(uint8_t id, bool str, const void* data, int len);
 
     uint8_t epType[1];
 
