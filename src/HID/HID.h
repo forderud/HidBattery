@@ -27,8 +27,6 @@
 
 #if defined(USBCON)
 
-#define _USING_HID
-
 // HID 'Driver'
 // ------------
 #define HID_GET_REPORT        0x01

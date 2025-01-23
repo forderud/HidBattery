@@ -21,8 +21,6 @@
 
 #include "HIDPowerDevice.h"
 
-#if defined(_USING_HID)
-
 //================================================================================
 //================================================================================
 //	UPS
@@ -246,6 +244,3 @@ int HIDPowerDevice_::SetStringIdxFeature(uint8_t id, const uint8_t* index, const
     res = SetString(*index , data);
     return res;
 }
-
-#endif
-

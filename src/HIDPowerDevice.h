@@ -22,19 +22,8 @@
 #ifndef HIDPOWERDEVICE_h
 #define HIDPOWERDEVICE_h
 
-#define _USING_HID
-
-
-
 #include "HID/HID.h"
 #include "WString.h"
-
-
-#if !defined(_USING_HID)
-
-#warning "Using legacy HID core (non pluggable)"
-
-#else
 
 //================================================================================
 //================================================================================
@@ -116,5 +105,3 @@ public:
 #define MAX_BATTERIES (USB_ENDPOINTS - CDC_FIRST_ENDPOINT - CDC_ENPOINT_COUNT) // 3 by default; 6 if defining CDC_DISABLED
 
 #endif
-#endif
-
