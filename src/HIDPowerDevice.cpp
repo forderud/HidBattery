@@ -247,7 +247,5 @@ int HIDPowerDevice_::SetStringIdxFeature(uint8_t id, const uint8_t* index, const
     return res;
 }
 
-HIDPowerDevice_ PowerDevice[BATTERY_COUNT];
-
 #endif
 

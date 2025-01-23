@@ -36,8 +36,10 @@ const byte bCapacityGranularity1 = 1;
 const byte bCapacityGranularity2 = 1;
 uint16_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
 
-uint16_t iRemaining[BATTERY_COUNT] = {}; // remaining charge
+uint16_t iRemaining[MAX_BATTERIES] = {}; // remaining charge
 uint16_t iPrevRemaining=0;
+
+HIDPowerDevice_ PowerDevice[MAX_BATTERIES];
 
 
 void setup() {
@@ -45,7 +47,7 @@ void setup() {
   Serial.begin(57600);
 #endif
 
-  for (int i = 0; i < BATTERY_COUNT; i++) {
+  for (int i = 0; i < MAX_BATTERIES; i++) {
     // initialize batteries with 30% charge
     iRemaining[i] = 0.30f*iFullChargeCapacity;
 
@@ -54,7 +56,7 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running.
 
-  for (int i = 0; i < BATTERY_COUNT; i++) {
+  for (int i = 0; i < MAX_BATTERIES; i++) {
     PowerDevice[i].SetFeature(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
 
     PowerDevice[i].SetFeature(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
@@ -91,7 +93,7 @@ void setup() {
 
 void loop() {
   // propagate charge level from first to last battery
-  for (int i = BATTERY_COUNT-1; i > 0; i--)
+  for (int i = MAX_BATTERIES-1; i > 0; i--)
     iRemaining[i] = iRemaining[i-1];
 
 #ifdef ENABLE_POTENTIOMETER
@@ -158,7 +160,7 @@ void loop() {
 
   //************ Bulk send or interrupt ***********************
   int res = 0;
-  for (int i = 0; i < BATTERY_COUNT; i++) {
+  for (int i = 0; i < MAX_BATTERIES; i++) {
     if (res >= 0)
       res = PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
 
