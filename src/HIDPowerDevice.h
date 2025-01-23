@@ -113,9 +113,7 @@ public:
 };
 
 // max number of batteries supported by the HW
-#define BATTERY_COUNT (USB_ENDPOINTS - CDC_FIRST_ENDPOINT - CDC_ENPOINT_COUNT) // 3 by default; 6 if defining CDC_DISABLED
-
-extern HIDPowerDevice_ PowerDevice[BATTERY_COUNT];
+#define MAX_BATTERIES (USB_ENDPOINTS - CDC_FIRST_ENDPOINT - CDC_ENPOINT_COUNT) // 3 by default; 6 if defining CDC_DISABLED
 
 #endif
 #endif
