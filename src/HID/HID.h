@@ -84,9 +84,10 @@ typedef struct
 class HIDReport {
 public:
     HIDReport *next = NULL;
-    HIDReport(uint16_t i, const void *d, uint8_t l) : id(i), data(d), length(l) {}
+    HIDReport(uint8_t i, bool s, const void *d, uint8_t l) : id(i), str(s), data(d), length(l) {}
     
-    uint16_t id;
+    uint8_t id;
+    bool str;
     const void* data;
     uint16_t length;
     bool lock;

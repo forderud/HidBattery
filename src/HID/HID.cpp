@@ -125,22 +125,18 @@ int HID_::SetString(const uint8_t index, const char* data)
 
 int HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
 {
-    uint16_t idx = id;
-    if (str)
-        idx |= 0xFF00; // strings in the 0xFF00-0xFFFE range
-
     if(!rootReport) {
-        rootReport = new HIDReport(idx, data, len);
+        rootReport = new HIDReport(id, str, data, len);
     } else {
         HIDReport* current;
         int i=0;
         for ( current = rootReport; current; current = current->next, i++) {
-            if(current->id == idx) {
+            if((current->id == id) && (current->str == str)) {
                 return i;
             }
             // check if we are on the last report
             if(!current->next) {
-                current->next = new HIDReport(idx, data, len);
+                current->next = new HIDReport(id, str, data, len);
                 break;
             }
         }
@@ -161,14 +157,10 @@ int HID_::SendReport(uint8_t id, const void* data, int len)
 
 HIDReport* HID_::GetFeature(uint8_t id, bool str)
 {
-    uint16_t idx = id;
-    if (str)
-        idx |= 0xFF00; // strings in the 0xFF00-0xFFFE range
-
     HIDReport* current;
     int i=0;
     for(current=rootReport; current && i<reportCount; current=current->next, i++) {
-        if(idx == current->id) {
+        if((id == current->id) && (str == current->str)) {
             return current;
         }
     }
