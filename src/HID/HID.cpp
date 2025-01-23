@@ -56,8 +56,7 @@ int HID_::getDescriptor(USBSetup& setup)
 
     // HID-specific strings
     if(USB_STRING_DESCRIPTOR_TYPE == t) {
-        // we place all strings in the 0xFF00-0xFFFE range
-        HIDReport* rep = GetFeature(0xFF00 | setup.wValueL );
+        HIDReport* rep = GetFeature(setup.wValueL, true/*string*/);
         if(rep) {
             return USB_SendStringDescriptor((char*)rep->data, strlen_P((char*)rep->data), TRANSFER_PGM);
         }
@@ -156,12 +155,16 @@ int HID_::SendReport(uint8_t id, const void* data, int len)
     return ret + ret2;
 }
 
-HIDReport* HID_::GetFeature(uint16_t id)
+HIDReport* HID_::GetFeature(uint8_t id, bool str)
 {
+    uint16_t idx = id;
+    if (str)
+        idx |= 0xFF00; // strings in the 0xFF00-0xFFFE range
+
     HIDReport* current;
     int i=0;
     for(current=rootReport; current && i<reportCount; current=current->next, i++) {
-        if(id == current->id) {
+        if(idx == current->id) {
             return current;
         }
     }
@@ -182,7 +185,7 @@ bool HID_::setup(USBSetup& setup)
         if (request == HID_GET_REPORT) {
             if(setup.wValueH == HID_REPORT_TYPE_FEATURE)
             {
-                HIDReport* current = GetFeature(setup.wValueL);
+                HIDReport* current = GetFeature(setup.wValueL, false/*string*/);
                 if(current){
                     if(USB_SendControl(0, &(current->id), 1)>0 &&
                        USB_SendControl(0, current->data, current->length)>0)
@@ -218,8 +221,7 @@ bool HID_::setup(USBSetup& setup)
         {
             if(setup.wValueH == HID_REPORT_TYPE_FEATURE)
             {
-
-                HIDReport* current = GetFeature(setup.wValueL);
+                HIDReport* current = GetFeature(setup.wValueL, false/*string*/);
                 if(!current) return false;
                 if(setup.wLength != current->length + 1) return false;
                 uint8_t* data = new uint8_t[setup.wLength];
