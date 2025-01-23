@@ -49,7 +49,7 @@ void setup() {
     // initialize batteries with 30% charge
     iRemaining[i] = 0.30f*iFullChargeCapacity;
 
-    PowerDevice[i].SetFeature(0xFF00 | PowerDevice[i].bSerial, STRING_SERIAL, strlen_P(STRING_SERIAL));
+    PowerDevice[i].SetString(PowerDevice[i].bSerial, STRING_SERIAL);
   }
 
   pinMode(LED_BUILTIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running.
@@ -71,7 +71,7 @@ void setup() {
 
     PowerDevice[i].SetStringIdxFeature(HID_PD_IDEVICECHEMISTRY, &bDeviceChemistry, STRING_DEVICECHEMISTRY);
     PowerDevice[i].SetStringIdxFeature(HID_PD_IOEMINFORMATION, &bOEMVendor, STRING_OEMVENDOR);
-    PowerDevice[i].SetFeature(0xFF00 | PowerDevice[i].bManufacturer, STRING_OEMVENDOR, strlen_P(STRING_OEMVENDOR));
+    PowerDevice[i].SetString(PowerDevice[i].bManufacturer, STRING_OEMVENDOR);
 
     PowerDevice[i].SetFeature(HID_PD_AUDIBLEALARMCTRL, &iAudibleAlarmCtrl, sizeof(iAudibleAlarmCtrl));
 

@@ -107,6 +107,7 @@ public:
     HID_(void);
     int SendReport(uint8_t id, const void* data, int len);
     int SetFeature(uint16_t id, const void* data, int len);
+    int SetString(const uint8_t index, const char* data);
     
     void AppendDescriptor(HIDSubDescriptor* node);
     

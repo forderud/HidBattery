@@ -137,6 +137,11 @@ int HID_::SetFeature(uint16_t id, const void* data, int len)
     return reportCount;
 }
 
+int HID_::SetString(const uint8_t index, const char* data)
+{
+    return SetFeature(0xFF00 | index, data, strlen_P(data));
+}
+
 int HID_::SendReport(uint8_t id, const void* data, int len)
 {
     auto ret = USB_Send(pluggedEndpoint, &id, 1);

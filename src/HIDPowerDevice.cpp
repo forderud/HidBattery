@@ -243,7 +243,7 @@ int HIDPowerDevice_::SetStringIdxFeature(uint8_t id, const uint8_t* index, const
         return res;
     
     // set string at given index
-    res = SetFeature(0xFF00 | *index , data, strlen_P(data));
+    res = SetString(*index , data);
     return res;
 }
 
