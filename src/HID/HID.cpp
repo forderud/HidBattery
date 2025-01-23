@@ -114,7 +114,17 @@ void HID_::AppendDescriptor(HIDSubDescriptor *node)
     descriptorSize += node->length;
 }
 
-int HID_::SetFeature(uint16_t id, const void* data, int len)
+int HID_::SetFeature(uint8_t id, const void* data, int len)
+{
+    return SetFeatureInternal(0x0000 | id, data, len); // expand id to 16bits
+}
+
+int HID_::SetString(const uint8_t index, const char* data)
+{
+    return SetFeatureInternal(0xFF00 | index, data, strlen_P(data)); // expand index to 16bits
+}
+
+int HID_::SetFeatureInternal(uint16_t id, const void* data, int len)
 {
     if(!rootReport) {
         rootReport = new HIDReport(id, data, len);
@@ -135,11 +145,6 @@ int HID_::SetFeature(uint16_t id, const void* data, int len)
 
     reportCount++;
     return reportCount;
-}
-
-int HID_::SetString(const uint8_t index, const char* data)
-{
-    return SetFeature(0xFF00 | index, data, strlen_P(data));
 }
 
 int HID_::SendReport(uint8_t id, const void* data, int len)
