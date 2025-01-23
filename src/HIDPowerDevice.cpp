@@ -236,14 +236,14 @@ HIDPowerDevice_::HIDPowerDevice_(void) {
     SetFeature(HID_PD_MANUFACTURER, &bManufacturer, sizeof(bManufacturer));
 }
 
-int HIDPowerDevice_::setStringFeature(uint8_t id, const uint8_t* index, const char* data) {
-    
+int HIDPowerDevice_::SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data) {
+    // set string index for report
     int res = SetFeature(id, index, 1);
+    if(res <= 0)
+        return res;
     
-    if(res == 0) return 0;
-    
-    res += SetFeature(0xFF00 | *index , data, strlen_P(data));
-    
+    // set string at given index
+    res = SetFeature(0xFF00 | *index , data, strlen_P(data));
     return res;
 }
 
