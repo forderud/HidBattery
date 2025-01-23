@@ -35,7 +35,6 @@ int HID_::getInterface(uint8_t* interfaceCount)
 // Since this function is not exposed in USBCore API, had to replicate here.
 static bool USB_SendStringDescriptor(const char* string_P, u8 string_len, uint8_t flags) {
     u8 c[2] = {(u8)(2 + string_len * 2), 3};
-
     USB_SendControl(0,&c,2);
 
     bool pgm = flags & TRANSFER_PGM;
@@ -43,9 +42,8 @@ static bool USB_SendStringDescriptor(const char* string_P, u8 string_len, uint8_
             c[0] = pgm ? pgm_read_byte(&string_P[i]) : string_P[i];
             c[1] = 0;
             int r = USB_SendControl(0,&c,2);
-            if(!r) {
+            if(!r)
                 return false;
-            }
     }
     return true;
 }
@@ -57,20 +55,22 @@ int HID_::getDescriptor(USBSetup& setup)
     // HID-specific strings
     if(USB_STRING_DESCRIPTOR_TYPE == t) {
         HIDReport* rep = GetFeature(setup.wValueL, true/*string*/);
-        if(rep) {
+        if(rep)
             return USB_SendStringDescriptor((char*)rep->data, strlen_P((char*)rep->data), TRANSFER_PGM);
-        }
-        else {
+        else
             return 0;
-        }
     }
 
     // Check if this is a HID Class Descriptor request
-    if (setup.bmRequestType != REQUEST_DEVICETOHOST_STANDARD_INTERFACE) { return 0; }
-    if (HID_REPORT_DESCRIPTOR_TYPE != t) { return 0; }
+    if (setup.bmRequestType != REQUEST_DEVICETOHOST_STANDARD_INTERFACE)
+        return 0;
+
+    if (HID_REPORT_DESCRIPTOR_TYPE != t)
+        return 0;
 
     // In a HID Class Descriptor wIndex cointains the interface number
-    if (setup.wIndex != pluggedInterface) { return 0; }
+    if (setup.wIndex != pluggedInterface)
+        return 0;
 
     int total = 0;
     HIDSubDescriptor* node;
@@ -105,9 +105,9 @@ void HID_::AppendDescriptor(HIDSubDescriptor *node)
         rootNode = node;
     } else {
         HIDSubDescriptor *current = rootNode;
-        while (current->next) {
+        while (current->next)
             current = current->next;
-        }
+
         current->next = node;
     }
     descriptorSize += node->length;
@@ -131,9 +131,9 @@ int HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
         HIDReport* current;
         int i=0;
         for ( current = rootReport; current; current = current->next, i++) {
-            if((current->id == id) && (current->str == str)) {
+            if((current->id == id) && (current->str == str))
                 return i;
-            }
+
             // check if we are on the last report
             if(!current->next) {
                 current->next = new HIDReport(id, str, data, len);
@@ -149,9 +149,12 @@ int HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
 int HID_::SendReport(uint8_t id, const void* data, int len)
 {
     auto ret = USB_Send(pluggedEndpoint, &id, 1);
-    if (ret < 0) return ret;
+    if (ret < 0)
+        return ret;
+
     auto ret2 = USB_Send(pluggedEndpoint | TRANSFER_RELEASE, data, len);
-    if (ret2 < 0) return ret2;
+    if (ret2 < 0)
+        return ret2;
     return ret + ret2;
 }
 
@@ -160,31 +163,26 @@ HIDReport* HID_::GetFeature(uint8_t id, bool str)
     HIDReport* current;
     int i=0;
     for(current=rootReport; current && i<reportCount; current=current->next, i++) {
-        if((id == current->id) && (str == current->str)) {
+        if((id == current->id) && (str == current->str))
             return current;
-        }
     }
     return (HIDReport*) NULL;
 }
 
 bool HID_::setup(USBSetup& setup)
 {
-    if (pluggedInterface != setup.wIndex) {
+    if (pluggedInterface != setup.wIndex)
         return false;
-    }
 
     uint8_t request = setup.bRequest;
     uint8_t requestType = setup.bmRequestType;
 
-    if (requestType == REQUEST_DEVICETOHOST_CLASS_INTERFACE)
-    {
+    if (requestType == REQUEST_DEVICETOHOST_CLASS_INTERFACE) {
         if (request == HID_GET_REPORT) {
-            if(setup.wValueH == HID_REPORT_TYPE_FEATURE)
-            {
+            if(setup.wValueH == HID_REPORT_TYPE_FEATURE) {
                 HIDReport* current = GetFeature(setup.wValueL, false/*string*/);
                 if(current){
-                    if(USB_SendControl(0, &(current->id), 1)>0 &&
-                       USB_SendControl(0, current->data, current->length)>0)
+                    if(USB_SendControl(0, &(current->id), 1)>0 && USB_SendControl(0, current->data, current->length)>0)
                         return true;
                 }
 
@@ -201,8 +199,7 @@ bool HID_::setup(USBSetup& setup)
         }
     }
 
-    if (requestType == REQUEST_HOSTTODEVICE_CLASS_INTERFACE)
-    {
+    if (requestType == REQUEST_HOSTTODEVICE_CLASS_INTERFACE) {
         if (request == HID_SET_PROTOCOL) {
             // The USB Host tells us if we are in boot or report mode.
             // This only works with a real boot compatible device.
@@ -213,16 +210,19 @@ bool HID_::setup(USBSetup& setup)
             idle = setup.wValueL;
             return true;
         }
-        if (request == HID_SET_REPORT)
-        {
-            if(setup.wValueH == HID_REPORT_TYPE_FEATURE)
-            {
+        if (request == HID_SET_REPORT) {
+            if(setup.wValueH == HID_REPORT_TYPE_FEATURE) {
                 HIDReport* current = GetFeature(setup.wValueL, false/*string*/);
-                if(!current) return false;
-                if(setup.wLength != current->length + 1) return false;
+                if(!current)
+                    return false;
+
+                if(setup.wLength != current->length + 1)
+                    return false;
+
                 uint8_t* data = new uint8_t[setup.wLength];
                 USB_RecvControl(data, setup.wLength);
-                if(*data != current->id) return false;
+                if(*data != current->id)
+                    return false;
                 memcpy((uint8_t*)current->data, data+1, current->length);
                 delete[] data;
                 return true;
