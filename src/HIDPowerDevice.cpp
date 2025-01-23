@@ -65,7 +65,7 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
     0x85, HID_PD_CPCTYGRANULARITY1, //     REPORT_ID (16)
     0x09, 0x8D, //     USAGE (CapacityGranularity1)
-    0x75, 0x18, //     REPORT_SIZE (24)
+    0x75, 0x10, //     REPORT_SIZE (16)
     0x95, 0x04, //     REPORT_COUNT (4)
     0x67, 0x01, 0x10, 0x10, 0x00, //     UNIT (AmpSec)
     0x55, 0x00, //     UNIT_EXPONENT (0)
