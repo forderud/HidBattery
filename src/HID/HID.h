@@ -25,8 +25,6 @@
 #include <HardwareSerial.h>
 #include <PluggableUSB.h>
 
-#if defined(USBCON)
-
 // HID 'Driver'
 // ------------
 #define HID_GET_REPORT        0x01
@@ -136,7 +134,5 @@ private:
 };
 
 #define D_HIDREPORT(length) { 9, 0x21, 0x01, 0x01, 0, 1, 0x22, lowByte(length), highByte(length) }
-
-#endif // USBCON
 
 #endif // HID_h
