@@ -37,7 +37,7 @@ uint16_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (
 
 uint16_t iRemaining[BATTERY_COUNT] = {}; // remaining charge
 uint16_t iPrevRemaining=0;
-bool bCharging = false;
+
 
 void setup() {
 #ifdef CDC_ENABLED
@@ -104,17 +104,16 @@ void loop() {
   iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining[0]/iFullChargeCapacity);
 
   if (iRemaining[0] > iPrevRemaining + 1) // add a bit hysteresis
-    bCharging = true;
+    iPresentStatus.Charging = true;
   else if (iRemaining[0] < iPrevRemaining - 1) // add a bit hysteresis
-    bCharging = false;
+    iPresentStatus.Charging = false;
 
   // Charging
-  iPresentStatus.Charging = bCharging;
-  iPresentStatus.ACPresent = bCharging; // assume charging implies AC present
+  iPresentStatus.ACPresent = iPresentStatus.Charging; // assume charging implies AC present
   iPresentStatus.FullyCharged = (iRemaining[0] == iFullChargeCapacity);
 
   // Discharging
-  if(!bCharging) { // assume not charging implies discharging
+  if(!iPresentStatus.Charging) { // assume not charging implies discharging
     iPresentStatus.Discharging = 1;
     // if(iRemaining[0] < iRemnCapacityLimit) iPresentStatus.BelowRemainingCapacityLimit = 1;
 
@@ -159,7 +158,7 @@ void loop() {
     if (res >= 0)
       res = PowerDevice[i].SendReport(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
 
-    if((res >= 0) && !bCharging)
+    if((res >= 0) && !iPresentStatus.Charging)
       res = PowerDevice[i].SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
 
     if (res >= 0)
