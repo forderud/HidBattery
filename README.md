@@ -25,6 +25,9 @@ Windows 10:
 Windows 2000:  
 ![image](https://github.com/user-attachments/assets/e1bae398-1769-468a-80fb-083cc57f32b3)
 
+macOS: (shows up as a UPS)  
+![image](https://github.com/user-attachments/assets/ec24ff0f-f7c7-46ef-9882-22ae3cd5c4bf)
+
 ## License
 Copyright (c) Alex Bratchik 2020. All right reserved.
 
