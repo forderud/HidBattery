@@ -18,10 +18,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
-#ifndef HIDPOWERDEVICE_h
-#define HIDPOWERDEVICE_h
-
+#pragma once
 #include "HID/HID.h"
 #include "WString.h"
 
@@ -103,5 +100,3 @@ public:
 
 // max number of batteries supported by the HW
 #define MAX_BATTERIES (USB_ENDPOINTS - CDC_FIRST_ENDPOINT - CDC_ENPOINT_COUNT) // 3 by default; 6 if defining CDC_DISABLED
-
-#endif
