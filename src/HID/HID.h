@@ -111,7 +111,7 @@ public:
     
     void AppendDescriptor(HIDSubDescriptor* node);
     
-    HIDReport* GetFeature(uint16_t id);
+    HIDReport* GetFeature(uint8_t id, bool str);
     
 protected:
     // Implementation of the PluggableUSBModule
