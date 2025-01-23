@@ -177,9 +177,6 @@ void loop() {
   Serial.print("Remaining charge: ");
   Serial.println(iRemaining[0]);
 
-  Serial.print("Run time to empty: ");
-  Serial.println(iRunTimeToEmpty);
-
   Serial.print("SendReport res=");
   Serial.println(res);
 #endif
