@@ -37,7 +37,6 @@
 
 // HID subclass HID1.11 Page 8 4.2 Subclass
 #define HID_SUBCLASS_NONE 0
-#define HID_SUBCLASS_BOOT_INTERFACE 1
 
 // HID Keyboard/Mouse bios compatible protocols HID1.11 Page 9 4.3 Protocols
 #define HID_PROTOCOL_NONE 0
