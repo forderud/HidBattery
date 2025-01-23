@@ -73,8 +73,7 @@ int HID_::getDescriptor(USBSetup& setup)
         return 0;
 
     int total = 0;
-    HIDSubDescriptor* node;
-    for (node = rootNode; node; node = node->next) {
+    for (HIDSubDescriptor* node = rootNode; node; node = node->next) {
         int res = USB_SendControl(TRANSFER_PGM, node->data, node->length);
         if (res == -1)
             return -1;
@@ -128,9 +127,8 @@ int HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
     if(!rootReport) {
         rootReport = new HIDReport(id, str, data, len);
     } else {
-        HIDReport* current;
         int i=0;
-        for ( current = rootReport; current; current = current->next, i++) {
+        for (HIDReport* current = rootReport; current; current = current->next, i++) {
             if((current->id == id) && (current->str == str))
                 return i;
 
@@ -160,13 +158,11 @@ int HID_::SendReport(uint8_t id, const void* data, int len)
 
 HIDReport* HID_::GetFeature(uint8_t id, bool str)
 {
-    HIDReport* current;
-    int i=0;
-    for(current=rootReport; current && i<reportCount; current=current->next, i++) {
+    for(HIDReport* current=rootReport; current; current=current->next) {
         if((id == current->id) && (str == current->str))
             return current;
     }
-    return (HIDReport*) NULL;
+    return nullptr;
 }
 
 bool HID_::setup(USBSetup& setup)
