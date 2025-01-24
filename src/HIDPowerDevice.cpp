@@ -142,6 +142,7 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0x09, 0x6B, //     USAGE (CycleCount)
     0x75, 0x10, //     REPORT_SIZE (16)
     0x27, 0xFF, 0xFF, 0x00, 0x00, //     LOGICAL_MAXIMUM (65534)
+    0x15, 0x00, //     LOGICAL_MINIMUM (0)
     0x81, 0xA3, //     INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
     0x09, 0x6B, //     USAGE (CycleCount)
     0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
