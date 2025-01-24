@@ -100,19 +100,31 @@ void loop() {
   // read charge level from potentiometer
   int iBattSoc = analogRead(PIN_A7); // potentiometer value in [0,1024)
   iRemaining[0] = (uint16_t)(round((float)iFullChargeCapacity*iBattSoc/1024));
-#else
-  // auto-increment charge
-  iRemaining[0] += 0.01f*iFullChargeCapacity;; // incr. 1%
-  if (iRemaining[0] > iFullChargeCapacity)
-    iRemaining[0] = 0.20f*iFullChargeCapacity; // reset to 20%
-#endif
-
-  iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining[0]/iFullChargeCapacity);
 
   if (iRemaining[0] > iPrevRemaining + 1) // add a bit hysteresis
     iPresentStatus.Charging = true;
   else if (iRemaining[0] < iPrevRemaining - 1) // add a bit hysteresis
     iPresentStatus.Charging = false;
+#else
+  // simulate charge & discharge cycles
+  if (iPresentStatus.Charging) {
+    iRemaining[0] += 0.01f*iFullChargeCapacity; // incr. 1%
+
+    if (iRemaining[0] > iFullChargeCapacity) {
+      iRemaining[0] = iFullChargeCapacity; // clamp at 100%
+      iPresentStatus.Charging = false;
+    }
+  } else {
+    iRemaining[0] -= 0.01f*iFullChargeCapacity; // decr. 1%
+
+    if (iRemaining[0] < 0.20f*iFullChargeCapacity) {
+      iRemaining[0] = 0.20f*iFullChargeCapacity; // clamp at 20% to prevent triggering shutdown
+      iPresentStatus.Charging = true;
+    }
+  }
+#endif
+
+  iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining[0]/iFullChargeCapacity);
 
   // Charging
   iPresentStatus.ACPresent = iPresentStatus.Charging; // assume charging implies AC present
