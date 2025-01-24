@@ -183,6 +183,9 @@ void loop() {
 
     if (res >= 0)
       res = PowerDevice[i].SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
+
+    if (res >= 0)
+      res = PowerDevice[i].SendReport(HID_PD_CYCLE_COUNT, &iCycleCount, sizeof(iCycleCount));
   }
 
   iPrevRemaining = iRemaining[0];
