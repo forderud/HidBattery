@@ -53,6 +53,7 @@
 
 #define HID_PD_IDEVICECHEMISTRY      0x1F // Feature
 #define HID_PD_IOEMINFORMATION       0x20 // Feature
+#define HID_PD_CYCLE_COUNT           0x21 // 33 INPUT OR FEATURE
 
 
 // PresentStatus dynamic flags
