@@ -50,7 +50,7 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
     0x05, 0x85, //     USAGE_PAGE (Battery System) ====================
     0x85, HID_PD_RECHARGEABLE, //     REPORT_ID (6)
-    0x09, 0x8B, //     USAGE (Rechargable)                  
+    0x09, 0x8B, //     USAGE (Rechargable)
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
     0x85, HID_PD_IDEVICECHEMISTRY, //     REPORT_ID (31)
     0x09, 0x89, //     USAGE (iDeviceChemistry)
@@ -73,7 +73,7 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0x85, HID_PD_CPCTYGRANULARITY2, //     REPORT_ID (24)
     0x09, 0x8E, //     USAGE (CapacityGranularity2)
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
-    0x85, HID_PD_FULLCHRGECAPACITY, //     REPORT_ID (14)        
+    0x85, HID_PD_FULLCHRGECAPACITY, //     REPORT_ID (14)
     0x09, 0x67, //     USAGE (FullChargeCapacity)
     0x95, 0x01, //     REPORT_COUNT (1)
     0xB1, 0x83, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
@@ -101,17 +101,17 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0x27, 0xFF, 0xFF, 0x00, 0x00, //     LOGICAL_MAXIMUM (65534)
     0x66, 0x01, 0x10, //     UNIT (Seconds)
     0x55, 0x00, //     UNIT_EXPONENT (0)
-    0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield) 
+    0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
     0x85, HID_PD_AVERAGETIME2EMPTY, //     REPORT_ID (28)
-    0x09, 0x69, //     USAGE (AverageTimeToEmpty)  
+    0x09, 0x69, //     USAGE (AverageTimeToEmpty)
     0x81, 0xA3, //     INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
     0x09, 0x69, //     USAGE (AverageTimeToEmpty)
     0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
-    0x85, HID_PD_RUNTIMETOEMPTY, //     REPORT_ID (13)    
-    0x09, 0x68, //     USAGE (RunTimeToEmpty)  
+    0x85, HID_PD_RUNTIMETOEMPTY, //     REPORT_ID (13)
+    0x09, 0x68, //     USAGE (RunTimeToEmpty)
     0x81, 0xA3, //     INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
     0x09, 0x68, //     USAGE (RunTimeToEmpty)
-    0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)      
+    0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
     0x85, HID_PD_REMAINTIMELIMIT, //     REPORT_ID (8)
     0x09, 0x2A, //     USAGE (RemainingTimeLimit)
     0x75, 0x10, //     REPORT_SIZE (16)
@@ -181,11 +181,11 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0x09, 0x43, //       USAGE (RemainingTimeLimitExpired)
     0x81, 0xA2, //       INPUT (Data, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
     0x09, 0x43, //       USAGE (RemainingTimeLimitExpired)
-    0xB1, 0xA2, //       FEATURE (Data, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)  
+    0xB1, 0xA2, //       FEATURE (Data, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
     0x09, 0x4B, //       USAGE (NeedReplacement)
     0x81, 0xA3, //       INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
     0x09, 0x4B, //       USAGE (NeedReplacement)
-    0xB1, 0xA3, //       FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)    
+    0xB1, 0xA3, //       FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
     0x09, 0xDB, //       USAGE (VoltageNotRegulated)
     0x81, 0xA3, //       INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
     0x09, 0xDB, //       USAGE (VoltageNotRegulated)
@@ -197,7 +197,7 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
     0x09, 0x47, //       USAGE (FullyDischarged)
     0x81, 0xA3, //       INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
     0x09, 0x47, //       USAGE (FullyDischarged)
-    0xB1, 0xA3, //       FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)    
+    0xB1, 0xA3, //       FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
     0x05, 0x84, //       USAGE_PAGE (Power Device) =================
     0x09, 0x68, //       USAGE (ShutdownRequested)
     0x81, 0xA2, //       INPUT (Data, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
@@ -229,7 +229,7 @@ HIDPowerDevice_::HIDPowerDevice_(void) {
     AppendDescriptor(&node);
 
     // set string ID here
-    
+
     SetFeature(HID_PD_IPRODUCT, &bProduct, sizeof(bProduct));
     SetFeature(HID_PD_SERIAL, &bSerial, sizeof(bSerial));
     SetFeature(HID_PD_MANUFACTURER, &bManufacturer, sizeof(bManufacturer));
@@ -240,7 +240,7 @@ int HIDPowerDevice_::SetStringIdxFeature(uint8_t id, const uint8_t* index, const
     int res = SetFeature(id, index, 1);
     if(res <= 0)
         return res;
-    
+
     // set string at given index
     res = SetString(*index , data);
     return res;

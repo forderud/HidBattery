@@ -39,7 +39,7 @@
 #define HID_PD_VOLTAGE               0x0B // 11 INPUT (NA) OR FEATURE(implemented)
 #define HID_PD_REMAININGCAPACITY     0x0C // 12 INPUT OR FEATURE(required by Windows)
 #define HID_PD_RUNTIMETOEMPTY        0x0D // 13 INPUT OR FEATURE
-#define HID_PD_FULLCHRGECAPACITY     0x0E // 14 FEATURE ONLY. Last Full Charge Capacity 
+#define HID_PD_FULLCHRGECAPACITY     0x0E // 14 FEATURE ONLY. Last Full Charge Capacity
 #define HID_PD_WARNCAPACITYLIMIT     0x0F // 15 FEATURE ONLY
 #define HID_PD_CPCTYGRANULARITY1     0x10 // 16 FEATURE ONLY
 #define HID_PD_REMNCAPACITYLIMIT     0x11 // 17 FEATURE ONLY
@@ -66,7 +66,7 @@ struct PresentStatus {
   uint8_t RemainingTimeLimitExpired : 1;  // bit 0x05
   uint8_t NeedReplacement : 1;            // bit 0x06
   uint8_t VoltageNotRegulated : 1;        // bit 0x07
-  
+
   uint8_t FullyCharged : 1;               // bit 0x08
   uint8_t FullyDischarged : 1;            // bit 0x09
   uint8_t ShutdownRequested : 1;          // bit 0x0A
@@ -75,7 +75,7 @@ struct PresentStatus {
   uint8_t Overload : 1;                   // bit 0x0D
   uint8_t unused1 : 1;
   uint8_t unused2 : 1;
-  
+
   operator uint16_t () {
       return *(uint16_t*)(this); // switch to std::bit_cast after migrating to C++20
   }
@@ -90,11 +90,11 @@ class HIDPowerDevice_ : public HID_ {
 public:
     const byte bProduct = IPRODUCT;
     const byte bManufacturer = IMANUFACTURER;
-    const byte bSerial = ISERIAL;  
-    
+    const byte bSerial = ISERIAL;
+
 public:
   HIDPowerDevice_(void);
-  
+
   int SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data);
 };
 
