@@ -1,7 +1,5 @@
 /*
-  Copyright (c) 2015, Arduino LLC
-  Original code (pre-library): Copyright (c) 2011, Peter Barrett
-  Modified code: Copyright (c) 2020, Aleksandr Bratchik
+  Copyright (c) Arduino LLC, Peter Barrett, Aleksandr Bratchik, Fredrik Orderud
 
   Permission to use, copy, modify, and/or distribute this software for
   any purpose with or without fee is hereby granted, provided that the

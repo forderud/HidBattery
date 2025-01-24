@@ -36,7 +36,7 @@ Limitation: MacOS displays the battery as a UPS. It only displays aggregated inf
 Limtation: Linux seem to assume charge values in `%`, regardless of the actual unit.
 
 ## License
-Copyright (c) Alex Bratchik 2020. All right reserved.
+Copyright (c) Alex Bratchik, Fredrik Orderud.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public

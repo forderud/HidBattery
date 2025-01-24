@@ -1,8 +1,7 @@
 /*
   HIDPowerDevice.cpp
 
-  Copyright (c) 2020, Aleksandr Bratchik
-  Original code (pre-library): Copyright (c) 2020, Aleksandr Bratchik
+  Copyright (c) 2020, Aleksandr Bratchik, Fredrik Orderud
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
