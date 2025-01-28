@@ -24,7 +24,7 @@
 //================================================================================
 //	UPS
 
-static const uint8_t _hidReportDescriptor[] PROGMEM = {
+static const uint8_t s_hidReportDescriptor[] PROGMEM = {
 
     0x05, 0x84, // USAGE_PAGE (Power Device)
     0x09, 0x04, // USAGE (UPS)
@@ -247,7 +247,7 @@ static const uint8_t _hidReportDescriptor[] PROGMEM = {
 };
 
 HIDPowerDevice_::HIDPowerDevice_(void) {
-    static HIDSubDescriptor node(_hidReportDescriptor, sizeof (_hidReportDescriptor));
+    static const HIDSubDescriptor node(s_hidReportDescriptor, sizeof (s_hidReportDescriptor));
 
     AppendDescriptor(&node);
 
