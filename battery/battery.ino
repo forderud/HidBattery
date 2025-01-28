@@ -51,6 +51,7 @@ void setup() {
     // initialize batteries with 30% charge
     iRemaining[i] = 0.30f*iFullChargeCapacity;
 
+    PowerDevice[i].SetManufacturer(STRING_OEMVENDOR);
     PowerDevice[i].SetSerial(STRING_SERIAL);
   }
 
@@ -73,7 +74,6 @@ void setup() {
 
     PowerDevice[i].SetStringIdxFeature(HID_PD_IDEVICECHEMISTRY, &bDeviceChemistry, STRING_DEVICECHEMISTRY);
     PowerDevice[i].SetStringIdxFeature(HID_PD_IOEMINFORMATION, &bOEMVendor, STRING_OEMVENDOR);
-    PowerDevice[i].SetManufacturer(STRING_OEMVENDOR);
 
     PowerDevice[i].SetFeature(HID_PD_AUDIBLEALARMCTRL, &iAudibleAlarmCtrl, sizeof(iAudibleAlarmCtrl));
 
