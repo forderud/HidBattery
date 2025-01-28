@@ -97,10 +97,10 @@ public:
     /** The "data" pointer need to outlast this object. */ 
     int SetFeature(uint8_t id, const void* data, int len);
 
+protected:
     /** The "data" pointer need to outlast this object. */ 
     int SetString(const uint8_t index, const char* data);
     
-protected:
     /** The "node" pointer need to outlast this object. */ 
     void AppendDescriptor(const HIDSubDescriptor* node);
     
