@@ -49,8 +49,7 @@
 #define HID_REPORT_TYPE_OUTPUT  2
 #define HID_REPORT_TYPE_FEATURE 3
 
-typedef struct
-{
+struct HIDDescDescriptor {
   uint8_t len;      // 9
   uint8_t dtype;    // 0x21
   uint8_t addr;
@@ -60,14 +59,13 @@ typedef struct
   uint8_t desctype; // 0x22 report
   uint8_t descLenL;
   uint8_t descLenH;
-} HIDDescDescriptor;
+};
 
-typedef struct 
-{
+struct HIDDescriptor {
   InterfaceDescriptor hid;
   HIDDescDescriptor   desc;
   EndpointDescriptor  in;
-} HIDDescriptor;
+};
 
 class HIDReport {
 public:
