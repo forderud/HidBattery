@@ -93,8 +93,13 @@ public:
 class HID_ : public PluggableUSBModule {
 public:
     HID_();
+
     int SendReport(uint8_t id, const void* data, int len);
+
+    /** The "data" pointer need to outlast this object. */ 
     int SetFeature(uint8_t id, const void* data, int len);
+
+    /** The "data" pointer need to outlast this object. */ 
     int SetString(const uint8_t index, const char* data);
     
     void AppendDescriptor(HIDSubDescriptor* node);
