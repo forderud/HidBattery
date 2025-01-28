@@ -97,7 +97,7 @@ uint8_t HID_::getShortName(char *name)
     return 5;
 }
 
-void HID_::AppendDescriptor(HIDSubDescriptor *node)
+void HID_::AppendDescriptor(const HIDSubDescriptor *node)
 {
     if (!rootNode) {
         rootNode = node;
@@ -155,9 +155,9 @@ int HID_::SendReport(uint8_t id, const void* data, int len)
     return ret + ret2;
 }
 
-HIDReport* HID_::GetFeature(uint8_t id, bool str)
+const HIDReport* HID_::GetFeature(uint8_t id, bool str)
 {
-    for(HIDReport* current=rootReport; current; current=current->next) {
+    for(const HIDReport* current=rootReport; current; current=current->next) {
         if((id == current->id) && (str == current->str))
             return current;
     }

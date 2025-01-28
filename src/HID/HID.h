@@ -71,7 +71,7 @@ typedef struct
 
 class HIDReport {
 public:
-    HIDReport *next = NULL;
+    const HIDReport *next = NULL;
     HIDReport(uint8_t i, bool s, const void *d, uint8_t l) : id(i), str(s), data(d), length(l) {}
     
     uint8_t id;
@@ -83,7 +83,7 @@ public:
 
 class HIDSubDescriptor {
 public:
-  HIDSubDescriptor *next = NULL;
+  const HIDSubDescriptor *next = NULL;
   HIDSubDescriptor(const void *d, uint16_t l) : data(d), length(l) { }
 
   const void* data;
@@ -102,9 +102,9 @@ public:
     /** The "data" pointer need to outlast this object. */ 
     int SetString(const uint8_t index, const char* data);
     
-    void AppendDescriptor(HIDSubDescriptor* node);
+    void AppendDescriptor(const HIDSubDescriptor* node);
     
-    HIDReport* GetFeature(uint8_t id, bool str);
+    const HIDReport* GetFeature(uint8_t id, bool str);
     
 protected:
     // Implementation of the PluggableUSBModule
