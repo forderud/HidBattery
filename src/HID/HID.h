@@ -115,17 +115,17 @@ private:
     
     int SetFeatureInternal(uint8_t id, bool str, const void* data, int len);
 
-    uint8_t epType[1];
+    uint8_t m_epType[1];
 
-    HIDSubDescriptor* rootNode = nullptr;
-    uint16_t descriptorSize = 0;
+    HIDSubDescriptor* m_rootNode = nullptr;
+    uint16_t m_descriptorSize = 0;
 
-    uint8_t protocol = HID_REPORT_PROTOCOL;
-    uint8_t idle = 1;
+    uint8_t m_protocol = HID_REPORT_PROTOCOL;
+    uint8_t m_idle = 1;
   
     // Buffer pointer to hold the feature data
-    HIDReport* rootReport = nullptr;
-    uint16_t reportCount = 0;
+    HIDReport* m_rootReport = nullptr;
+    uint16_t m_reportCount = 0;
 };
 
 #define D_HIDREPORT(length) { 9, 0x21, 0x01, 0x01, 0, 1, 0x22, lowByte(length), highByte(length) }

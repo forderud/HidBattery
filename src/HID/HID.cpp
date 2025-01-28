@@ -17,8 +17,8 @@
 
 #include "HID.h"
 
-HID_::HID_() : PluggableUSBModule(1, 1, epType) {
-    epType[0] = EP_TYPE_INTERRUPT_IN;
+HID_::HID_() : PluggableUSBModule(1, 1, m_epType) {
+    m_epType[0] = EP_TYPE_INTERRUPT_IN;
     PluggableUSB().plug(this);
 }
 
@@ -27,7 +27,7 @@ int HID_::getInterface(uint8_t* interfaceCount)
     *interfaceCount += 1; // uses 1
     HIDDescriptor hidInterface = {
         D_INTERFACE(pluggedInterface, 1, USB_DEVICE_CLASS_HUMAN_INTERFACE, HID_SUBCLASS_NONE, HID_PROTOCOL_NONE),
-        D_HIDREPORT(descriptorSize),
+        D_HIDREPORT(m_descriptorSize),
         D_ENDPOINT(USB_ENDPOINT_IN(pluggedEndpoint), USB_ENDPOINT_TYPE_INTERRUPT, USB_EP_SIZE, 0x14)
     };
     return USB_SendControl(0, &hidInterface, sizeof(hidInterface));
@@ -72,7 +72,7 @@ int HID_::getDescriptor(USBSetup& setup)
         return 0;
 
     int total = 0;
-    for (const HIDSubDescriptor* node = rootNode; node; node = node->next) {
+    for (const HIDSubDescriptor* node = m_rootNode; node; node = node->next) {
         int res = USB_SendControl(TRANSFER_PGM, node->data, node->length);
         if (res == -1)
             return -1;
@@ -81,7 +81,7 @@ int HID_::getDescriptor(USBSetup& setup)
 
     // Reset the protocol on reenumeration. Normally the host should not assume the state of the protocol
     // due to the USB specs, but Windows and Linux just assumes its in report mode.
-    protocol = HID_REPORT_PROTOCOL;
+    m_protocol = HID_REPORT_PROTOCOL;
 
     return total;
 }
@@ -92,23 +92,23 @@ uint8_t HID_::getShortName(char *name)
     name[0] = 'H';
     name[1] = 'I';
     name[2] = 'D';
-    name[3] = 'A' + (descriptorSize & 0x0F);
-    name[4] = 'A' + ((descriptorSize >> 4) & 0x0F);
+    name[3] = 'A' + (m_descriptorSize & 0x0F);
+    name[4] = 'A' + ((m_descriptorSize >> 4) & 0x0F);
     return 5;
 }
 
 void HID_::AppendDescriptor(const HIDSubDescriptor *node)
 {
-    if (!rootNode) {
-        rootNode = node;
+    if (!m_rootNode) {
+        m_rootNode = node;
     } else {
-        HIDSubDescriptor *current = rootNode;
+        HIDSubDescriptor *current = m_rootNode;
         while (current->next)
             current = current->next;
 
         current->next = node;
     }
-    descriptorSize += node->length;
+    m_descriptorSize += node->length;
 }
 
 int HID_::SetFeature(uint8_t id, const void* data, int len)
@@ -123,11 +123,11 @@ int HID_::SetString(const uint8_t index, const char* data)
 
 int HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
 {
-    if(!rootReport) {
-        rootReport = new HIDReport(id, str, data, len);
+    if(!m_rootReport) {
+        m_rootReport = new HIDReport(id, str, data, len);
     } else {
         int i=0;
-        for (HIDReport* current = rootReport; current; current = current->next, i++) {
+        for (HIDReport* current = m_rootReport; current; current = current->next, i++) {
             if((current->id == id) && (current->str == str))
                 return i;
 
@@ -139,8 +139,8 @@ int HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
         }
     }
 
-    reportCount++;
-    return reportCount;
+    m_reportCount++;
+    return m_reportCount;
 }
 
 int HID_::SendReport(uint8_t id, const void* data, int len)
@@ -157,7 +157,7 @@ int HID_::SendReport(uint8_t id, const void* data, int len)
 
 const HIDReport* HID_::GetFeature(uint8_t id, bool str)
 {
-    for(const HIDReport* current=rootReport; current; current=current->next) {
+    for(const HIDReport* current=m_rootReport; current; current=current->next) {
         if((id == current->id) && (str == current->str))
             return current;
     }
@@ -186,11 +186,11 @@ bool HID_::setup(USBSetup& setup)
             return true;
         }
         if (request == HID_GET_PROTOCOL) {
-            // TODO: Send8(protocol);
+            // TODO: Send8(m_protocol);
             return true;
         }
         if (request == HID_GET_IDLE) {
-            // TODO: Send8(idle);
+            // TODO: Send8(m_idle);
         }
     }
 
@@ -198,11 +198,11 @@ bool HID_::setup(USBSetup& setup)
         if (request == HID_SET_PROTOCOL) {
             // The USB Host tells us if we are in boot or report mode.
             // This only works with a real boot compatible device.
-            protocol = setup.wValueL;
+            m_protocol = setup.wValueL;
             return true;
         }
         if (request == HID_SET_IDLE) {
-            idle = setup.wValueL;
+            m_idle = setup.wValueL;
             return true;
         }
         if (request == HID_SET_REPORT) {
