@@ -92,7 +92,7 @@ public:
     const byte bSerial = ISERIAL;
 
 public:
-  HIDPowerDevice_(void);
+  HIDPowerDevice_();
 
   int SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data);
 };

@@ -246,7 +246,7 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0xC0        // END_COLLECTION
 };
 
-HIDPowerDevice_::HIDPowerDevice_(void) {
+HIDPowerDevice_::HIDPowerDevice_() {
     static const HIDSubDescriptor node(s_hidReportDescriptor, sizeof (s_hidReportDescriptor));
 
     AppendDescriptor(&node);
