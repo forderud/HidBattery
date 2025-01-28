@@ -100,12 +100,10 @@ public:
     /** The "data" pointer need to outlast this object. */ 
     int SetString(const uint8_t index, const char* data);
     
+protected:
     /** The "node" pointer need to outlast this object. */ 
     void AppendDescriptor(const HIDSubDescriptor* node);
     
-    const HIDReport* GetFeature(uint8_t id, bool str);
-    
-protected:
     // Implementation of the PluggableUSBModule
     int getInterface(uint8_t* interfaceCount) override;
     int getDescriptor(USBSetup& setup) override;
@@ -113,6 +111,8 @@ protected:
     uint8_t getShortName(char* name) override;
     
 private:
+    const HIDReport* GetFeature(uint8_t id, bool str);
+    
     int SetFeatureInternal(uint8_t id, bool str, const void* data, int len);
 
     uint8_t epType[1];
