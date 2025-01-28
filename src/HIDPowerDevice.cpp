@@ -255,13 +255,11 @@ HIDPowerDevice_::HIDPowerDevice_() {
 }
 
 int HIDPowerDevice_::SetManufacturer(const char* data) {
-    int res = SetFeature(HID_PD_MANUFACTURER, &bManufacturer, sizeof(bManufacturer));
-    return SetString(bManufacturer, data);
+    return SetStringIdxFeature(HID_PD_MANUFACTURER, &bManufacturer, data);
 }
 
 int HIDPowerDevice_::SetSerial(const char* data) {
-    int res = SetFeature(HID_PD_SERIAL, &bSerial, sizeof(bSerial));
-    return SetString(bSerial, data);
+    return SetStringIdxFeature(HID_PD_SERIAL, &bSerial, data);
 }
 
 int HIDPowerDevice_::SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data) {
