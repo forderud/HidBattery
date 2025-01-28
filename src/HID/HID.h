@@ -90,10 +90,9 @@ public:
   const uint16_t length;
 };
 
-class HID_ : public PluggableUSBModule
-{
+class HID_ : public PluggableUSBModule {
 public:
-    HID_(void);
+    HID_();
     int SendReport(uint8_t id, const void* data, int len);
     int SetFeature(uint8_t id, const void* data, int len);
     int SetString(const uint8_t index, const char* data);
