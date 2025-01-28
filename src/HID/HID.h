@@ -71,7 +71,6 @@ typedef struct
 
 class HIDReport {
 public:
-    const HIDReport *next = NULL;
     HIDReport(uint8_t i, bool s, const void *d, uint8_t l) : id(i), str(s), data(d), length(l) {}
     
     uint8_t id;
@@ -79,15 +78,16 @@ public:
     const void* data;
     uint16_t length;
     bool lock;
+    const HIDReport *next = NULL;
 };
 
 class HIDSubDescriptor {
 public:
-  const HIDSubDescriptor *next = NULL;
   HIDSubDescriptor(const void *d, uint16_t l) : data(d), length(l) { }
 
   const void* data;
   const uint16_t length;
+  const HIDSubDescriptor *next = NULL;
 };
 
 class HID_ : public PluggableUSBModule {
