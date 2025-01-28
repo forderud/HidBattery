@@ -100,6 +100,7 @@ public:
     /** The "data" pointer need to outlast this object. */ 
     int SetString(const uint8_t index, const char* data);
     
+    /** The "node" pointer need to outlast this object. */ 
     void AppendDescriptor(const HIDSubDescriptor* node);
     
     const HIDReport* GetFeature(uint8_t id, bool str);
