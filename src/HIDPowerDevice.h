@@ -86,13 +86,15 @@ static_assert(sizeof(PresentStatus) == sizeof(uint16_t));
 
 
 class HIDPowerDevice_ : public HID_ {
-public:
-    const byte bProduct = IPRODUCT;
-    const byte bManufacturer = IMANUFACTURER;
-    const byte bSerial = ISERIAL;
+  const byte bProduct = IPRODUCT;
+  const byte bManufacturer = IMANUFACTURER;
+  const byte bSerial = ISERIAL;
 
 public:
   HIDPowerDevice_();
+  
+  int SetManufacturer(const char* data);
+  int SetSerial(const char* data);
 
   int SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data);
 };

@@ -251,11 +251,17 @@ HIDPowerDevice_::HIDPowerDevice_() {
 
     AppendDescriptor(&node);
 
-    // set string ID here
-
     SetFeature(HID_PD_IPRODUCT, &bProduct, sizeof(bProduct));
-    SetFeature(HID_PD_SERIAL, &bSerial, sizeof(bSerial));
-    SetFeature(HID_PD_MANUFACTURER, &bManufacturer, sizeof(bManufacturer));
+}
+
+int HIDPowerDevice_::SetManufacturer(const char* data) {
+    int res = SetFeature(HID_PD_MANUFACTURER, &bManufacturer, sizeof(bManufacturer));
+    return SetString(bManufacturer, data);
+}
+
+int HIDPowerDevice_::SetSerial(const char* data) {
+    int res = SetFeature(HID_PD_SERIAL, &bSerial, sizeof(bSerial));
+    return SetString(bSerial, data);
 }
 
 int HIDPowerDevice_::SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data) {
