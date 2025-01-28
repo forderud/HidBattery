@@ -251,7 +251,7 @@ HIDPowerDevice_::HIDPowerDevice_() {
 
     AppendDescriptor(&node);
 
-    SetFeature(HID_PD_IPRODUCT, &bProduct, sizeof(bProduct));
+    SetFeature(HID_PD_IPRODUCT, &bProduct, sizeof(bProduct)); // automatically populated with "Arduino Micro"
 }
 
 int HIDPowerDevice_::SetManufacturer(const char* data) {
