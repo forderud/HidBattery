@@ -110,17 +110,17 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0x27, 0xFF, 0xFF, 0x00, 0x00, //     LOGICAL_MAXIMUM (65534)
     0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
 
-    0x85, HID_PD_AVERAGETIME2FULL, //     REPORT_ID (26)
-    0x09, 0x6A, //     USAGE (AverageTimeToFull)
+    0x85, HID_PD_AVERAGETIME2EMPTY, //     REPORT_ID (26)
+    0x09, 0x69, //     USAGE (AverageTimeToEmpty)
     0x27, 0xFF, 0xFF, 0x00, 0x00, //     LOGICAL_MAXIMUM (65534)
     0x66, 0x01, 0x10, //     UNIT (Seconds)
     0x55, 0x00, //     UNIT_EXPONENT (0)
-    0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
-
-    0x85, HID_PD_AVERAGETIME2EMPTY, //     REPORT_ID (28)
-    0x09, 0x69, //     USAGE (AverageTimeToEmpty)
     0x81, 0xA3, //     INPUT (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Bitfield)
     0x09, 0x69, //     USAGE (AverageTimeToEmpty)
+    0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
+
+    0x85, HID_PD_AVERAGETIME2FULL, //     REPORT_ID (28)
+    0x09, 0x6A, //     USAGE (AverageTimeToFull)
     0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
 
     0x85, HID_PD_RUNTIMETOEMPTY, //     REPORT_ID (13)
