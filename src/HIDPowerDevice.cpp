@@ -77,7 +77,7 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0x95, 0x01, //     REPORT_COUNT (1)
     0xB1, 0x83, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
 
-    0x85, HID_PD_DESIGNCAPACITY, //     REPORT_ID (23)
+    0x85, HID_PD_DESIGNCAPACITY, //     REPORT_ID (15)
     0x09, 0x83, //     USAGE (DesignCapacity)
     0xB1, 0x83, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
 
