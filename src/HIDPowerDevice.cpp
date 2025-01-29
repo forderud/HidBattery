@@ -20,10 +20,7 @@
 
 #include "HIDPowerDevice.h"
 
-//================================================================================
-//================================================================================
-//	UPS
-
+// HID report descriptor
 static const uint8_t s_hidReportDescriptor[] PROGMEM = {
 
     0x05, 0x84, // USAGE_PAGE (Power Device)
