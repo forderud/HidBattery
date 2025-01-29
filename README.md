@@ -21,6 +21,10 @@ Copy `linux/98-upower-hid.rules` file to the `/etc/udev/rules.d/` folder and reb
 * Windows 2000 - 11
 
 ### Screenshots
+#### Windows 11
+![image](https://github.com/user-attachments/assets/3e878c38-26f7-47d4-83f7-550039ceaae2)  
+Obtained with `CDC_DISABLED` defined to emulate 6 batteries.
+
 #### Windows 10
 ![image](https://github.com/user-attachments/assets/1ed60c05-b280-4781-a16f-40c1f56f2a1c)  
 Obtained with `CDC_DISABLED` defined to emulate 6 batteries.
