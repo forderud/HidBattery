@@ -27,6 +27,8 @@
 #define HID_PD_IPRODUCT              0x01 // FEATURE ONLY
 #define HID_PD_SERIAL                0x02 // FEATURE ONLY
 #define HID_PD_MANUFACTURER          0x03 // FEATURE ONLY
+
+#define HID_PD_IDEVICECHEMISTRY      0x04 // Feature
 #define IDEVICECHEMISTRY             0x04
 
 #define HID_PD_PRESENTSTATUS         0x07 // INPUT OR FEATURE(required by Windows)
@@ -41,8 +43,6 @@
 #define HID_PD_CAPACITYMODE          0x16 // 22 FEATURE ONLY
 #define HID_PD_DESIGNCAPACITY        0x17 // 23 FEATURE ONLY
 #define HID_PD_CPCTYGRANULARITY2     0x18 // 24 FEATURE ONLY
-
-#define HID_PD_IDEVICECHEMISTRY      0x1F // Feature
 
 
 // PresentStatus dynamic flags

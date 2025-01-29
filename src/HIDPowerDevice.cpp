@@ -51,7 +51,7 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
 
     0x05, 0x85, //     USAGE_PAGE (Battery System) ====================
-    0x85, HID_PD_IDEVICECHEMISTRY, //     REPORT_ID (31)
+    0x85, HID_PD_IDEVICECHEMISTRY, //     REPORT_ID (4)
     0x09, 0x89, //     USAGE (iDeviceChemistry)
     0x79, IDEVICECHEMISTRY, //     STRING INDEX (4)
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
