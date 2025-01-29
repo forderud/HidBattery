@@ -30,8 +30,8 @@ byte iAudibleAlarmCtrl = 2; // 1 - Disabled, 2 - Enabled, 3 - Muted
 
 // Parameters for ACPI compliancy
 const uint16_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
-byte iWarnCapacityLimit = 10; // warning at 10% (maps to DefaultAlert2 on Windows)
-byte iRemnCapacityLimit = 5; // low at 5% (maps to DefaultAlert1 on Windows)
+byte iRemnCapacityLimit = 10; // low at 10% (maps to DefaultAlert1 on Windows)
+byte iWarnCapacityLimit = 5; // warning at 5% (maps to DefaultAlert2 on Windows)
 const byte bCapacityGranularity1 = 1;
 const byte bCapacityGranularity2 = 1;
 uint16_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
@@ -80,8 +80,8 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_DESIGNCAPACITY, &iDesignCapacity, sizeof(iDesignCapacity));
     PowerDevice[i].SetFeature(HID_PD_FULLCHRGECAPACITY, &iFullChargeCapacity, sizeof(iFullChargeCapacity));
     PowerDevice[i].SetFeature(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
-    PowerDevice[i].SetFeature(HID_PD_WARNCAPACITYLIMIT, &iWarnCapacityLimit, sizeof(iWarnCapacityLimit));
     PowerDevice[i].SetFeature(HID_PD_REMNCAPACITYLIMIT, &iRemnCapacityLimit, sizeof(iRemnCapacityLimit));
+    PowerDevice[i].SetFeature(HID_PD_WARNCAPACITYLIMIT, &iWarnCapacityLimit, sizeof(iWarnCapacityLimit));
     PowerDevice[i].SetFeature(HID_PD_CPCTYGRANULARITY1, &bCapacityGranularity1, sizeof(bCapacityGranularity1));
     PowerDevice[i].SetFeature(HID_PD_CPCTYGRANULARITY2, &bCapacityGranularity2, sizeof(bCapacityGranularity2));
 
