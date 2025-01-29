@@ -18,7 +18,7 @@ byte bCapacityMode = 0;  // unit: 0=mAh, 1=mWh, 2=%
 // Physical parameters
 const uint16_t iConfigVoltage = 1509; // centiVolt
 uint16_t iVoltage =1499; // centiVolt
-uint16_t iRunTimeToEmpty = 0;
+uint16_t iRunTimeToEmpty = 0; // maps to BatteryEstimatedTime on Windows
 uint16_t iAvgTimeToFull = 7200;
 uint16_t iAvgTimeToEmpty = 7200;
 uint16_t iRemainTimeLimit = 600;

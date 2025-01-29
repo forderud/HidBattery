@@ -37,7 +37,7 @@
 #define HID_PD_CONFIGVOLTAGE         0x0A // 10 FEATURE ONLY
 #define HID_PD_VOLTAGE               0x0B // 11 INPUT (NA) OR FEATURE(implemented)
 #define HID_PD_REMAININGCAPACITY     0x0C // 12 INPUT OR FEATURE(required by Windows)
-#define HID_PD_RUNTIMETOEMPTY        0x0D // 13 INPUT OR FEATURE
+#define HID_PD_RUNTIMETOEMPTY        0x0D // 13 INPUT OR FEATURE (maps to BatteryEstimatedTime on Windows)
 #define HID_PD_FULLCHRGECAPACITY     0x0E // 14 FEATURE ONLY. Last Full Charge Capacity
 #define HID_PD_REMNCAPACITYLIMIT     0x0F // 15 FEATURE ONLY (maps to DefaultAlert1 on Windows)
 #define HID_PD_WARNCAPACITYLIMIT     0x11 // 17 FEATURE ONLY (maps to DefaultAlert2 on Windows)
