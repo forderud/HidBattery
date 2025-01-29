@@ -87,7 +87,7 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0x09, 0x66, //     USAGE (RemainingCapacity)
     0xB1, 0xA3, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
 
-    0x85, HID_PD_REMNCAPACITYLIMIT, //     REPORT_ID (15)
+    0x85, HID_PD_REMNCAPACITYLIMIT, //     REPORT_ID (16)
     0x09, 0x29, //     USAGE (RemainingCapacityLimit)
     0xB1, 0xA2, //     FEATURE (Data, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
 
