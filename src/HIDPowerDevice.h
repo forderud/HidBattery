@@ -28,13 +28,9 @@
 #define HID_PD_SERIAL                0x02 // FEATURE ONLY
 #define HID_PD_MANUFACTURER          0x03 // FEATURE ONLY
 #define IDEVICECHEMISTRY             0x04
-#define IOEMVENDOR                   0x05
 
-#define HID_PD_RECHARGEABLE          0x06 // FEATURE ONLY
 #define HID_PD_PRESENTSTATUS         0x07 // INPUT OR FEATURE(required by Windows)
-#define HID_PD_REMAINTIMELIMIT       0x08 // INPUT OR FEATURE
 #define HID_PD_MANUFACTUREDATE       0x09 // FEATURE ONLY
-#define HID_PD_CONFIGVOLTAGE         0x0A // 10 FEATURE ONLY
 #define HID_PD_VOLTAGE               0x0B // 11 INPUT (NA) OR FEATURE(implemented)
 #define HID_PD_REMAININGCAPACITY     0x0C // 12 INPUT OR FEATURE(required by Windows)
 #define HID_PD_RUNTIMETOEMPTY        0x0D // 13 INPUT OR FEATURE (maps to BatteryEstimatedTime on Windows)
@@ -42,17 +38,11 @@
 #define HID_PD_REMNCAPACITYLIMIT     0x0F // 15 FEATURE ONLY (maps to DefaultAlert1 on Windows)
 #define HID_PD_WARNCAPACITYLIMIT     0x11 // 17 FEATURE ONLY (maps to DefaultAlert2 on Windows)
 #define HID_PD_CPCTYGRANULARITY1     0x10 // 16 FEATURE ONLY
-#define HID_PD_DELAYBE4SHUTDOWN      0x12 // 18 FEATURE ONLY
-#define HID_PD_DELAYBE4REBOOT        0x13 // 19 FEATURE ONLY
-#define HID_PD_AUDIBLEALARMCTRL      0x14 // 20 INPUT OR FEATURE
 #define HID_PD_CAPACITYMODE          0x16 // 22 FEATURE ONLY
 #define HID_PD_DESIGNCAPACITY        0x17 // 23 FEATURE ONLY
 #define HID_PD_CPCTYGRANULARITY2     0x18 // 24 FEATURE ONLY
-#define HID_PD_AVERAGETIME2EMPTY     0x1A // 25 INPUT OR FEATURE
-#define HID_PD_AVERAGETIME2FULL      0x1C // 27 FEATURE ONLY
 
 #define HID_PD_IDEVICECHEMISTRY      0x1F // Feature
-#define HID_PD_IOEMINFORMATION       0x20 // Feature
 
 
 // PresentStatus dynamic flags
@@ -60,26 +50,17 @@ struct PresentStatus {
   uint8_t Charging : 1;                   // bit 0x00
   uint8_t Discharging : 1;                // bit 0x01
   uint8_t ACPresent : 1;                  // bit 0x02
-  uint8_t BatteryPresent : 1;             // bit 0x03
-  uint8_t BelowRemainingCapacityLimit : 1;// bit 0x04
-  uint8_t RemainingTimeLimitExpired : 1;  // bit 0x05
-  uint8_t NeedReplacement : 1;            // bit 0x06
-  uint8_t VoltageNotRegulated : 1;        // bit 0x07
-
-  uint8_t FullyCharged : 1;               // bit 0x08
-  uint8_t FullyDischarged : 1;            // bit 0x09
-  uint8_t ShutdownRequested : 1;          // bit 0x0A
-  uint8_t ShutdownImminent : 1;           // bit 0x0B (maps to BATTERY_CRITICAL on Windows)
-  uint8_t CommunicationLost : 1;          // bit 0x0C
-  uint8_t Overload : 1;                   // bit 0x0D
+  uint8_t ShutdownImminent : 1;           // bit 0x03 (maps to BATTERY_CRITICAL on Windows)
   uint8_t unused1 : 1;
   uint8_t unused2 : 1;
+  uint8_t unused3 : 1;
+  uint8_t unused4 : 1;
 
-  operator uint16_t () {
-      return *(uint16_t*)(this); // switch to std::bit_cast after migrating to C++20
+  operator uint8_t () {
+      return *(uint8_t*)(this); // switch to std::bit_cast after migrating to C++20
   }
 };
-static_assert(sizeof(PresentStatus) == sizeof(uint16_t));
+static_assert(sizeof(PresentStatus) == sizeof(uint8_t));
 
 
 

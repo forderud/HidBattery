@@ -6,27 +6,17 @@ const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
 const byte bDeviceChemistry = IDEVICECHEMISTRY;
 
 const char STRING_OEMVENDOR[] PROGMEM = "BatteryVendor";
-const byte bOEMVendor = IOEMVENDOR;
 
 const char STRING_SERIAL[] PROGMEM = "1234";
 
 PresentStatus iPresentStatus = {};
 
-byte bRechargable = 1;
 byte bCapacityMode = 0;  // unit: 0=mAh, 1=mWh, 2=%
 
 // Physical parameters
-const uint16_t iConfigVoltage = 1509; // centiVolt
 uint16_t iVoltage =1499; // centiVolt
 uint16_t iRunTimeToEmpty = 0; // maps to BatteryEstimatedTime on Windows
-uint16_t iAvgTimeToFull = 7200;
-uint16_t iAvgTimeToEmpty = 7200;
-uint16_t iRemainTimeLimit = 600;
-int16_t  iDelayBe4Reboot = -1;
-int16_t  iDelayBe4ShutDown = -1;
 uint16_t iManufacturerDate = 0; // initialized in setup function
-byte iAudibleAlarmCtrl = 2; // 1 - Disabled, 2 - Enabled, 3 - Muted
-
 
 // Parameters for ACPI compliancy
 const uint16_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
@@ -61,21 +51,11 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
 
     PowerDevice[i].SetFeature(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
-    PowerDevice[i].SetFeature(HID_PD_AVERAGETIME2FULL, &iAvgTimeToFull, sizeof(iAvgTimeToFull));
-    PowerDevice[i].SetFeature(HID_PD_AVERAGETIME2EMPTY, &iAvgTimeToEmpty, sizeof(iAvgTimeToEmpty));
-    PowerDevice[i].SetFeature(HID_PD_REMAINTIMELIMIT, &iRemainTimeLimit, sizeof(iRemainTimeLimit));
-    PowerDevice[i].SetFeature(HID_PD_DELAYBE4REBOOT, &iDelayBe4Reboot, sizeof(iDelayBe4Reboot));
-    PowerDevice[i].SetFeature(HID_PD_DELAYBE4SHUTDOWN, &iDelayBe4ShutDown, sizeof(iDelayBe4ShutDown));
 
-    PowerDevice[i].SetFeature(HID_PD_RECHARGEABLE, &bRechargable, sizeof(bRechargable));
     PowerDevice[i].SetFeature(HID_PD_CAPACITYMODE, &bCapacityMode, sizeof(bCapacityMode));
-    PowerDevice[i].SetFeature(HID_PD_CONFIGVOLTAGE, &iConfigVoltage, sizeof(iConfigVoltage));
     PowerDevice[i].SetFeature(HID_PD_VOLTAGE, &iVoltage, sizeof(iVoltage));
 
     PowerDevice[i].SetStringIdxFeature(HID_PD_IDEVICECHEMISTRY, &bDeviceChemistry, STRING_DEVICECHEMISTRY);
-    PowerDevice[i].SetStringIdxFeature(HID_PD_IOEMINFORMATION, &bOEMVendor, STRING_OEMVENDOR);
-
-    PowerDevice[i].SetFeature(HID_PD_AUDIBLEALARMCTRL, &iAudibleAlarmCtrl, sizeof(iAudibleAlarmCtrl));
 
     PowerDevice[i].SetFeature(HID_PD_DESIGNCAPACITY, &iDesignCapacity, sizeof(iDesignCapacity));
     PowerDevice[i].SetFeature(HID_PD_FULLCHRGECAPACITY, &iFullChargeCapacity, sizeof(iFullChargeCapacity));
@@ -124,35 +104,20 @@ void loop() {
   }
 #endif
 
+  uint16_t iAvgTimeToEmpty = 7200;
   iRunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*iRemaining[0]/iFullChargeCapacity);
 
   // Charging
   iPresentStatus.ACPresent = iPresentStatus.Charging; // assume charging implies AC present
-  iPresentStatus.FullyCharged = (iRemaining[0] == iFullChargeCapacity);
-
   // Discharging
   if(!iPresentStatus.Charging) { // assume not charging implies discharging
     iPresentStatus.Discharging = 1;
-    // if(iRemaining[0] < iRemnCapacityLimit) iPresentStatus.BelowRemainingCapacityLimit = 1;
-
-    iPresentStatus.RemainingTimeLimitExpired = (iRunTimeToEmpty < iRemainTimeLimit);
   } else {
     iPresentStatus.Discharging = 0;
-    iPresentStatus.RemainingTimeLimitExpired = 0;
-  }
-
-  // Shutdown requested
-  if(iDelayBe4ShutDown > 0 ) {
-      iPresentStatus.ShutdownRequested = 1;
-#ifdef CDC_ENABLED
-      Serial.println("shutdown requested");
-#endif
-  } else {
-    iPresentStatus.ShutdownRequested = 0;
   }
 
   // Shutdown imminent
-  if((iPresentStatus.ShutdownRequested) || (iPresentStatus.RemainingTimeLimitExpired)) {
+  if(iRunTimeToEmpty < 60) {
     iPresentStatus.ShutdownImminent = 1;
 #ifdef CDC_ENABLED
     Serial.println("shutdown imminent");
@@ -160,9 +125,6 @@ void loop() {
   } else {
     iPresentStatus.ShutdownImminent = 0;
   }
-
-  iPresentStatus.BatteryPresent = 1;
-
 
   //************ Delay ****************************************
   delay(1000);
