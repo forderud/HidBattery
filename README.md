@@ -35,7 +35,7 @@ Limitation: MacOS displays the battery as a UPS. It only displays aggregated inf
 
 ### Linux
 ![image](https://github.com/user-attachments/assets/26d1babd-27d4-40c8-beef-d3f7f88c0dc1)  
-Limtation: Linux seem to assume charge values in `%`, regardless of the actual unit.
+Limtation: Linux seem to assume charge values in `%`, regardless of the actual unit ([upower issue #300](https://gitlab.freedesktop.org/upower/upower/-/issues/300)).
 
 ## License
 Copyright (c) Alex Bratchik, Fredrik Orderud.
