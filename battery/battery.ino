@@ -17,6 +17,7 @@ byte bCapacityMode = 0;  // unit: 0=mAh, 1=mWh, 2=%
 uint16_t iVoltage =1499; // centiVolt
 uint16_t iRunTimeToEmpty = 0; // maps to BatteryEstimatedTime on Windows
 uint16_t iManufacturerDate = 0; // initialized in setup function
+int16_t  iCycleCount = 41;
 
 // Parameters for ACPI compliancy
 const uint16_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
@@ -68,6 +69,8 @@ void setup() {
     uint16_t year = 2024, month = 10, day = 12;
     iManufacturerDate = (year - 1980)*512 + month*32 + day; // from 4.2.6 Battery Settings in "Universal Serial Bus Usage Tables for HID Power Devices"
     PowerDevice[i].SetFeature(HID_PD_MANUFACTUREDATE, &iManufacturerDate, sizeof(iManufacturerDate));
+
+    PowerDevice[i].SetFeature(HID_PD_CYCLE_COUNT, &iCycleCount, sizeof(iCycleCount));
   }
 }
 
@@ -100,6 +103,7 @@ void loop() {
     if (iRemaining[0] < 0.20f*iFullChargeCapacity) {
       iRemaining[0] = 0.20f*iFullChargeCapacity; // clamp at 20% to prevent triggering shutdown
       iPresentStatus.Charging = true;
+      iCycleCount += 1;
     }
   }
 #endif
@@ -143,6 +147,9 @@ void loop() {
 
     if (res >= 0)
       res = PowerDevice[i].SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
+
+    if (res >= 0)
+      res = PowerDevice[i].SendReport(HID_PD_CYCLE_COUNT, &iCycleCount, sizeof(iCycleCount));
   }
 
   iPrevRemaining = iRemaining[0];
