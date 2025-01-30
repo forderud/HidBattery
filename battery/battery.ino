@@ -20,8 +20,8 @@ uint16_t iManufacturerDate = 0; // initialized in setup function
 
 // Parameters for ACPI compliancy
 const uint16_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
-byte iRemnCapacityLimit = 10; // low at 10% (maps to DefaultAlert1 on Windows)
-byte iWarnCapacityLimit = 5; // warning at 5% (maps to DefaultAlert2 on Windows)
+byte iRemnCapacityLimit = 5; // critical at 5% (maps to DefaultAlert1 on Windows)
+byte iWarnCapacityLimit = 10; // low  at 10% (maps to DefaultAlert2 on Windows)
 const byte bCapacityGranularity1 = 1;
 const byte bCapacityGranularity2 = 1;
 uint16_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
