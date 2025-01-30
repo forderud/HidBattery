@@ -33,6 +33,7 @@
 
 #define HID_PD_PRESENTSTATUS         0x07 // INPUT OR FEATURE(required by Windows)
 #define HID_PD_MANUFACTUREDATE       0x09 // FEATURE ONLY
+#define HID_PD_TEMPERATURE           0x0A // 10 INPUT OR FEATURE
 #define HID_PD_VOLTAGE               0x0B // 11 INPUT (NA) OR FEATURE(implemented)
 #define HID_PD_REMAININGCAPACITY     0x0C // 12 INPUT OR FEATURE(required by Windows)
 #define HID_PD_RUNTIMETOEMPTY        0x0D // 13 INPUT OR FEATURE (maps to BatteryEstimatedTime on Windows)

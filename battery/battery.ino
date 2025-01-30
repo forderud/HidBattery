@@ -18,6 +18,7 @@ uint16_t iVoltage =1499; // centiVolt
 uint16_t iRunTimeToEmpty = 0; // maps to BatteryEstimatedTime on Windows
 uint16_t iManufacturerDate = 0; // initialized in setup function
 int16_t  iCycleCount = 41;
+uint16_t iTemperature = 300; // degrees Kelvin
 
 // Parameters for ACPI compliancy
 const uint16_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
@@ -54,6 +55,7 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
 
     PowerDevice[i].SetFeature(HID_PD_CAPACITYMODE, &bCapacityMode, sizeof(bCapacityMode));
+    PowerDevice[i].SetFeature(HID_PD_TEMPERATURE, &iTemperature, sizeof(iTemperature));
     PowerDevice[i].SetFeature(HID_PD_VOLTAGE, &iVoltage, sizeof(iVoltage));
 
     PowerDevice[i].SetStringIdxFeature(HID_PD_IDEVICECHEMISTRY, &bDeviceChemistry, STRING_DEVICECHEMISTRY);
@@ -144,6 +146,9 @@ void loop() {
 
     if((res >= 0) && !iPresentStatus.Charging)
       res = PowerDevice[i].SendReport(HID_PD_RUNTIMETOEMPTY, &iRunTimeToEmpty, sizeof(iRunTimeToEmpty));
+
+    if (res >= 0)
+      PowerDevice[i].SetFeature(HID_PD_TEMPERATURE, &iTemperature, sizeof(iTemperature));
 
     if (res >= 0)
       res = PowerDevice[i].SendReport(HID_PD_PRESENTSTATUS, &iPresentStatus, sizeof(iPresentStatus));
