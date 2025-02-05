@@ -77,13 +77,12 @@ NTSTATUS SetFeatureColor (
             &collectionInfoDesc,
             NULL,
             NULL);
-
-        //KdPrint(("TailLight: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInfo.ProductID, collectionInfo.VendorID, collectionInfo.VersionNumber, collectionInfo.DescriptorSize));
-
         if (!NT_SUCCESS(status)) {
             KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously1 failed 0x%x\n", status));
             return status;
         }
+
+        //KdPrint(("TailLight: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInfo.ProductID, collectionInfo.VendorID, collectionInfo.VersionNumber, collectionInfo.DescriptorSize));
     }
 
     PHIDP_PREPARSED_DATA_Wrap preparsedData(collectionInfo.DescriptorSize);
