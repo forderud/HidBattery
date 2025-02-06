@@ -105,7 +105,6 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0xB1, 0xA2, //     FEATURE (Data, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Volatile, Bitfield)
 
     0x05, 0x84, //     USAGE_PAGE (Power Device) ====================
-
     0x85, HID_PD_TEMPERATURE, //     REPORT_ID (10)
     0x09, 0x36, //     USAGE (Temperature)
     0x75, 0x10, //     REPORT_SIZE (16)
