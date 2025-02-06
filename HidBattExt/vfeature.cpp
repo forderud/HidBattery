@@ -78,7 +78,7 @@ NTSTATUS SetFeatureColor (
             NULL,
             NULL);
         if (!NT_SUCCESS(status)) {
-            KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously1 failed 0x%x\n", status));
+            KdPrint(("TailLight: IOCTL_HID_GET_COLLECTION_INFORMATION failed 0x%x\n", status));
             return status;
         }
 
@@ -104,7 +104,7 @@ NTSTATUS SetFeatureColor (
             NULL);
 
         if (!NT_SUCCESS(status)) {
-            KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously2 failed 0x%x\n", status));
+            KdPrint(("TailLight: IOCTL_HID_GET_COLLECTION_DESCRIPTOR failed 0x%x\n", status));
             return status;
         }
     }
