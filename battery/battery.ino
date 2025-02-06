@@ -89,14 +89,14 @@ void loop() {
 #else
   // simulate charge & discharge cycles
   if (iPresentStatus.Charging) {
-    iRemaining[0] += 0.01f*iFullChargeCapacity; // incr. 1%
+    iRemaining[0] += 0.02f*iFullChargeCapacity; // incr. 2%
 
     if (iRemaining[0] > iFullChargeCapacity) {
       iRemaining[0] = iFullChargeCapacity; // clamp at 100%
       iPresentStatus.Charging = false;
     }
   } else {
-    iRemaining[0] -= 0.01f*iFullChargeCapacity; // decr. 1%
+    iRemaining[0] -= 0.02f*iFullChargeCapacity; // decr. 2%
 
     if (iRemaining[0] < 0.20f*iFullChargeCapacity) {
       iRemaining[0] = 0.20f*iFullChargeCapacity; // clamp at 20% to prevent triggering shutdown
