@@ -24,8 +24,6 @@ uint16_t iTemperature = 300; // degrees Kelvin
 const uint16_t iDesignCapacity = 58003*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
 uint16_t iRemnCapacityLimit = iDesignCapacity/20; // critical at 5% (maps to DefaultAlert1 on Windows)
 uint16_t iWarnCapacityLimit = iDesignCapacity/10; // low  at 10% (maps to DefaultAlert2 on Windows)
-const byte bCapacityGranularity1 = 1;
-const byte bCapacityGranularity2 = 1;
 uint16_t iFullChargeCapacity = 40690*360/iVoltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
 
 uint16_t iRemaining[MAX_BATTERIES] = {}; // remaining charge
@@ -65,8 +63,6 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_REMAININGCAPACITY, &iRemaining[i], sizeof(iRemaining[i]));
     PowerDevice[i].SetFeature(HID_PD_REMNCAPACITYLIMIT, &iRemnCapacityLimit, sizeof(iRemnCapacityLimit));
     PowerDevice[i].SetFeature(HID_PD_WARNCAPACITYLIMIT, &iWarnCapacityLimit, sizeof(iWarnCapacityLimit));
-    PowerDevice[i].SetFeature(HID_PD_CPCTYGRANULARITY1, &bCapacityGranularity1, sizeof(bCapacityGranularity1));
-    PowerDevice[i].SetFeature(HID_PD_CPCTYGRANULARITY2, &bCapacityGranularity2, sizeof(bCapacityGranularity2));
 
     uint16_t year = 2024, month = 10, day = 12;
     iManufacturerDate = (year - 1980)*512 + month*32 + day; // from 4.2.6 Battery Settings in "Universal Serial Bus Usage Tables for HID Power Devices"
