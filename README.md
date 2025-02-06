@@ -37,7 +37,7 @@ Obtained with `CDC_DISABLED` defined[^1] to emulate 6 batteries.
 
 ### MacOS
 ![image](https://github.com/user-attachments/assets/ec24ff0f-f7c7-46ef-9882-22ae3cd5c4bf)  
-Limitation: MacOS displays the battery as a UPS. It only displays aggregated information, and not per-battery.
+Limitation: MacOS displays the battery as a UPS. The UI furthermore only display aggregated information, and not per-battery.
 
 ### Linux
 ![image](https://github.com/user-attachments/assets/26d1babd-27d4-40c8-beef-d3f7f88c0dc1)  
