@@ -33,7 +33,7 @@ Obtained with `CDC_DISABLED` defined[^1] to emulate 6 batteries.
 ![image](https://github.com/user-attachments/assets/e1bae398-1769-468a-80fb-083cc57f32b3)  
 Obtained with `CDC_DISABLED` defined[^1] to emulate 6 batteries.
 
-[^1]: `CDC_DISABLED` can be defined by uncommenting a line in `%LOCALAPPDATA%\Arduino15\packages\arduino\hardware\avr\<version>\cores\arduino\USBDesc.h` to disable serial console over USB. This will free up 3 USB endpoints for alternative usage.
+[^1]: `CDC_DISABLED` can be defined by uncommenting a line in `%LOCALAPPDATA%\Arduino15\packages\arduino\hardware\avr\<version>\cores\arduino\USBDesc.h`. This will disable serial console over USB, which will free up 3 USB endpoints for alternative usage.
 
 ### MacOS
 ![image](https://github.com/user-attachments/assets/ec24ff0f-f7c7-46ef-9882-22ae3cd5c4bf)  
