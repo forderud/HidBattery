@@ -51,8 +51,7 @@ NTSTATUS SetFeatureColor (
         // open in write-only mode
         DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
         WDF_IO_TARGET_OPEN_PARAMS openParams = {};
-        WDF_IO_TARGET_OPEN_PARAMS_INIT_OPEN_BY_NAME(&openParams, &deviceContext->PdoName, FILE_WRITE_ACCESS);
-
+        WDF_IO_TARGET_OPEN_PARAMS_INIT_OPEN_BY_NAME(&openParams, &deviceContext->PdoName, FILE_READ_ACCESS | FILE_WRITE_ACCESS);
         // We will let the framework to respond automatically to the pnp
         // state changes of the target by closing and opening the handle.
         openParams.ShareAccess = FILE_SHARE_WRITE | FILE_SHARE_READ;
