@@ -4,7 +4,7 @@ Make an Arduino board with USB capabilities act as a [HID Power Device](https://
 The project is based on Alexander Bratchik's [HIDPowerDevice](https://github.com/abratchik/HIDPowerDevice) project, but with changes to make the emulated battery more like a "battery" instead of a "UPS". The project is also extended to emulate multiple batteries.
 
 ## Supported Arduinos
-* (Pro)Micro
+* (Pro)[Micro](https://docs.arduino.cc/hardware/micro/)
 * Leonardo
 
 ## Setup & Usage
