@@ -152,12 +152,12 @@ NTSTATUS SetFeatureColor (
         report.SetColor(Color);
 
         // send TailLightReport to device
-        WDF_MEMORY_DESCRIPTOR reportDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&reportDesc, &report, sizeof(report));
+        WDF_MEMORY_DESCRIPTOR inputDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&inputDesc, &report, sizeof(report));
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
             NULL,
             IOCTL_HID_SET_FEATURE, // 0xb0191
-            &reportDesc,
+            &inputDesc,
             NULL,
             NULL,
             NULL);
