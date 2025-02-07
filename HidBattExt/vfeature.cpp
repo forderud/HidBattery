@@ -128,8 +128,9 @@ NTSTATUS SetFeatureColor (
     TailLightReport report;
 
     {
-        // get TailLightReport from device
-        // using INTERNAL IOCTL function to avoid 0xc00000e8 (STATUS_INVALID_USER_BUFFER) error
+        // Get TailLightReport from device.
+        // Using INTERNAL IOCTL function to avoid 0xc00000e8 (STATUS_INVALID_USER_BUFFER) error.
+        // WARNING: Call succeeds but doesn't update the report.
         WDF_MEMORY_DESCRIPTOR reportDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&reportDesc, &report, sizeof(report));
         NTSTATUS status = WdfIoTargetSendInternalIoctlSynchronously(hidTarget,
