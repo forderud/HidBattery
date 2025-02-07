@@ -140,7 +140,7 @@ NTSTATUS SetFeatureColor (
             NULL,
             NULL);
         if (!NT_SUCCESS(status)) {
-            KdPrint(("TailLight: WdfIoTargetSendIoctlSynchronously3 failed 0x%x\n", status));
+            KdPrint(("TailLight: IOCTL_HID_SET_FEATURE failed 0x%x\n", status));
             return status;
         }
     }
