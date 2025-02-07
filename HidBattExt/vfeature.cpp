@@ -134,8 +134,8 @@ NTSTATUS SetFeatureColor (
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
             NULL,
             IOCTL_HID_GET_FEATURE,
-            NULL,
-            &outputDesc,
+            NULL, // input
+            &outputDesc, // output
             NULL,
             NULL);
         if (!NT_SUCCESS(status)) {
@@ -157,8 +157,8 @@ NTSTATUS SetFeatureColor (
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
             NULL,
             IOCTL_HID_SET_FEATURE, // 0xb0191
-            &inputDesc,
-            NULL,
+            &inputDesc, // input
+            NULL, // output
             NULL,
             NULL);
         if (!NT_SUCCESS(status)) {
