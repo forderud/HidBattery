@@ -126,6 +126,27 @@ NTSTATUS SetFeatureColor (
 
     // Create a report to send to the device.
     TailLightReport report;
+
+    {
+        // get TailLightReport from device
+        // using INTERNAL IOCTL function to avoid 0xc00000e8 (STATUS_INVALID_USER_BUFFER) error
+        WDF_MEMORY_DESCRIPTOR reportDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&reportDesc, &report, sizeof(report));
+        NTSTATUS status = WdfIoTargetSendInternalIoctlSynchronously(hidTarget,
+            NULL,
+            IOCTL_HID_GET_FEATURE,
+            &reportDesc,
+            NULL,
+            NULL,
+            NULL);
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("TailLight: IOCTL_HID_GET_FEATURE failed 0x%x\n", status));
+            return status;
+        }
+
+        KdPrint(("TailLight: Previous color: Red=%u, Green=%u, Blue=%u\n", report.Red, report.Green, report.Blue)); // always zero
+    }
+
     report.SetColor(Color);
 
     {
@@ -143,6 +164,8 @@ NTSTATUS SetFeatureColor (
             KdPrint(("TailLight: IOCTL_HID_SET_FEATURE failed 0x%x\n", status));
             return status;
         }
+
+        KdPrint(("TailLight: New color: Red=%u, Green=%u, Blue=%u\n", report.Red, report.Green, report.Blue));
     }
 
     return STATUS_SUCCESS;
