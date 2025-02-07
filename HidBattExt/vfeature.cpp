@@ -125,6 +125,7 @@ NTSTATUS SetFeatureColor (
     }
 
     {
+#if 0
         // Get TailLightReport from device.
         TailLightReport report;
 
@@ -144,6 +145,7 @@ NTSTATUS SetFeatureColor (
         }
 
         KdPrint(("TailLight: Previous color: Red=%u, Green=%u, Blue=%u\n", report.Red, report.Green, report.Blue)); // always zero
+#endif
     }
 
     {
