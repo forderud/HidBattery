@@ -128,16 +128,17 @@ void HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
 {
     if(!m_rootReport) {
         m_rootReport = new HIDReport(id, str, data, len);
-    } else {
-        for (HIDReport* current = m_rootReport; current; current = current->next) {
-            if((current->id == id) && (current->str == str))
-                return;
+        return;
+    }
 
-            // check if we are on the last report
-            if(!current->next) {
-                current->next = new HIDReport(id, str, data, len);
-                break;
-            }
+    for (HIDReport* current = m_rootReport; current; current = current->next) {
+        if((current->id == id) && (current->str == str))
+            return; // feature already configured
+
+        if(!current->next) {
+            // append at the end
+            current->next = new HIDReport(id, str, data, len);
+            break;
         }
     }
 }
