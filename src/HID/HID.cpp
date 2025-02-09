@@ -55,15 +55,16 @@ int HID_::getDescriptor(USBSetup& setup)
         return 0;
     
     if (setup.bmRequestType == REQUEST_DEVICETOHOST | REQUEST_STANDARD | REQUEST_DEVICE) {
-        if (setup.wIndex == 0x0409) {// English (matches STRING_LANGUAGE in arduino/USBCore.cpp)
-            // HID-specific strings
-            if(setup.wValueH == USB_STRING_DESCRIPTOR_TYPE) {
-                HIDReport* rep = GetFeature(setup.wValueL, true/*string*/);
-                if(rep)
-                    return USB_SendStringDescriptor((char*)rep->data, strlen_P((char*)rep->data), TRANSFER_PGM);
-                else
-                    return 0;
-            }
+        if (setup.wIndex != 0x0409) // English (matches STRING_LANGUAGE in arduino/USBCore.cpp)
+            return 0;
+        
+        // HID-specific strings
+        if(setup.wValueH == USB_STRING_DESCRIPTOR_TYPE) {
+            HIDReport* rep = GetFeature(setup.wValueL, true/*string*/);
+            if(rep)
+                return USB_SendStringDescriptor((char*)rep->data, strlen_P((char*)rep->data), TRANSFER_PGM);
+            else
+                return 0;
         }
     }
 
