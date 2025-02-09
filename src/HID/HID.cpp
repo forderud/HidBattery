@@ -52,7 +52,7 @@ static bool USB_SendStringDescriptor(const char* string_P, u8 string_len, uint8_
 int HID_::getDescriptor(USBSetup& setup)
 {
     // HID-specific strings
-    if(USB_STRING_DESCRIPTOR_TYPE == setup.wValueH) {
+    if(setup.wValueH == USB_STRING_DESCRIPTOR_TYPE) {
         HIDReport* rep = GetFeature(setup.wValueL, true/*string*/);
         if(rep)
             return USB_SendStringDescriptor((char*)rep->data, strlen_P((char*)rep->data), TRANSFER_PGM);
@@ -64,7 +64,7 @@ int HID_::getDescriptor(USBSetup& setup)
     if (setup.bmRequestType != REQUEST_DEVICETOHOST_STANDARD_INTERFACE)
         return 0;
 
-    if (HID_REPORT_DESCRIPTOR_TYPE != setup.wValueH)
+    if (setup.wValueH != HID_REPORT_DESCRIPTOR_TYPE)
         return 0;
 
     // In a HID Class Descriptor wIndex cointains the interface number
