@@ -75,7 +75,6 @@ public:
     bool str;
     const void* data;
     uint16_t length;
-    bool lock;
     const HIDReport *next = NULL;
 };
 
