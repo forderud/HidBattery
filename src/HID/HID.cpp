@@ -54,13 +54,15 @@ int HID_::getDescriptor(USBSetup& setup)
     if (setup.bRequest != GET_DESCRIPTOR) // redundant check, since it's already done before calling this method
         return 0;
     
-    // HID-specific strings
-    if(setup.wValueH == USB_STRING_DESCRIPTOR_TYPE) {
-        HIDReport* rep = GetFeature(setup.wValueL, true/*string*/);
-        if(rep)
-            return USB_SendStringDescriptor((char*)rep->data, strlen_P((char*)rep->data), TRANSFER_PGM);
-        else
-            return 0;
+    if (setup.wIndex == 0x0409) {// English (matches STRING_LANGUAGE in arduino/USBCore.cpp)
+        // HID-specific strings
+        if(setup.wValueH == USB_STRING_DESCRIPTOR_TYPE) {
+            HIDReport* rep = GetFeature(setup.wValueL, true/*string*/);
+            if(rep)
+                return USB_SendStringDescriptor((char*)rep->data, strlen_P((char*)rep->data), TRANSFER_PGM);
+            else
+                return 0;
+        }
     }
 
     // Check if this is a HID Class Descriptor request
