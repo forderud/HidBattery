@@ -33,18 +33,22 @@ int HID_::getInterface(uint8_t* interfaceCount)
     return USB_SendControl(0, &hidInterface, sizeof(hidInterface));
 }
 
-// Since this function is not exposed in USBCore API, had to replicate here.
+/** Send a USB descriptor string.
+  The string is converted from ASCII to UTF-16 with 2-byte prefix.
+  Copied from https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/USBCore.cpp */
 static bool USB_SendStringDescriptor(const char* string_P, u8 string_len, uint8_t flags) {
-    u8 c[2] = {(u8)(2 + string_len * 2), 3};
-    USB_SendControl(0,&c,2);
+    u8 c[2] = {string_len*2 + 2, // string length
+               0x03};            // string descriptor type
+    USB_SendControl(0, &c, 2);
 
     bool pgm = flags & TRANSFER_PGM;
     for(u8 i = 0; i < string_len; i++) {
-            c[0] = pgm ? pgm_read_byte(&string_P[i]) : string_P[i];
-            c[1] = 0;
-            int r = USB_SendControl(0,&c,2);
-            if(!r)
-                return false;
+        // expand from ASCII to UTF-16
+        c[0] = pgm ? pgm_read_byte(&string_P[i]) : string_P[i];
+        c[1] = 0;
+        int r = USB_SendControl(0, &c, 2);
+        if(!r)
+            return false;
     }
     return true;
 }
