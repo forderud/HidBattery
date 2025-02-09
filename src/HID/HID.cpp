@@ -37,7 +37,7 @@ int HID_::getInterface(uint8_t* interfaceCount)
   The string is converted from ASCII to UTF-16 with 2-byte prefix.
   Copied from https://github.com/arduino/ArduinoCore-avr/blob/master/cores/arduino/USBCore.cpp */
 static bool USB_SendStringDescriptor(const char* string_P, u8 string_len, uint8_t flags) {
-    u8 c[2] = {string_len*2 + 2, // string length
+    u8 c[2] = {string_len*2 + 2, // descriptor size
                0x03};            // string descriptor type
     USB_SendControl(0, &c, 2);
 
