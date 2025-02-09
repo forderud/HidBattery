@@ -36,7 +36,7 @@ struct TailLightReport {
         // RGB check
         unsigned int color_sum = Red + Green + Blue;
         if (color_sum > 640) {
-            KdPrint(("TailLight: Color saturation %u exceeded 640 threshold. Reseting color to RED to signal error\n", color_sum));
+            DebugPrint(DPFLTR_WARNING_LEVEL, "TailLight: Color saturation %u exceeded 640 threshold. Reseting color to RED to signal error\n", color_sum);
             Red = 255;
             Green = 0;
             Blue = 0;
