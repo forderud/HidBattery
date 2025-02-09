@@ -165,11 +165,8 @@ bool HID_::setup(USBSetup& setup)
     if (pluggedInterface != setup.wIndex)
         return false;
 
-    uint8_t request = setup.bRequest;
-    uint8_t requestType = setup.bmRequestType;
-
-    if (requestType == REQUEST_DEVICETOHOST_CLASS_INTERFACE) {
-        if (request == HID_GET_REPORT) {
+    if (setup.bmRequestType == REQUEST_DEVICETOHOST_CLASS_INTERFACE) {
+        if (setup.bRequest == HID_GET_REPORT) {
             if(setup.wValueH == HID_REPORT_TYPE_FEATURE) {
                 HIDReport* current = GetFeature(setup.wValueL, false/*string*/);
                 if(current){
@@ -183,27 +180,27 @@ bool HID_::setup(USBSetup& setup)
             }
             return true;
         }
-        if (request == HID_GET_PROTOCOL) {
+        if (setup.bRequest == HID_GET_PROTOCOL) {
             // TODO: Send8(m_protocol);
             return true;
         }
-        if (request == HID_GET_IDLE) {
+        if (setup.bRequest == HID_GET_IDLE) {
             // TODO: Send8(m_idle);
         }
     }
 
-    if (requestType == REQUEST_HOSTTODEVICE_CLASS_INTERFACE) {
-        if (request == HID_SET_PROTOCOL) {
+    if (setup.bmRequestType == REQUEST_HOSTTODEVICE_CLASS_INTERFACE) {
+        if (setup.bRequest == HID_SET_PROTOCOL) {
             // The USB Host tells us if we are in boot or report mode.
             // This only works with a real boot compatible device.
             m_protocol = setup.wValueL;
             return true;
         }
-        if (request == HID_SET_IDLE) {
+        if (setup.bRequest == HID_SET_IDLE) {
             m_idle = setup.wValueL;
             return true;
         }
-        if (request == HID_SET_REPORT) {
+        if (setup.bRequest == HID_SET_REPORT) {
             if(setup.wValueH == HID_REPORT_TYPE_FEATURE) {
                 HIDReport* current = GetFeature(setup.wValueL, false/*string*/);
                 if(!current)
