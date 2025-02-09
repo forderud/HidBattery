@@ -1,4 +1,5 @@
 #include "eventlog.h"
+#include "driver.h"
 
 
 constexpr USHORT IO_ERROR_LOG_PACKET_size() {
