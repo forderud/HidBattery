@@ -41,7 +41,8 @@ NTSTATUS SetFeatureColor (
 
     WDFIOTARGET_Wrap hidTarget;
     {
-        // open "hidTarget" using PdoName
+        // Use PDO for HID commands.
+        // Using PDO, since WdfDeviceGetIoTarget(Device) leads to failing WdfIoTargetSendIoctlSynchronously(IOCTL_HID_SET_FEATURE,..) calls with 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD).
         NTSTATUS status = WdfIoTargetCreate(Device, WDF_NO_OBJECT_ATTRIBUTES, &hidTarget);
         if (!NT_SUCCESS(status)) {
             KdPrint(("TailLight: WdfIoTargetCreate failed 0x%x\n", status));
