@@ -22,7 +22,7 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1
     USHORT total_size = IO_ERROR_LOG_PACKET_size() + InsertionStr1Len + InsertionStr2Len;
     if (total_size > ERROR_LOG_MAXIMUM_SIZE) {
         // overflow check
-        KdPrint(("TailLight: IoAllocateErrorLogEntry too long message.\n"));
+        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: IoAllocateErrorLogEntry too long message.\n");
         return;
     }
 
@@ -30,7 +30,7 @@ void WriteToSystemLog(WDFDEVICE Device, NTSTATUS MessageId, WCHAR* InsertionStr1
     DEVICE_OBJECT* dev_object = WdfDeviceWdmGetDeviceObject(Device);
     auto* entry = (IO_ERROR_LOG_PACKET*)IoAllocateErrorLogEntry(dev_object, static_cast<UCHAR>(total_size));
     if (!entry) {
-        KdPrint(("TailLight: IoAllocateErrorLogEntry allocation failure.\n"));
+        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: IoAllocateErrorLogEntry allocation failure.\n");
         return;
     }
 

@@ -11,7 +11,7 @@ VOID SelfTestTimerProc (_In_ WDFTIMER timer) {
     auto* stCtx = WdfObjectGet_SELF_TEST_CONTEXT(timer);
     NTSTATUS status = SetFeatureColor(device, pInfo->TailLight);
     if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: %s: failed 0x%x\n", __func__, status));
+        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: %s: failed 0x%x\n", __func__, status);
         stCtx->Result = status;
         LONG wasSignaled = KeSetEvent(&deviceContext->SelfTestCompleted, IO_MOUSE_INCREMENT, FALSE);
         NT_ASSERTMSG("TailLight: SelfTest method set to signaled while already signaled.\n", wasSignaled == 0);
@@ -99,7 +99,7 @@ NTSTATUS WmiInitialize(_In_ WDFDEVICE Device)
 
     NTSTATUS status = WdfDeviceAssignMofResourceName(Device, &mofRsrcName);
     if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: Error in WdfDeviceAssignMofResourceName %x\n", status));
+        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: Error in WdfDeviceAssignMofResourceName %x\n", status);
         return status;
     }
 
@@ -121,7 +121,7 @@ NTSTATUS WmiInitialize(_In_ WDFDEVICE Device)
     WDFWMIINSTANCE WmiInstance = 0;
     status = WdfWmiInstanceCreate(Device, &instanceConfig, &woa, &WmiInstance);
     if (!NT_SUCCESS(status)) {
-        KdPrint(("TailLight: WdfWmiInstanceCreate error %x\n", status));
+        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfWmiInstanceCreate error %x\n", status);
         return status;
     }
 
@@ -141,7 +141,7 @@ NTSTATUS WmiInitialize(_In_ WDFDEVICE Device)
 
         status = WdfTimerCreate(&timerCfg, &attribs, &deviceContext->SelfTestTimer);
         if (!NT_SUCCESS(status)) {
-            KdPrint(("TailLight: %s: WdfTimerCreate failed 0x%x\n", __func__, status));
+            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: %s: WdfTimerCreate failed 0x%x\n", __func__, status);
             return status;
         }
     }
