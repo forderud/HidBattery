@@ -5,7 +5,7 @@ EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
 
 
 VOID EvtSetBlackTimer(_In_ WDFTIMER  Timer) {
-    KdPrint(("TailLight: EvtSetBlackTimer begin\n"));
+    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtSetBlackTimer begin\n");
 
     WDFDEVICE device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
     NT_ASSERTMSG("EvtSetBlackTimer device NULL\n", device);
@@ -16,7 +16,7 @@ VOID EvtSetBlackTimer(_In_ WDFTIMER  Timer) {
         return;
     }
 
-    KdPrint(("TailLight: EvtSetBlackTimer end\n"));
+    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtSetBlackTimer end\n");
 }
 
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE device) {
@@ -119,7 +119,7 @@ Arguments:
             return STATUS_UNSUCCESSFUL;
         }
 
-        KdPrint(("TailLight: PdoName: %wZ\n", deviceContext->PdoName)); // outputs "\Device\00000083"
+        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: PdoName: %wZ\n", deviceContext->PdoName); // outputs "\Device\00000083"
     }
 
     {
@@ -182,7 +182,7 @@ Arguments:
 {
     UNREFERENCED_PARAMETER(OutputBufferLength);
 
-    //KdPrint(("TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu)\n", IoControlCode, InputBufferLength));
+    //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu)\n", IoControlCode, InputBufferLength);
 
     WDFDEVICE device = WdfIoQueueGetDevice(Queue);
 

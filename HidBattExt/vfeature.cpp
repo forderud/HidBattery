@@ -37,7 +37,7 @@ NTSTATUS SetFeatureColor (
     and send to the device.
 --*/
 {
-    KdPrint(("TailLight: SetFeatureColor\n"));
+    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: SetFeatureColor\n");
 
     WDFIOTARGET_Wrap hidTarget;
     {
@@ -82,7 +82,7 @@ NTSTATUS SetFeatureColor (
             return status;
         }
 
-        //KdPrint(("TailLight: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInfo.ProductID, collectionInfo.VendorID, collectionInfo.VersionNumber, collectionInfo.DescriptorSize));
+        //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInfo.ProductID, collectionInfo.VendorID, collectionInfo.VersionNumber, collectionInfo.DescriptorSize);
     }
 
     PHIDP_PREPARSED_DATA_Wrap preparsedData(collectionInfo.DescriptorSize);
@@ -117,7 +117,7 @@ NTSTATUS SetFeatureColor (
             return status;
         }
 
-        //KdPrint(("TailLight: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage));
+        //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage);
 
         if (caps.FeatureReportByteLength != sizeof(TailLightReport)) {
             KdPrint(("TailLight: FeatureReportByteLength mismatch (%u, %Iu).\n", caps.FeatureReportByteLength, sizeof(TailLightReport)));
@@ -145,7 +145,7 @@ NTSTATUS SetFeatureColor (
             return status;
         }
 
-        KdPrint(("TailLight: Previous color: Red=%u, Green=%u, Blue=%u\n", report.Red, report.Green, report.Blue)); // always zero
+        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Previous color: Red=%u, Green=%u, Blue=%u\n", report.Red, report.Green, report.Blue); // always zero
 #endif
     }
 
@@ -169,7 +169,7 @@ NTSTATUS SetFeatureColor (
             return status;
         }
 
-        KdPrint(("TailLight: New color: Red=%u, Green=%u, Blue=%u\n", report.Red, report.Green, report.Blue));
+        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: New color: Red=%u, Green=%u, Blue=%u\n", report.Red, report.Green, report.Blue);
     }
 
     return STATUS_SUCCESS;
@@ -193,7 +193,7 @@ Arguments:
     Request - Pointer to Request Packet.
 --*/
 {
-    KdPrint(("TailLight: SetFeatureFilter\n"));
+    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: SetFeatureFilter\n");
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     if (InputBufferLength != sizeof(TailLightReport)) {
@@ -218,7 +218,7 @@ Arguments:
     UCHAR r = packet->Red;
     UCHAR g = packet->Green;
     UCHAR b = packet->Blue;
-    KdPrint(("TailLight: Red=%u, Green=%u, Blue=%u\n", r, g, b));
+    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Red=%u, Green=%u, Blue=%u\n", r, g, b);
 
     // Enforce safety limits (sets color to RED on failure)
     if (!packet->SafetyCheck()) {
