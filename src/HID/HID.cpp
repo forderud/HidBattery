@@ -63,9 +63,8 @@ int HID_::getDescriptor(USBSetup& setup)
             HIDReport* rep = GetFeature(setup.wValueL, true/*string*/);
             if(rep)
                 return USB_SendStringDescriptor((char*)rep->data, strlen_P((char*)rep->data), TRANSFER_PGM);
-            else
-                return 0;
         }
+        return 0;
     }
 
     // Check if this is a HID Class Descriptor request
