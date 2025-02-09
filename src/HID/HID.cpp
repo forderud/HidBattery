@@ -162,7 +162,7 @@ const HIDReport* HID_::GetFeature(uint8_t id, bool str)
 
 bool HID_::setup(USBSetup& setup)
 {
-    if (pluggedInterface != setup.wIndex)
+    if (setup.wIndex != pluggedInterface)
         return false;
 
     if (setup.bmRequestType == REQUEST_DEVICETOHOST_CLASS_INTERFACE) {
