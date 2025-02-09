@@ -74,10 +74,10 @@ class HIDPowerDevice_ : public HID_ {
 public:
   HIDPowerDevice_();
   
-  int SetManufacturer(const char* data);
-  int SetSerial(const char* data);
+  void SetManufacturer(const char* data);
+  void SetSerial(const char* data);
 
-  int SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data);
+  void SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data);
 };
 
 // max number of batteries supported by the HW

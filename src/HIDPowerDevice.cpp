@@ -164,21 +164,17 @@ HIDPowerDevice_::HIDPowerDevice_() {
     SetFeature(HID_PD_IPRODUCT, &bProduct, sizeof(bProduct)); // automatically populated with "Arduino Micro"
 }
 
-int HIDPowerDevice_::SetManufacturer(const char* data) {
-    return SetStringIdxFeature(HID_PD_MANUFACTURER, &bManufacturer, data);
+void HIDPowerDevice_::SetManufacturer(const char* data) {
+    SetStringIdxFeature(HID_PD_MANUFACTURER, &bManufacturer, data);
 }
 
-int HIDPowerDevice_::SetSerial(const char* data) {
-    return SetStringIdxFeature(HID_PD_SERIAL, &bSerial, data);
+void HIDPowerDevice_::SetSerial(const char* data) {
+    SetStringIdxFeature(HID_PD_SERIAL, &bSerial, data);
 }
 
-int HIDPowerDevice_::SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data) {
+void HIDPowerDevice_::SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data) {
     // set string index for report
-    int res = SetFeature(id, index, 1);
-    if(res <= 0)
-        return res;
-
+    SetFeature(id, index, 1);
     // set string at given index
-    res = SetString(*index , data);
-    return res;
+    SetString(*index , data);
 }

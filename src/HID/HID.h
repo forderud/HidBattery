@@ -95,11 +95,11 @@ public:
     int SendReport(uint8_t id, const void* data, int len);
 
     /** The "data" pointer need to outlast this object. */ 
-    int SetFeature(uint8_t id, const void* data, int len);
+    void SetFeature(uint8_t id, const void* data, int len);
 
 protected:
     /** The "data" pointer need to outlast this object. */ 
-    int SetString(const uint8_t index, const char* data);
+    void SetString(const uint8_t index, const char* data);
     
     /** The "node" pointer need to outlast this object. */ 
     void AppendDescriptor(const HIDSubDescriptor* node);
@@ -113,7 +113,7 @@ protected:
 private:
     const HIDReport* GetFeature(uint8_t id, bool str);
     
-    int SetFeatureInternal(uint8_t id, bool str, const void* data, int len);
+    void SetFeatureInternal(uint8_t id, bool str, const void* data, int len);
 
     uint8_t m_epType[1];
 
@@ -125,7 +125,6 @@ private:
   
     // Buffer pointer to hold the feature data
     HIDReport* m_rootReport = nullptr;
-    uint16_t m_reportCount = 0;
 };
 
 #define D_HIDREPORT(length) { 9, 0x21, 0x01, 0x01, 0, 1, 0x22, lowByte(length), highByte(length) }

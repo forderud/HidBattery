@@ -111,25 +111,24 @@ void HID_::AppendDescriptor(const HIDSubDescriptor *node)
     m_descriptorSize += node->length;
 }
 
-int HID_::SetFeature(uint8_t id, const void* data, int len)
+void HID_::SetFeature(uint8_t id, const void* data, int len)
 {
-    return SetFeatureInternal(id, false/*string*/, data, len);
+    SetFeatureInternal(id, false/*string*/, data, len);
 }
 
-int HID_::SetString(const uint8_t index, const char* data)
+void HID_::SetString(const uint8_t index, const char* data)
 {
-    return SetFeatureInternal(index, true/*string*/, data, strlen_P(data));
+    SetFeatureInternal(index, true/*string*/, data, strlen_P(data));
 }
 
-int HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
+void HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
 {
     if(!m_rootReport) {
         m_rootReport = new HIDReport(id, str, data, len);
     } else {
-        int i=0;
-        for (HIDReport* current = m_rootReport; current; current = current->next, i++) {
+        for (HIDReport* current = m_rootReport; current; current = current->next) {
             if((current->id == id) && (current->str == str))
-                return i;
+                return;
 
             // check if we are on the last report
             if(!current->next) {
@@ -138,9 +137,6 @@ int HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
             }
         }
     }
-
-    m_reportCount++;
-    return m_reportCount;
 }
 
 int HID_::SendReport(uint8_t id, const void* data, int len)
