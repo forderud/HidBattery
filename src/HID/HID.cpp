@@ -65,32 +65,32 @@ int HID_::getDescriptor(USBSetup& setup)
                 return USB_SendStringDescriptor((char*)rep->data, strlen_P((char*)rep->data), TRANSFER_PGM);
         }
         return 0;
+    } else if (setup.bmRequestType == REQUEST_DEVICETOHOST_STANDARD_INTERFACE) {
+        // Check if this is a HID Class Descriptor request
+
+        if (setup.wValueH != HID_REPORT_DESCRIPTOR_TYPE)
+            return 0;
+
+        // In a HID Class Descriptor wIndex cointains the interface number
+        if (setup.wIndex != pluggedInterface)
+            return 0;
+
+        int total = 0;
+        for (const HIDSubDescriptor* node = m_rootNode; node; node = node->next) {
+            int res = USB_SendControl(TRANSFER_PGM, node->data, node->length);
+            if (res == -1)
+                return -1;
+            total += res;
+        }
+
+        // Reset the protocol on reenumeration. Normally the host should not assume the state of the protocol
+        // due to the USB specs, but Windows and Linux just assumes its in report mode.
+        m_protocol = HID_REPORT_PROTOCOL;
+
+        return total;
     }
-
-    // Check if this is a HID Class Descriptor request
-    if (setup.bmRequestType != REQUEST_DEVICETOHOST_STANDARD_INTERFACE)
-        return 0;
-
-    if (setup.wValueH != HID_REPORT_DESCRIPTOR_TYPE)
-        return 0;
-
-    // In a HID Class Descriptor wIndex cointains the interface number
-    if (setup.wIndex != pluggedInterface)
-        return 0;
-
-    int total = 0;
-    for (const HIDSubDescriptor* node = m_rootNode; node; node = node->next) {
-        int res = USB_SendControl(TRANSFER_PGM, node->data, node->length);
-        if (res == -1)
-            return -1;
-        total += res;
-    }
-
-    // Reset the protocol on reenumeration. Normally the host should not assume the state of the protocol
-    // due to the USB specs, but Windows and Linux just assumes its in report mode.
-    m_protocol = HID_REPORT_PROTOCOL;
-
-    return total;
+    
+    return 0;
 }
 
 uint8_t HID_::getShortName(char *name)
