@@ -158,13 +158,13 @@ NTSTATUS EvtWmiInstanceQueryInstance(
 {
     UNREFERENCED_PARAMETER(OutBufferSize); // mininum buffer size already checked by WDF
 
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: WMI QueryInstance\n");
+    DebugEnter();
 
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
     RtlCopyMemory(/*dst*/OutBuffer, /*src*/pInfo, sizeof(*pInfo));
     *BufferUsed = sizeof(*pInfo);
 
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: WMI QueryInstance completed\n");
+    DebugExit();
     return STATUS_SUCCESS;
 }
 
@@ -176,7 +176,7 @@ NTSTATUS EvtWmiInstanceSetInstance(
 {
     UNREFERENCED_PARAMETER(InBufferSize); // mininum buffer size already checked by WDF
 
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: WMI SetInstance\n");
+    DebugEnter();
 
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
     RtlCopyMemory(/*dst*/pInfo, /*src*/InBuffer, sizeof(*pInfo));
@@ -184,7 +184,7 @@ NTSTATUS EvtWmiInstanceSetInstance(
     // call SetFeatureColor to trigger tail-light update
     NTSTATUS status = SetFeatureColor(WdfWmiInstanceGetDevice(WmiInstance), pInfo->TailLight);
 
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: WMI SetInstance completed\n");
+    DebugExitStatus(status);
     return status;
 }
 
@@ -195,7 +195,7 @@ NTSTATUS EvtWmiInstanceSetItem(
     _In_reads_bytes_(InBufferSize)  PVOID InBuffer
     )
 {
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: WMI SetItem\n");
+    DebugEnter();
 
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(WmiInstance);
     NTSTATUS status = STATUS_SUCCESS;
@@ -212,6 +212,6 @@ NTSTATUS EvtWmiInstanceSetItem(
         return STATUS_INVALID_DEVICE_REQUEST;
     }
 
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: WMI SetItem completed\n");
+    DebugExitStatus(status);
     return status;
 }

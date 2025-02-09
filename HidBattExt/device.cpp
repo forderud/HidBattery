@@ -5,7 +5,7 @@ EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
 
 
 VOID EvtSetBlackTimer(_In_ WDFTIMER  Timer) {
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtSetBlackTimer begin\n");
+    DebugEnter();
 
     WDFDEVICE device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
     NT_ASSERTMSG("EvtSetBlackTimer device NULL\n", device);
@@ -16,7 +16,7 @@ VOID EvtSetBlackTimer(_In_ WDFTIMER  Timer) {
         return;
     }
 
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtSetBlackTimer end\n");
+    DebugExit();
 }
 
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE device) {

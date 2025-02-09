@@ -37,7 +37,7 @@ NTSTATUS SetFeatureColor (
     and send to the device.
 --*/
 {
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: SetFeatureColor\n");
+    DebugEnter();
 
     WDFIOTARGET_Wrap hidTarget;
     {
@@ -172,6 +172,7 @@ NTSTATUS SetFeatureColor (
         DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: New color: Red=%u, Green=%u, Blue=%u\n", report.Red, report.Green, report.Blue);
     }
 
+    DebugExit();
     return STATUS_SUCCESS;
 }
 
@@ -193,7 +194,7 @@ Arguments:
     Request - Pointer to Request Packet.
 --*/
 {
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: SetFeatureFilter\n");
+    DebugEnter();
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     if (InputBufferLength != sizeof(TailLightReport)) {
@@ -236,5 +237,6 @@ Arguments:
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(deviceContext->WmiInstance);
     pInfo->TailLight = packet->GetColor();
 
+    DebugExitStatus(status);
     return status;
 }
