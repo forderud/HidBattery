@@ -51,6 +51,9 @@ static bool USB_SendStringDescriptor(const char* string_P, u8 string_len, uint8_
 
 int HID_::getDescriptor(USBSetup& setup)
 {
+    if (setup.bRequest != GET_DESCRIPTOR) // redundant check, since it's already done before calling this method
+        return 0;
+    
     // HID-specific strings
     if(setup.wValueH == USB_STRING_DESCRIPTOR_TYPE) {
         HIDReport* rep = GetFeature(setup.wValueL, true/*string*/);
