@@ -177,8 +177,10 @@ bool HID_::setup(USBSetup& setup)
             if(setup.wValueH == HID_REPORT_TYPE_FEATURE) {
                 HIDReport* current = GetFeature(setup.wValueL, false/*string*/);
                 if(current){
-                    if(USB_SendControl(0, &(current->id), 1)>0 && USB_SendControl(0, current->data, current->length)>0)
-                        return true;
+                    int res = USB_SendControl(0, &(current->id), 1);
+                    if(res > 0)
+                        res = USB_SendControl(0, current->data, current->length);
+                    return (res > 0);
                 }
 
                 return false;
