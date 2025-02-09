@@ -158,7 +158,7 @@ NTSTATUS SetFeatureColor (
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&inputDesc, &report, sizeof(report));
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
             NULL,
-            IOCTL_HID_SET_FEATURE, // 0xb0191
+            IOCTL_HID_SET_FEATURE,
             &inputDesc, // input
             NULL, // output
             NULL,
