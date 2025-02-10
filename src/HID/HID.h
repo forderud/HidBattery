@@ -78,7 +78,7 @@ public:
     const HIDReport *next = NULL;
 };
 
-struct HIDSubDescriptor {
+struct HIDReportDescriptor {
   void* data = nullptr;
   uint16_t length = 0;
 };
@@ -112,7 +112,7 @@ private:
 
     uint8_t m_epType[1];
 
-    HIDSubDescriptor m_reportDesc;
+    HIDReportDescriptor m_reportDesc;
 
     uint8_t m_protocol = HID_REPORT_PROTOCOL;
     uint8_t m_idle = 1;
