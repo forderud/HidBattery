@@ -26,10 +26,12 @@ TailLight.sys = 1
 ; Models section
 ; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-models-section
 [IntelliMouseSampleMfg.NT$ARCH$]
-"Pro IntelliMouse TailLight"=TailLight_Inst, HID\VID_045E&PID_082A&MI_01&Col05
+"Pro IntelliMouse TailLight"=TailLight_Inst, HID_DEVICE_UP:0084_U:0004
 
 ; Install Section
 [TailLight_Inst.NT]
+Include = HidBatt.inf
+Needs = HidBatt_Inst
 CopyFiles = @TailLight.sys
 
 [TailLight_Inst.NT.Filters]
@@ -37,11 +39,12 @@ CopyFiles = @TailLight.sys
 AddFilter = TailLight, , Filter_Inst
 
 [Filter_Inst]
-FilterPosition = Upper
+FilterPosition = Lower
 
 [TailLight_Inst.NT.Services]
+Include = HidBatt.inf
+Needs = HidBatt_Inst.Services
 AddService = TailLight, , TailLight_Service_Inst, TailLight_EventLog_Inst
-AddService = , %SPSVCINST_ASSOCSERVICE%
 
 [TailLight_Service_Inst]
 ServiceType   = %SERVICE_KERNEL_DRIVER%
