@@ -2,14 +2,15 @@
 //#define ENABLE_POTENTIOMETER // uncomment to enable potentiometer
 
 // String constants
+byte stringIdxConter = ISERIAL+1; // one past the last hadcoded string index in arduino/USBDesc.h
 const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
-const byte DeviceChemistryIdx = IDEVICECHEMISTRY;
+const byte DeviceChemistryIdx = stringIdxConter++;
 
 const char STRING_OEMVENDOR[] PROGMEM = "BatteryVendor";
-const byte ManufacturerIdx = IMANUFACTURER;
+const byte ManufacturerIdx = stringIdxConter++;
 
 const char STRING_SERIAL[] PROGMEM = "1234";
-const byte SerialIdx = ISERIAL;
+const byte SerialIdx = stringIdxConter++;
 
 PresentStatus PresentStatus = {};
 

@@ -26,7 +26,6 @@
 #define HID_PD_MANUFACTURER          0x03 // FEATURE ONLY
 
 #define HID_PD_IDEVICECHEMISTRY      0x04 // Feature
-#define IDEVICECHEMISTRY             0x04
 
 #define HID_PD_PRESENTSTATUS         0x07 // INPUT OR FEATURE(required by Windows)
 #define HID_PD_MANUFACTUREDATE       0x09 // FEATURE ONLY
