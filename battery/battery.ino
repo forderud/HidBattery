@@ -8,6 +8,7 @@ const byte DeviceChemistryIdx = IDEVICECHEMISTRY;
 const char STRING_OEMVENDOR[] PROGMEM = "BatteryVendor";
 
 const char STRING_SERIAL[] PROGMEM = "1234";
+const byte SerialIdx = ISERIAL;
 
 PresentStatus PresentStatus = {};
 
@@ -42,7 +43,7 @@ void setup() {
     Remaining[i] = 0.30f*FullChargeCapacity;
 
     PowerDevice[i].SetManufacturer(STRING_OEMVENDOR);
-    PowerDevice[i].SetSerial(STRING_SERIAL);
+    PowerDevice[i].SetStringFeature(HID_PD_SERIAL, &SerialIdx, STRING_SERIAL);
   }
 
   pinMode(LED_BUILTIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running.

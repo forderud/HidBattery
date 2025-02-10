@@ -64,14 +64,12 @@ public:
   HIDPowerDevice_();
   
   void SetManufacturer(const char* data);
-  void SetSerial(const char* data);
 
   void SetStringFeature(uint8_t id, const uint8_t* index, const char* data);
   
 private:
   static const byte s_productIdx;
   static const byte s_manufacturerIdx;
-  static const byte s_serialIdx;
 };
 
 // max number of batteries supported by the HW

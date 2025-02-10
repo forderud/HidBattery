@@ -154,7 +154,6 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
 
 const byte HIDPowerDevice_::s_productIdx = IPRODUCT;
 const byte HIDPowerDevice_::s_manufacturerIdx = IMANUFACTURER;
-const byte HIDPowerDevice_::s_serialIdx = ISERIAL;
 
 HIDPowerDevice_::HIDPowerDevice_() {
     SetDescriptor(s_hidReportDescriptor, sizeof (s_hidReportDescriptor));
@@ -164,10 +163,6 @@ HIDPowerDevice_::HIDPowerDevice_() {
 
 void HIDPowerDevice_::SetManufacturer(const char* data) {
     SetStringFeature(HID_PD_MANUFACTURER, &s_manufacturerIdx, data);
-}
-
-void HIDPowerDevice_::SetSerial(const char* data) {
-    SetStringFeature(HID_PD_SERIAL, &s_serialIdx, data);
 }
 
 void HIDPowerDevice_::SetStringFeature(uint8_t id, const uint8_t* index, const char* data) {
