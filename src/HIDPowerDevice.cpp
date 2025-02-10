@@ -159,15 +159,15 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
 HIDPowerDevice_::HIDPowerDevice_() {
     SetDescriptor(s_hidReportDescriptor, sizeof (s_hidReportDescriptor));
 
-    SetFeature(HID_PD_IPRODUCT, &bProduct, sizeof(bProduct)); // automatically populated with "Arduino Micro"
+    SetFeature(HID_PD_IPRODUCT, &m_productIdx, sizeof(m_productIdx)); // automatically populated with "Arduino Micro"
 }
 
 void HIDPowerDevice_::SetManufacturer(const char* data) {
-    SetStringIdxFeature(HID_PD_MANUFACTURER, &bManufacturer, data);
+    SetStringIdxFeature(HID_PD_MANUFACTURER, &m_manufacturerIdx, data);
 }
 
 void HIDPowerDevice_::SetSerial(const char* data) {
-    SetStringIdxFeature(HID_PD_SERIAL, &bSerial, data);
+    SetStringIdxFeature(HID_PD_SERIAL, &m_serialIdx, data);
 }
 
 void HIDPowerDevice_::SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data) {
