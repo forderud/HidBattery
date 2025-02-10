@@ -40,20 +40,19 @@ void setup() {
   Serial.begin(57600);
 #endif
 
-  for (int i = 0; i < MAX_BATTERIES; i++) {
-    // initialize batteries with 30% charge
+  // initialize batteries with 30% charge
+  for (int i = 0; i < MAX_BATTERIES; i++)
     Remaining[i] = 0.30f*FullChargeCapacity;
 
+  pinMode(LED_BUILTIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running.
+
+  for (int i = 0; i < MAX_BATTERIES; i++) {
     ManufacturerIdx[i] = stringIdxConter++;
     PowerDevice[i].SetStringFeature(HID_PD_MANUFACTURER, &ManufacturerIdx[i], STRING_OEMVENDOR[i % 2]);
 
     SerialIdx[i] = stringIdxConter++;
     PowerDevice[i].SetStringFeature(HID_PD_SERIAL, &SerialIdx[i], STRING_SERIAL[i % 3]);
-  }
 
-  pinMode(LED_BUILTIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running.
-
-  for (int i = 0; i < MAX_BATTERIES; i++) {
     PowerDevice[i].SetFeature(HID_PD_PRESENTSTATUS, &PresentStatus, sizeof(PresentStatus));
 
     PowerDevice[i].SetFeature(HID_PD_RUNTIMETOEMPTY, &RunTimeToEmpty, sizeof(RunTimeToEmpty));
