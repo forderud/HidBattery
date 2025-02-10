@@ -119,8 +119,6 @@ protected:
     
 private:
     const HIDReport* GetFeature(uint8_t id, bool str);
-    
-    void SetFeatureInternal(uint8_t id, bool str, const void* data, int len);
 
     uint8_t m_epType[1];
 

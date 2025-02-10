@@ -116,23 +116,18 @@ void HID_::SetDescriptor(const void *data, uint16_t length)
 
 void HID_::SetFeature(uint8_t id, const void* data, int len)
 {
-    SetFeatureInternal(id, false/*string*/, data, len);
+    if(!m_reports)
+        m_reports = new HIDReport(id, data, len);
+    else
+        m_reports->AppendReport(id, data, len);
 }
 
 void HID_::SetString(const uint8_t index, const char* data)
 {
-    SetFeatureInternal(index, true/*string*/, data, strlen_P(data));
-}
-
-void HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
-{
-    const HIDReport** reports = str ? &m_strReports : &m_reports;
-
-    if(!*reports) {
-        *reports = new HIDReport(id, data, len);
-    } else {
-        (*reports)->AppendReport(id, data, len);
-    }
+    if(!m_strReports)
+        m_strReports = new HIDReport(index, data, strlen_P(data));
+    else
+        m_strReports->AppendReport(index, data, strlen_P(data));
 }
 
 int HID_::SendReport(uint8_t id, const void* data, int len)
