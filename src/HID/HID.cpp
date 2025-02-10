@@ -126,18 +126,20 @@ void HID_::SetString(const uint8_t index, const char* data)
 
 void HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
 {
-    if(!m_reports) {
-        m_reports = new HIDReport(id, str, data, len);
+    const HIDReport** reports = str ? &m_strReports : &m_reports;
+
+    if(!*reports) {
+        *reports = new HIDReport(id, data, len);
         return;
     }
 
-    for (HIDReport* current = m_reports; current; current = current->next) {
-        if((current->id == id) && (current->str == str))
+    for (HIDReport* current = *reports; current; current = current->next) {
+        if(current->id == id)
             return; // feature already configured
 
         if(!current->next) {
             // append at the end
-            current->next = new HIDReport(id, str, data, len);
+            current->next = new HIDReport(id, data, len);
             break;
         }
     }
@@ -157,8 +159,9 @@ int HID_::SendReport(uint8_t id, const void* data, int len)
 
 const HIDReport* HID_::GetFeature(uint8_t id, bool str)
 {
-    for(const HIDReport* current=m_reports; current; current=current->next) {
-        if((id == current->id) && (str == current->str))
+    const HIDReport* current = str ? m_strReports : m_reports;
+    for(; current; current=current->next) {
+        if(id == current->id)
             return current;
     }
     return nullptr;

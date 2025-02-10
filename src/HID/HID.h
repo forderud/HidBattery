@@ -69,10 +69,9 @@ struct HIDDescriptor {
 
 class HIDReport {
 public:
-    HIDReport(uint8_t i, bool s, const void *d, uint8_t l) : id(i), str(s), data(d), length(l) {}
+    HIDReport(uint8_t i, const void *d, uint8_t l) : id(i), data(d), length(l) {}
     
     uint8_t id;
-    bool str;
     const void* data;
     uint16_t length;
     const HIDReport *next = NULL;
@@ -117,8 +116,8 @@ private:
     uint8_t m_protocol = HID_REPORT_PROTOCOL;
     uint8_t m_idle = 1;
   
-    // Buffer pointer to hold the feature data
-    HIDReport* m_reports = nullptr;
+    HIDReport* m_reports = nullptr;    // feature reports
+    HIDReport* m_strReports = nullptr; // string reports
 };
 
 #define D_HIDREPORT(length) { 9, 0x21, 0x01, 0x01, 0, 1, 0x22, lowByte(length), highByte(length) }
