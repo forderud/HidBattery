@@ -80,8 +80,8 @@ int HID_::getDescriptor(USBSetup& setup)
             return 0;
 
         int total = 0;
-        for (const HIDSubDescriptor* node = m_rootNode; node; node = node->next) {
-            int res = USB_SendControl(TRANSFER_PGM, node->data, node->length);
+        if (m_rootNode) {
+            int res = USB_SendControl(TRANSFER_PGM, m_rootNode->data, m_rootNode->length);
             if (res == -1)
                 return -1;
             total += res;
@@ -108,17 +108,9 @@ uint8_t HID_::getShortName(char *name)
     return 5;
 }
 
-void HID_::AppendDescriptor(const HIDSubDescriptor *node)
+void HID_::SetDescriptor(const HIDSubDescriptor *node)
 {
-    if (!m_rootNode) {
-        m_rootNode = node;
-    } else {
-        HIDSubDescriptor *current = m_rootNode;
-        while (current->next)
-            current = current->next;
-
-        current->next = node;
-    }
+    m_rootNode = node;
     m_descriptorSize += node->length;
 }
 

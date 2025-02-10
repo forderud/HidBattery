@@ -158,8 +158,7 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
 
 HIDPowerDevice_::HIDPowerDevice_() {
     static const HIDSubDescriptor node(s_hidReportDescriptor, sizeof (s_hidReportDescriptor));
-
-    AppendDescriptor(&node);
+    SetDescriptor(&node);
 
     SetFeature(HID_PD_IPRODUCT, &bProduct, sizeof(bProduct)); // automatically populated with "Arduino Micro"
 }

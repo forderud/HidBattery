@@ -84,7 +84,6 @@ public:
 
   const void* data;
   const uint16_t length;
-  const HIDSubDescriptor *next = NULL;
 };
 
 class HID_ : public PluggableUSBModule {
@@ -101,7 +100,7 @@ protected:
     void SetString(const uint8_t index, const char* data);
     
     /** The "node" pointer need to outlast this object. */ 
-    void AppendDescriptor(const HIDSubDescriptor* node);
+    void SetDescriptor(const HIDSubDescriptor* node);
     
     // Implementation of the PluggableUSBModule
     int getInterface(uint8_t* interfaceCount) override;
