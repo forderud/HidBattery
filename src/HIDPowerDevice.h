@@ -67,10 +67,6 @@ static_assert(sizeof(PresentStatus) == sizeof(uint8_t));
 
 
 class HIDPowerDevice_ : public HID_ {
-  const byte m_productIdx = IPRODUCT;
-  const byte m_manufacturerIdx = IMANUFACTURER;
-  const byte m_serialIdx = ISERIAL;
-
 public:
   HIDPowerDevice_();
   
@@ -78,6 +74,11 @@ public:
   void SetSerial(const char* data);
 
   void SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data);
+  
+private:
+  static const byte s_productIdx;
+  static const byte s_manufacturerIdx;
+  static const byte s_serialIdx;
 };
 
 // max number of batteries supported by the HW
