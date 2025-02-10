@@ -56,7 +56,7 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_TEMPERATURE, &Temperature, sizeof(Temperature));
     PowerDevice[i].SetFeature(HID_PD_VOLTAGE, &Voltage, sizeof(Voltage));
 
-    PowerDevice[i].SetStringIdxFeature(HID_PD_IDEVICECHEMISTRY, &DeviceChemistryIdx, STRING_DEVICECHEMISTRY);
+    PowerDevice[i].SetStringFeature(HID_PD_IDEVICECHEMISTRY, &DeviceChemistryIdx, STRING_DEVICECHEMISTRY);
 
     PowerDevice[i].SetFeature(HID_PD_DESIGNCAPACITY, &DesignCapacity, sizeof(DesignCapacity));
     PowerDevice[i].SetFeature(HID_PD_FULLCHRGECAPACITY, &FullChargeCapacity, sizeof(FullChargeCapacity));

@@ -167,14 +167,14 @@ HIDPowerDevice_::HIDPowerDevice_() {
 }
 
 void HIDPowerDevice_::SetManufacturer(const char* data) {
-    SetStringIdxFeature(HID_PD_MANUFACTURER, &s_manufacturerIdx, data);
+    SetStringFeature(HID_PD_MANUFACTURER, &s_manufacturerIdx, data);
 }
 
 void HIDPowerDevice_::SetSerial(const char* data) {
-    SetStringIdxFeature(HID_PD_SERIAL, &s_serialIdx, data);
+    SetStringFeature(HID_PD_SERIAL, &s_serialIdx, data);
 }
 
-void HIDPowerDevice_::SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data) {
+void HIDPowerDevice_::SetStringFeature(uint8_t id, const uint8_t* index, const char* data) {
     // set string index for report
     SetFeature(id, index, 1);
     // set string at given index

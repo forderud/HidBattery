@@ -73,7 +73,7 @@ public:
   void SetManufacturer(const char* data);
   void SetSerial(const char* data);
 
-  void SetStringIdxFeature(uint8_t id, const uint8_t* index, const char* data);
+  void SetStringFeature(uint8_t id, const uint8_t* index, const char* data);
   
 private:
   static const byte s_productIdx;
