@@ -91,7 +91,6 @@ public:
         }
         return nullptr;
     }
-
     
     uint8_t id;
     const void* data;
@@ -127,7 +126,8 @@ protected:
     uint8_t getShortName(char* name) override;
     
 private:
-    const HIDReport* GetFeature(uint8_t id, bool str);
+    const HIDReport* GetFeature(uint8_t id);
+    const HIDReport* GetString(uint8_t id);
 
     uint8_t m_epType[1];
 
