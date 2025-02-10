@@ -49,20 +49,24 @@ void setup() {
     Remaining[i] = 0.30f*FullChargeCapacity;
 
     ManufacturerIdx[i] = stringIdxConter++;
+    const char* manufacturerStr = nullptr;
     if (i % 3 == 0)
-        PowerDevice[i].SetStringFeature(HID_PD_MANUFACTURER, &ManufacturerIdx[i], STRING_OEMVENDOR1);
+        manufacturerStr = STRING_OEMVENDOR1;
     else if (i % 3 == 1)
-        PowerDevice[i].SetStringFeature(HID_PD_MANUFACTURER, &ManufacturerIdx[i], STRING_OEMVENDOR2);
+        manufacturerStr = STRING_OEMVENDOR2;
     else
-        PowerDevice[i].SetStringFeature(HID_PD_MANUFACTURER, &ManufacturerIdx[i], STRING_OEMVENDOR3);
+        manufacturerStr = STRING_OEMVENDOR3;
+    PowerDevice[i].SetStringFeature(HID_PD_MANUFACTURER, &ManufacturerIdx[i], manufacturerStr);
 
     SerialIdx[i] = stringIdxConter++;
+    const char* serialStr = nullptr;
     if (i % 3 == 0)
-        PowerDevice[i].SetStringFeature(HID_PD_SERIAL, &SerialIdx[i], STRING_SERIAL1);
+        serialStr = STRING_SERIAL1;
     else if (i % 3 == 1)
-        PowerDevice[i].SetStringFeature(HID_PD_SERIAL, &SerialIdx[i], STRING_SERIAL2);
+        serialStr = STRING_SERIAL2;
     else
-        PowerDevice[i].SetStringFeature(HID_PD_SERIAL, &SerialIdx[i], STRING_SERIAL3);
+        serialStr = STRING_SERIAL3;
+    PowerDevice[i].SetStringFeature(HID_PD_SERIAL, &SerialIdx[i], serialStr);
   }
 
   pinMode(LED_BUILTIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running.
