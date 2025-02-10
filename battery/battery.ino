@@ -3,8 +3,8 @@
 
 // String constants
 byte stringIdxConter = ISERIAL+1; // one past the last hadcoded string index in arduino/USBDesc.h
-const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
-const byte DeviceChemistryIdx = stringIdxConter++;
+const char STRING_DEVICECHEMISTRY[][5] PROGMEM = {"LiP", "NiCd", "NiMH"};
+byte DeviceChemistryIdx[MAX_BATTERIES] = {};
 
 const char STRING_OEMVENDOR[][16] PROGMEM = {"BatteryVendor A", "BatteryVendor B"}; // all strings must have same length
 byte       ManufacturerIdx[MAX_BATTERIES] = {};
@@ -62,7 +62,8 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_TEMPERATURE, &Temperature, sizeof(Temperature));
     PowerDevice[i].SetFeature(HID_PD_VOLTAGE, &Voltage, sizeof(Voltage));
 
-    PowerDevice[i].SetStringFeature(HID_PD_IDEVICECHEMISTRY, &DeviceChemistryIdx, STRING_DEVICECHEMISTRY);
+    DeviceChemistryIdx[i] = stringIdxConter++;
+    PowerDevice[i].SetStringFeature(HID_PD_IDEVICECHEMISTRY, &DeviceChemistryIdx[i], STRING_DEVICECHEMISTRY[i % 3]);
 
     PowerDevice[i].SetFeature(HID_PD_DESIGNCAPACITY, &DesignCapacity, sizeof(DesignCapacity));
     PowerDevice[i].SetFeature(HID_PD_FULLCHRGECAPACITY, &FullChargeCapacity, sizeof(FullChargeCapacity));
