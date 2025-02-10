@@ -79,8 +79,8 @@ void loop() {
 
 #ifdef ENABLE_POTENTIOMETER
   // read charge level from potentiometer
-  int iBattSoc = analogRead(PIN_A7); // potentiometer value in [0,1024)
-  Remaining[0] = (uint16_t)(round((float)FullChargeCapacity*iBattSoc/1024));
+  int BattSoc = analogRead(PIN_A7); // potentiometer value in [0,1024)
+  Remaining[0] = (uint16_t)(round((float)FullChargeCapacity*BattSoc/1024));
 
   if (Remaining[0] > PrevRemaining + 1) // add a bit hysteresis
     PresentStatus.Charging = true;
@@ -106,8 +106,8 @@ void loop() {
   }
 #endif
 
-  uint16_t iAvgTimeToEmpty = 7200;
-  RunTimeToEmpty = (uint16_t)round((float)iAvgTimeToEmpty*Remaining[0]/FullChargeCapacity);
+  uint16_t AvgTimeToEmpty = 7200;
+  RunTimeToEmpty = (uint16_t)round((float)AvgTimeToEmpty*Remaining[0]/FullChargeCapacity);
 
   // Charging
   PresentStatus.ACPresent = PresentStatus.Charging; // assume charging implies AC present
