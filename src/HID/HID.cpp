@@ -119,7 +119,7 @@ void HID_::SetFeature(uint8_t id, const void* data, int len)
     if(!m_reports)
         m_reports = new HIDReport(id, data, len);
     else
-        m_reports->AppendReport(id, data, len);
+        m_reports->Append(id, data, len);
 }
 
 void HID_::SetString(const uint8_t index, const char* data)
@@ -127,7 +127,7 @@ void HID_::SetString(const uint8_t index, const char* data)
     if(!m_strReports)
         m_strReports = new HIDReport(index, data, strlen_P(data));
     else
-        m_strReports->AppendReport(index, data, strlen_P(data));
+        m_strReports->Append(index, data, strlen_P(data));
 }
 
 int HID_::SendReport(uint8_t id, const void* data, int len)
