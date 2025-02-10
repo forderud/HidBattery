@@ -18,8 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #pragma once
-#include "HID/HID.h"
-#include "WString.h"
+#include <HID/HID.h>
 
 #define HID_PD_IPRODUCT              0x01 // FEATURE ONLY
 #define HID_PD_SERIAL                0x02 // FEATURE ONLY
