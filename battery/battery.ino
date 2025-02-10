@@ -3,7 +3,7 @@
 
 // String constants
 const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
-const byte bDeviceChemistry = IDEVICECHEMISTRY;
+const byte DeviceChemistryIdx = IDEVICECHEMISTRY;
 
 const char STRING_OEMVENDOR[] PROGMEM = "BatteryVendor";
 
@@ -56,7 +56,7 @@ void setup() {
     PowerDevice[i].SetFeature(HID_PD_TEMPERATURE, &iTemperature, sizeof(iTemperature));
     PowerDevice[i].SetFeature(HID_PD_VOLTAGE, &iVoltage, sizeof(iVoltage));
 
-    PowerDevice[i].SetStringIdxFeature(HID_PD_IDEVICECHEMISTRY, &bDeviceChemistry, STRING_DEVICECHEMISTRY);
+    PowerDevice[i].SetStringIdxFeature(HID_PD_IDEVICECHEMISTRY, &DeviceChemistryIdx, STRING_DEVICECHEMISTRY);
 
     PowerDevice[i].SetFeature(HID_PD_DESIGNCAPACITY, &iDesignCapacity, sizeof(iDesignCapacity));
     PowerDevice[i].SetFeature(HID_PD_FULLCHRGECAPACITY, &iFullChargeCapacity, sizeof(iFullChargeCapacity));
