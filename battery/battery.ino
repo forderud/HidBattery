@@ -6,6 +6,7 @@ const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
 const byte DeviceChemistryIdx = IDEVICECHEMISTRY;
 
 const char STRING_OEMVENDOR[] PROGMEM = "BatteryVendor";
+const byte ManufacturerIdx = IMANUFACTURER;
 
 const char STRING_SERIAL[] PROGMEM = "1234";
 const byte SerialIdx = ISERIAL;
@@ -42,7 +43,7 @@ void setup() {
     // initialize batteries with 30% charge
     Remaining[i] = 0.30f*FullChargeCapacity;
 
-    PowerDevice[i].SetManufacturer(STRING_OEMVENDOR);
+    PowerDevice[i].SetStringFeature(HID_PD_MANUFACTURER, &ManufacturerIdx, STRING_OEMVENDOR);
     PowerDevice[i].SetStringFeature(HID_PD_SERIAL, &SerialIdx, STRING_SERIAL);
   }
 
