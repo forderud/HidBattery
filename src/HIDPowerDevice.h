@@ -62,6 +62,7 @@ class HIDPowerDevice_ : public HID_ {
 public:
   HIDPowerDevice_();
   
+  /** The "index" & "data" pointers need to outlast this object. */ 
   void SetStringFeature(uint8_t id, const uint8_t* index, const char* data);
   
 private:
