@@ -130,7 +130,7 @@ NTSTATUS SetFeatureColor (
         // Get TailLightReport from device.
         TailLightReport report;
 
-        // WARNING: Call succeeds but doesn't update the report.
+        // WARNING: Call succeeds but doesn't update the report due to a IntelliMouse HW issue
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
