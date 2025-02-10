@@ -34,23 +34,19 @@ static const uint8_t s_hidReportDescriptor[] PROGMEM = {
     0x26, 0xFF, 0x00, //     LOGICAL_MAXIMUM (255)
     0x85, HID_PD_IPRODUCT, //     REPORT_ID (1)
     0x09, 0xFE, //     USAGE (iProduct)
-    0x79, IPRODUCT, //     STRING INDEX (2)
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
 
     0x85, HID_PD_SERIAL, //     REPORT_ID (2)
     0x09, 0xFF, //     USAGE (iSerialNumber)
-    0x79, ISERIAL, //  STRING INDEX (3)
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
 
     0x85, HID_PD_MANUFACTURER, //     REPORT_ID (3)
     0x09, 0xFD, //     USAGE (iManufacturer)
-    0x79, IMANUFACTURER, //     STRING INDEX (1)
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
 
     0x05, 0x85, //     USAGE_PAGE (Battery System) ====================
     0x85, HID_PD_IDEVICECHEMISTRY, //     REPORT_ID (4)
     0x09, 0x89, //     USAGE (iDeviceChemistry)
-    0x79, IDEVICECHEMISTRY, //     STRING INDEX (4)
     0xB1, 0x23, //     FEATURE (Constant, Variable, Absolute, No Wrap, Linear, No Preferred, No Null Position, Nonvolatile, Bitfield)
 
     0x85, HID_PD_CAPACITYMODE, //     REPORT_ID (22)
