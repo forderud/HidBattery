@@ -6,9 +6,8 @@ byte stringIdxConter = ISERIAL+1; // one past the last hadcoded string index in 
 const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
 const byte DeviceChemistryIdx = stringIdxConter++;
 
-const char STRING_OEMVENDOR1[] PROGMEM = "BatteryVendor1";
-const char STRING_OEMVENDOR2[] PROGMEM = "BatteryVendor2";
-const char STRING_OEMVENDOR3[] PROGMEM = "BatteryVendor3";
+const char STRING_OEMVENDOR1[] PROGMEM = "BatteryVendor A";
+const char STRING_OEMVENDOR2[] PROGMEM = "BatteryVendor B";
 byte       ManufacturerIdx[MAX_BATTERIES] = {};
 
 const char STRING_SERIAL1[] PROGMEM = "1234";
@@ -49,13 +48,7 @@ void setup() {
     Remaining[i] = 0.30f*FullChargeCapacity;
 
     ManufacturerIdx[i] = stringIdxConter++;
-    const char* manufacturerStr = nullptr;
-    if (i % 3 == 0)
-        manufacturerStr = STRING_OEMVENDOR1;
-    else if (i % 3 == 1)
-        manufacturerStr = STRING_OEMVENDOR2;
-    else
-        manufacturerStr = STRING_OEMVENDOR3;
+    const char* manufacturerStr = i % 2 ? STRING_OEMVENDOR2 : STRING_OEMVENDOR1;
     PowerDevice[i].SetStringFeature(HID_PD_MANUFACTURER, &ManufacturerIdx[i], manufacturerStr);
 
     SerialIdx[i] = stringIdxConter++;
