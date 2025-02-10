@@ -126,12 +126,12 @@ void HID_::SetString(const uint8_t index, const char* data)
 
 void HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
 {
-    if(!m_rootReport) {
-        m_rootReport = new HIDReport(id, str, data, len);
+    if(!m_reports) {
+        m_reports = new HIDReport(id, str, data, len);
         return;
     }
 
-    for (HIDReport* current = m_rootReport; current; current = current->next) {
+    for (HIDReport* current = m_reports; current; current = current->next) {
         if((current->id == id) && (current->str == str))
             return; // feature already configured
 
@@ -157,7 +157,7 @@ int HID_::SendReport(uint8_t id, const void* data, int len)
 
 const HIDReport* HID_::GetFeature(uint8_t id, bool str)
 {
-    for(const HIDReport* current=m_rootReport; current; current=current->next) {
+    for(const HIDReport* current=m_reports; current; current=current->next) {
         if((id == current->id) && (str == current->str))
             return current;
     }

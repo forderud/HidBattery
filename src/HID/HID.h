@@ -118,7 +118,7 @@ private:
     uint8_t m_idle = 1;
   
     // Buffer pointer to hold the feature data
-    HIDReport* m_rootReport = nullptr;
+    HIDReport* m_reports = nullptr;
 };
 
 #define D_HIDREPORT(length) { 9, 0x21, 0x01, 0x01, 0, 1, 0x22, lowByte(length), highByte(length) }
