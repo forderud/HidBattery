@@ -21,9 +21,6 @@
 #include "HID/HID.h"
 #include "WString.h"
 
-//================================================================================
-//================================================================================
-
 #define HID_PD_IPRODUCT              0x01 // FEATURE ONLY
 #define HID_PD_SERIAL                0x02 // FEATURE ONLY
 #define HID_PD_MANUFACTURER          0x03 // FEATURE ONLY
@@ -44,7 +41,6 @@
 #define HID_PD_CYCLE_COUNT           0x14 // 20 INPUT OR FEATURE
 #define HID_PD_CAPACITYMODE          0x16 // 22 FEATURE ONLY
 
-
 // PresentStatus dynamic flags
 struct PresentStatus {
   uint8_t Charging : 1;                   // bit 0x00
@@ -61,9 +57,6 @@ struct PresentStatus {
   }
 };
 static_assert(sizeof(PresentStatus) == sizeof(uint8_t));
-
-
-
 
 
 class HIDPowerDevice_ : public HID_ {
