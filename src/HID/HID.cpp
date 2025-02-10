@@ -17,6 +17,9 @@
 
 #include "HID.h"
 
+
+HIDReport* HID_::m_strReports = nullptr;
+
 HID_::HID_() : PluggableUSBModule(1, 1, m_epType) {
     m_epType[0] = EP_TYPE_INTERRUPT_IN;
     PluggableUSB().plug(this);

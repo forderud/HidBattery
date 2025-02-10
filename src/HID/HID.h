@@ -114,7 +114,7 @@ public:
 
 protected:
     /** The "data" pointer need to outlast this object. */ 
-    void SetString(const uint8_t index, const char* data);
+    static void SetString(const uint8_t index, const char* data);
     
     /** The "node" pointer need to outlast this object. */ 
     void SetDescriptor(const void *data, uint16_t length);
@@ -127,7 +127,7 @@ protected:
     
 private:
     const HIDReport* GetFeature(uint8_t id);
-    const HIDReport* GetString(uint8_t id);
+    static const HIDReport* GetString(uint8_t id);
 
     uint8_t m_epType[1];
 
@@ -136,8 +136,8 @@ private:
     uint8_t m_protocol = HID_REPORT_PROTOCOL;
     uint8_t m_idle = 1;
   
-    HIDReport* m_reports = nullptr;    // feature reports
-    HIDReport* m_strReports = nullptr; // string reports
+    HIDReport* m_reports = nullptr; // feature reports
+    static HIDReport* m_strReports; // string reports (shared across HID devices)
 };
 
 #define D_HIDREPORT(length) { 9, 0x21, 0x01, 0x01, 0, 1, 0x22, lowByte(length), highByte(length) }
