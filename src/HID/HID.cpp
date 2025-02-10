@@ -147,18 +147,18 @@ int HID_::SendReport(uint8_t id, const void* data, int len)
 
 const HIDReport* HID_::GetFeature(uint8_t id)
 {
-    if (m_reports)
-        return m_reports->Get(id);
-    else
+    if (!m_reports)
         return nullptr;
+
+    return m_reports->Get(id);
 }
 
 const HIDReport* HID_::GetString(uint8_t id)
 {
-    if (m_strReports)
-        return m_strReports->Get(id);
-    else
+    if (!m_strReports)
         return nullptr;
+    
+    return m_strReports->Get(id);
 }
 
 bool HID_::setup(USBSetup& setup)
