@@ -130,18 +130,8 @@ void HID_::SetFeatureInternal(uint8_t id, bool str, const void* data, int len)
 
     if(!*reports) {
         *reports = new HIDReport(id, data, len);
-        return;
-    }
-
-    for (HIDReport* current = *reports; current; current = current->next) {
-        if(current->id == id)
-            return; // feature already configured
-
-        if(!current->next) {
-            // append at the end
-            current->next = new HIDReport(id, data, len);
-            break;
-        }
+    } else {
+        (*reports)->AppendReport(id, data, len);
     }
 }
 

@@ -71,6 +71,19 @@ class HIDReport {
 public:
     HIDReport(uint8_t i, const void *d, uint8_t l) : id(i), data(d), length(l) {}
     
+    void AppendReport(uint8_t id, const void* data, int len) {
+        for (HIDReport* current = this; current; current = current->next) {
+            if(current->id == id)
+                return; // feature already configured
+
+            if(!current->next) {
+                // append at the end
+                current->next = new HIDReport(id, data, len);
+                break;
+            }
+        }
+    }
+    
     uint8_t id;
     const void* data;
     uint16_t length;
