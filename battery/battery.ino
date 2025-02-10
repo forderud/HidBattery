@@ -6,13 +6,10 @@ byte stringIdxConter = ISERIAL+1; // one past the last hadcoded string index in 
 const char STRING_DEVICECHEMISTRY[] PROGMEM = "LiP";
 const byte DeviceChemistryIdx = stringIdxConter++;
 
-const char STRING_OEMVENDOR1[] PROGMEM = "BatteryVendor A";
-const char STRING_OEMVENDOR2[] PROGMEM = "BatteryVendor B";
+const char STRING_OEMVENDOR[][16] PROGMEM = {"BatteryVendor A", "BatteryVendor B"}; // all strings must have same length
 byte       ManufacturerIdx[MAX_BATTERIES] = {};
 
-const char STRING_SERIAL1[] PROGMEM = "1234";
-const char STRING_SERIAL2[] PROGMEM = "3456";
-const char STRING_SERIAL3[] PROGMEM = "5678";
+const char STRING_SERIAL[][6] PROGMEM = {"12345", "34567", "56789"}; // all strings must have same length
 byte       SerialIdx[MAX_BATTERIES] = {};
 
 PresentStatus PresentStatus = {};
@@ -48,18 +45,10 @@ void setup() {
     Remaining[i] = 0.30f*FullChargeCapacity;
 
     ManufacturerIdx[i] = stringIdxConter++;
-    const char* manufacturerStr = i % 2 ? STRING_OEMVENDOR2 : STRING_OEMVENDOR1;
-    PowerDevice[i].SetStringFeature(HID_PD_MANUFACTURER, &ManufacturerIdx[i], manufacturerStr);
+    PowerDevice[i].SetStringFeature(HID_PD_MANUFACTURER, &ManufacturerIdx[i], STRING_OEMVENDOR[i % 2]);
 
     SerialIdx[i] = stringIdxConter++;
-    const char* serialStr = nullptr;
-    if (i % 3 == 0)
-        serialStr = STRING_SERIAL1;
-    else if (i % 3 == 1)
-        serialStr = STRING_SERIAL2;
-    else
-        serialStr = STRING_SERIAL3;
-    PowerDevice[i].SetStringFeature(HID_PD_SERIAL, &SerialIdx[i], serialStr);
+    PowerDevice[i].SetStringFeature(HID_PD_SERIAL, &SerialIdx[i], STRING_SERIAL[i % 3]);
   }
 
   pinMode(LED_BUILTIN, OUTPUT);  // output flushing 1 sec indicating that the arduino cycle is running.
