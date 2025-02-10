@@ -67,16 +67,14 @@ NTSTATUS SetFeatureColor (
     HID_COLLECTION_INFORMATION collectionInfo = {};
     {
         // populate "collectionInformation"
-        WDF_MEMORY_DESCRIPTOR collectionInfoDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&collectionInfoDesc, &collectionInfo, sizeof(HID_COLLECTION_INFORMATION));
+        WDF_MEMORY_DESCRIPTOR outputDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &collectionInfo, sizeof(HID_COLLECTION_INFORMATION));
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
-            NULL,
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget, NULL,
             IOCTL_HID_GET_COLLECTION_INFORMATION,
-            NULL,
-            &collectionInfoDesc,
-            NULL,
-            NULL);
+            NULL, // input
+            &outputDesc, // output
+            NULL, NULL);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: IOCTL_HID_GET_COLLECTION_INFORMATION failed 0x%x\n", status);
             return status;
@@ -92,17 +90,14 @@ NTSTATUS SetFeatureColor (
 
     {
         // populate "preparsedData"
-        WDF_MEMORY_DESCRIPTOR preparsedDataDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&preparsedDataDesc, static_cast<PHIDP_PREPARSED_DATA>(preparsedData), collectionInfo.DescriptorSize);
+        WDF_MEMORY_DESCRIPTOR outputDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, static_cast<PHIDP_PREPARSED_DATA>(preparsedData), collectionInfo.DescriptorSize);
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
-            NULL,
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget, NULL,
             IOCTL_HID_GET_COLLECTION_DESCRIPTOR, // same as HidD_GetPreparsedData in user-mode
-            NULL,
-            &preparsedDataDesc,
-            NULL,
-            NULL);
-
+            NULL, // input
+            &outputDesc, // output
+            NULL, NULL);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: IOCTL_HID_GET_COLLECTION_DESCRIPTOR failed 0x%x\n", status);
             return status;
@@ -133,13 +128,12 @@ NTSTATUS SetFeatureColor (
         // WARNING: Call succeeds but doesn't update the report due to a IntelliMouse HW issue
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
-            NULL,
+
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget, NULL,
             IOCTL_HID_GET_FEATURE,
             NULL, // input
             &outputDesc, // output
-            NULL,
-            NULL);
+            NULL, NULL);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: IOCTL_HID_GET_FEATURE failed 0x%x\n", status);
             return status;
@@ -157,13 +151,12 @@ NTSTATUS SetFeatureColor (
         // send TailLightReport to device
         WDF_MEMORY_DESCRIPTOR inputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&inputDesc, &report, sizeof(report));
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget,
-            NULL,
+
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget, NULL,
             IOCTL_HID_SET_FEATURE,
             &inputDesc, // input
             NULL, // output
-            NULL,
-            NULL);
+            NULL, NULL);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: IOCTL_HID_SET_FEATURE failed 0x%x\n", status);
             return status;
