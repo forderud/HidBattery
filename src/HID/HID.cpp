@@ -27,7 +27,7 @@ int HID_::getInterface(uint8_t* interfaceCount)
     *interfaceCount += 1; // uses 1
     HIDDescriptor hidInterface = {
         D_INTERFACE(pluggedInterface, 1, USB_DEVICE_CLASS_HUMAN_INTERFACE, HID_SUBCLASS_NONE, HID_PROTOCOL_NONE),
-        D_HIDREPORT(m_descriptorSize),
+        D_HIDREPORT(m_reportDesc.length),
         D_ENDPOINT(USB_ENDPOINT_IN(pluggedEndpoint), USB_ENDPOINT_TYPE_INTERRUPT, USB_EP_SIZE, 0x14)
     };
     return USB_SendControl(0, &hidInterface, sizeof(hidInterface));
@@ -80,8 +80,8 @@ int HID_::getDescriptor(USBSetup& setup)
             return 0;
 
         int total = 0;
-        if (m_rootNode) {
-            int res = USB_SendControl(TRANSFER_PGM, m_rootNode->data, m_rootNode->length);
+        if (m_reportDesc.length) {
+            int res = USB_SendControl(TRANSFER_PGM, m_reportDesc.data, m_reportDesc.length);
             if (res == -1)
                 return -1;
             total += res;
@@ -103,15 +103,15 @@ uint8_t HID_::getShortName(char *name)
     name[0] = 'H';
     name[1] = 'I';
     name[2] = 'D';
-    name[3] = 'A' + (m_descriptorSize & 0x0F);
-    name[4] = 'A' + ((m_descriptorSize >> 4) & 0x0F);
+    name[3] = 'A' + (m_reportDesc.length & 0x0F);
+    name[4] = 'A' + ((m_reportDesc.length >> 4) & 0x0F);
     return 5;
 }
 
-void HID_::SetDescriptor(const HIDSubDescriptor *node)
+void HID_::SetDescriptor(const void *data, uint16_t length)
 {
-    m_rootNode = node;
-    m_descriptorSize += node->length;
+    m_reportDesc.data = data;
+    m_reportDesc.length = length;
 }
 
 void HID_::SetFeature(uint8_t id, const void* data, int len)

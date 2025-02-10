@@ -78,12 +78,9 @@ public:
     const HIDReport *next = NULL;
 };
 
-class HIDSubDescriptor {
-public:
-  HIDSubDescriptor(const void *d, uint16_t l) : data(d), length(l) { }
-
-  const void* data;
-  const uint16_t length;
+struct HIDSubDescriptor {
+  void* data = nullptr;
+  uint16_t length = 0;
 };
 
 class HID_ : public PluggableUSBModule {
@@ -100,7 +97,7 @@ protected:
     void SetString(const uint8_t index, const char* data);
     
     /** The "node" pointer need to outlast this object. */ 
-    void SetDescriptor(const HIDSubDescriptor* node);
+    void SetDescriptor(const void *data, uint16_t length);
     
     // Implementation of the PluggableUSBModule
     int getInterface(uint8_t* interfaceCount) override;
@@ -115,8 +112,7 @@ private:
 
     uint8_t m_epType[1];
 
-    HIDSubDescriptor* m_rootNode = nullptr;
-    uint16_t m_descriptorSize = 0;
+    HIDSubDescriptor m_reportDesc;
 
     uint8_t m_protocol = HID_REPORT_PROTOCOL;
     uint8_t m_idle = 1;
