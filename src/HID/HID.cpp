@@ -145,11 +145,10 @@ int HID_::SendReport(uint8_t id, const void* data, int len)
 const HIDReport* HID_::GetFeature(uint8_t id, bool str)
 {
     const HIDReport* current = str ? m_strReports : m_reports;
-    for(; current; current=current->next) {
-        if(id == current->id)
-            return current;
-    }
-    return nullptr;
+    if (current)
+        return current->Get(id);
+    else
+        return nullptr;
 }
 
 bool HID_::setup(USBSetup& setup)

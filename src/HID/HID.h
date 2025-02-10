@@ -84,6 +84,15 @@ public:
         }
     }
     
+    HIDReport* Get (uint8_t id) const {
+        for(HIDReport* current = this; current; current = current->next) {
+            if(id == current->id)
+                return current;
+        }
+        return nullptr;
+    }
+
+    
     uint8_t id;
     const void* data;
     uint16_t length;
