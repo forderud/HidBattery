@@ -1,71 +1,54 @@
 #pragma once
 
 /** Tail-light feature report as observed in USBPcap/Wireshark. */
+#pragma pack(push, 1) // no padding
 struct TailLightReport {
-    TailLightReport() {
+    /** ReportID values taken from https://github.com/forderud/HidBattery/blob/master/src/HIDPowerDevice.h */
+    enum ReportType : UCHAR {
+        Zero = 0, // dummy report
+        ManufactureDate = 0x09,
+        Temperature = 0x0A,
+        Voltage = 0x0B,
+        RemainingCapacity = 0x0c,
+        CycleCount = 0x14,
+    };
+
+    static const char* TypeStr(ReportType type) {
+        switch (type) {
+        case Zero: return "0";
+        case ManufactureDate: return "ManufactureDate";
+        case Temperature: return "Temperature";
+        case Voltage: return "Voltage";
+        case RemainingCapacity: return "RemainingCapacity";
+        case CycleCount: return "CycleCount";
+        default:
+            return "Unknown";
+        }
     }
 
-    void SetColor(ULONG Color) {
-        Red = (Color) & 0xFF; // red;
-        Green = (Color >> 8) & 0xFF; // green
-        Blue = (Color >> 16) & 0xFF; // blue
-    }
+    TailLightReport() = default;
 
-    ULONG GetColor() const {
-        return (Blue << 16) | (Green << 8) | Red;
+    TailLightReport(ReportType type) {
+        ReportId = type;
     }
 
 #ifdef _KERNEL_MODE
     bool IsValid() const {
-        if (ReportId != 36) {// 0x24
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: TailLightReport: Unsupported report id %d"), ReportId);
-            return false;
-        }
-
-        if ((Unknown1 != 0xB2) || (Unknown2 != 0x03)) {
-            //DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: TailLightReport: Unknown control Code 0x%x 0x%x"), Unknown1, Unknown2);
-            return false;
-        }
-
-        return true;
-    }
-
-    bool SafetyCheck() {
-        // RGB check
-        unsigned int color_sum = Red + Green + Blue;
-        if (color_sum > 640) {
-            DebugPrint(DPFLTR_WARNING_LEVEL, DML_ERR("TailLight: Color saturation %u exceeded 640 threshold. Reseting color to RED to signal error."), color_sum);
-            Red = 255;
-            Green = 0;
-            Blue = 0;
-            return false;
-        }
-
         return true;
     }
 
     void Print(const char* prefix) const {
-        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight %s: Red=%u, Green=%u, Blue=%u\n", prefix, Red, Green, Blue);
-
+        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: %s Report=%s, Value=%u\n", prefix, TypeStr((ReportType)ReportId), Value);
     }
 #else
-    void Print(const wchar_t* prefix) const {
-        wprintf(L"%s Red=%u, Green=%u, Blue=%u\n", prefix, Red, Green, Blue);
-
+    void Print(const char* prefix) const {
+        printf("%s Report=%s, Value=%u\n", prefix, TypeStr((ReportType)ReportId), Value);
     }
 #endif
 
     //report ID of the collection to which the control request is sent
-    UCHAR   ReportId = 36; // (0x24)
-
-    // control codes (user-defined)
-    UCHAR   Unknown1 = 0xB2; // magic value
-    UCHAR   Unknown2 = 0x03; // magic value
-
-    UCHAR   Red = 0;
-    UCHAR   Green = 0;
-    UCHAR   Blue = 0;
-
-    UCHAR  padding[67] = {};
+    UCHAR  ReportId = 0;
+    USHORT Value = 0;
 };
-static_assert(sizeof(TailLightReport) == 73);
+#pragma pack(pop) // restore default settings
+static_assert(sizeof(TailLightReport) == 3);
