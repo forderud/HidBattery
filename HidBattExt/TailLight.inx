@@ -33,13 +33,13 @@ TailLight.sys = 1
 
 ; Install Section
 [TailLight_Inst.NT]
-Include = input.INF
-Needs = HID_Raw_Inst.NT
+Include=MsHidKmdf.inf
+Needs=MsHidKmdf.NT
 CopyFiles = @TailLight.sys
 
 [TailLight_Inst.NT.HW]
-Include = input.INF
-Needs = HID_Raw_Inst.NT.Hw
+Include=MsHidKmdf.inf
+Needs=MsHidKmdf.NT.HW
 
 [TailLight_Inst.NT.Filters]
 ; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-addfilter-directive
@@ -49,8 +49,8 @@ AddFilter = TailLight, , UpperFilter_Inst
 FilterPosition = Upper
 
 [TailLight_Inst.NT.Services]
-Include = input.INF
-Needs = HID_Raw_Inst.NT.Services
+Include=MsHidKmdf.inf
+Needs=MsHidKmdf.NT.Services
 AddService = TailLight, , TailLight_Service_Inst, TailLight_EventLog_Inst
 
 [TailLight_Service_Inst]
