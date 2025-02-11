@@ -1,6 +1,7 @@
 #include "driver.h"
 #include <Hidport.h>
 
+EVT_WDF_IO_QUEUE_IO_READ           EvtIoReadFilter;
 EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
 
 
@@ -12,7 +13,7 @@ VOID EvtSetBlackTimer(_In_ WDFTIMER  Timer) {
 
     NTSTATUS status = SetFeatureColor(Device, 0);
     if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: EvtSetBlackTimer failure 0x%x"), status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: SetFeatureColor failure 0x%x"), status);
         return;
     }
 
@@ -128,7 +129,7 @@ Arguments:
         // create queue for filtering
         WDF_IO_QUEUE_CONFIG queueConfig = {};
         WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel); // don't synchronize
-        //queueConfig.EvtIoRead  // pass-through read requests 
+        queueConfig.EvtIoRead = EvtIoReadFilter; // filter read requests 
         //queueConfig.EvtIoWrite // pass-through write requests
         queueConfig.EvtIoDeviceControl = EvtIoDeviceControlFilter; // filter IOCTL requests
 
@@ -203,6 +204,45 @@ Arguments:
     BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), &options);
     if (ret == FALSE) {
         status = WdfRequestGetStatus(Request);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestSend failed with status: 0x%x"), status);
+        WdfRequestComplete(Request, status);
+    }
+}
+
+
+void ParseReadBuffer(_In_ WDFREQUEST Request, _In_ size_t Length) {
+    if (Length != sizeof(TailLightReport)) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: EvtIoReadFilter: Incorrect Length"));
+        return;
+    }
+
+    TailLightReport* packet = nullptr;
+    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(TailLightReport), (void**)&packet, NULL);
+    if (!NT_SUCCESS(status) || !packet) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestRetrieveOutputBuffer failed 0x%x, packet=0x%p"), status, packet);
+        return;
+    }
+
+    packet->Print("INPUT");
+}
+
+_IRQL_requires_same_
+_IRQL_requires_max_(DISPATCH_LEVEL)
+VOID EvtIoReadFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_t Length)
+{
+    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtIoReadFilter (Length=%Iu)\n", Length);
+
+    WDFDEVICE device = WdfIoQueueGetDevice(Queue);
+
+    ParseReadBuffer(Request, Length);
+ 
+    // Forward the request down the driver stack
+    WDF_REQUEST_SEND_OPTIONS options = {};
+    WDF_REQUEST_SEND_OPTIONS_INIT(&options, WDF_REQUEST_SEND_OPTION_SEND_AND_FORGET);
+
+    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(device), &options);
+    if (ret == FALSE) {
+        NTSTATUS status = WdfRequestGetStatus(Request);
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestSend failed with status: 0x%x"), status);
         WdfRequestComplete(Request, status);
     }
