@@ -1,5 +1,5 @@
 ;/*++
-; TailLight driver setup information (INF) file.
+; Pro Intellimouse TailLight filter driver setup information (INF) file.
 ;--*/
 [Version]
 Signature="$Windows NT$"
@@ -46,7 +46,7 @@ AddService = TailLight, , TailLight_Service_Inst, TailLight_EventLog_Inst
 AddService = , %SPSVCINST_ASSOCSERVICE%
 
 [TailLight_Service_Inst]
-DisplayName   = "IntelliMouse TailLight filter driver"
+DisplayName   = "Pro IntelliMouse TailLight filter driver"
 ServiceType   = %SERVICE_KERNEL_DRIVER%
 StartType     = %SERVICE_DEMAND_START%
 ErrorControl  = %SERVICE_ERROR_NORMAL%
