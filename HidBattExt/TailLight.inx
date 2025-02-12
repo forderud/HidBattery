@@ -5,7 +5,7 @@
 Signature="$Windows NT$"
 Class=HIDClass
 ClassGUID={745a17a0-74d3-11d0-b6fe-00a0c90f57da}
-Provider="IntelliMouse sample project"
+Provider=%Provider%
 DriverVer=
 CatalogFile=TailLight.cat
 PnpLockdown=1
@@ -21,7 +21,7 @@ TailLight.sys = 1
 
 ; Manufacturer Section
 [Manufacturer]
-"IntelliMouse sample project"=IntelliMouseSampleMfg,NT$ARCH$
+%Provider%=IntelliMouseSampleMfg,NT$ARCH$
 
 ; Models section
 ; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-models-section
@@ -78,6 +78,7 @@ HKR,, TypesSupported,   %REG_DWORD%,     7
 
 [Strings]
 ; Strings for macro replacement
+Provider              = "IntelliMouse sample project"
 SPSVCINST_ASSOCSERVICE= 0x00000002
 SERVICE_KERNEL_DRIVER = 1
 SERVICE_BOOT_START    = 0
