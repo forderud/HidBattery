@@ -26,7 +26,7 @@ TailLight.sys = 1
 ; Models section
 ; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-models-section
 [IntelliMouseSampleMfg.NT$ARCH$]
-"IntelliMouse TailLight filter driver"=TailLight_Inst, HID\VID_045E&PID_082A&MI_01&Col05
+"Pro IntelliMouse TailLight"=TailLight_Inst, HID\VID_045E&PID_082A&MI_01&Col05
 
 ; Install Section
 [TailLight_Inst.NT]
