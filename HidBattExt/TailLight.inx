@@ -1,9 +1,6 @@
 ;/*++
 ; TailLight driver setup information (INF) file.
-;
-; Require Windows 10 version 1903 or newer
 ;--*/
-
 [Version]
 Signature="$Windows NT$"
 Class=HIDClass
