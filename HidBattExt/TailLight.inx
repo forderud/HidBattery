@@ -46,7 +46,6 @@ AddService = TailLight, , TailLight_Service_Inst, TailLight_EventLog_Inst
 AddService = , %SPSVCINST_ASSOCSERVICE%
 
 [TailLight_Service_Inst]
-DisplayName   = "Pro IntelliMouse TailLight filter driver"
 ServiceType   = %SERVICE_KERNEL_DRIVER%
 StartType     = %SERVICE_DEMAND_START%
 ErrorControl  = %SERVICE_ERROR_NORMAL%
