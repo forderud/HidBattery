@@ -4,12 +4,12 @@
 
 /** Fake self-test that gradually dims the tail-light color. */
 VOID SelfTestTimerProc (_In_ WDFTIMER timer) {
-    WDFDEVICE device = (WDFDEVICE)WdfTimerGetParentObject(timer);
-    DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(device);
+    WDFDEVICE Device = (WDFDEVICE)WdfTimerGetParentObject(timer);
+    DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
     TailLightDeviceInformation* pInfo = WdfObjectGet_TailLightDeviceInformation(deviceContext->WmiInstance);
 
     auto* stCtx = WdfObjectGet_SELF_TEST_CONTEXT(timer);
-    NTSTATUS status = SetFeatureColor(device, pInfo->TailLight);
+    NTSTATUS status = SetFeatureColor(Device, pInfo->TailLight);
     if (!NT_SUCCESS(status)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: %s: failed 0x%x\n", __func__, status);
         stCtx->Result = status;
@@ -47,12 +47,12 @@ static NTSTATUS EvtWmiInstanceExecuteMethod(
     if (OutBufferSize < SelfTest_OUT_SIZE)
         return STATUS_BUFFER_TOO_SMALL;
 
-    WDFDEVICE device = WdfWmiInstanceGetDevice(WmiInstance);
+    WDFDEVICE Device = WdfWmiInstanceGetDevice(WmiInstance);
 
     switch (MethodId) {
     case SelfTest:
         {
-            DEVICE_CONTEXT* devCtx = WdfObjectGet_DEVICE_CONTEXT(device);
+            DEVICE_CONTEXT* devCtx = WdfObjectGet_DEVICE_CONTEXT(Device);
             SELF_TEST_CONTEXT* stCtx = WdfObjectGet_SELF_TEST_CONTEXT(devCtx->SelfTestTimer);
             if (stCtx->IsBusy())
                 return STATUS_DEVICE_BUSY; // self-test already in progress

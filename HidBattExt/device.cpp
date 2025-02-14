@@ -7,10 +7,10 @@ EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
 VOID EvtSetBlackTimer(_In_ WDFTIMER  Timer) {
     DebugEnter();
 
-    WDFDEVICE device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
-    NT_ASSERTMSG("EvtSetBlackTimer device NULL\n", device);
+    WDFDEVICE Device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
+    NT_ASSERTMSG("EvtSetBlackTimer Device NULL\n", Device);
 
-    NTSTATUS status = SetFeatureColor(device, 0);
+    NTSTATUS status = SetFeatureColor(Device, 0);
     if (!NT_SUCCESS(status)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: EvtSetBlackTimer failure NTSTATUS=0x%x\n", status);
         return;
@@ -19,14 +19,14 @@ VOID EvtSetBlackTimer(_In_ WDFTIMER  Timer) {
     DebugExit();
 }
 
-NTSTATUS EvtSelfManagedIoInit(WDFDEVICE device) {
+NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
     // Initialize tail-light to black to have control over HW state
     WDF_TIMER_CONFIG timerCfg = {};
     WDF_TIMER_CONFIG_INIT(&timerCfg, EvtSetBlackTimer);
 
     WDF_OBJECT_ATTRIBUTES attribs = {};
     WDF_OBJECT_ATTRIBUTES_INIT(&attribs);
-    attribs.ParentObject = device;
+    attribs.ParentObject = Device;
     attribs.ExecutionLevel = WdfExecutionLevelPassive; // required to access HID functions
 
     WDFTIMER timer = nullptr;
@@ -95,27 +95,27 @@ Arguments:
         WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &PnpPowerCallbacks);
     }
 
-    WDFDEVICE device = 0;
+    WDFDEVICE Device = 0;
     {
         // create device
         WDF_OBJECT_ATTRIBUTES attributes = {};
         WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&attributes, DEVICE_CONTEXT);
 
-        NTSTATUS status = WdfDeviceCreate(&DeviceInit, &attributes, &device);
+        NTSTATUS status = WdfDeviceCreate(&DeviceInit, &attributes, &Device);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfDeviceCreate, Error %x\n", status);
             return status;
         }
 
-        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: PDO=0x%p, FDO=0x%p\n", WdfDeviceWdmGetPhysicalDevice(device), WdfDeviceWdmGetDeviceObject(device));
+        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: PDO=0x%p, FDO=0x%p\n", WdfDeviceWdmGetPhysicalDevice(Device), WdfDeviceWdmGetDeviceObject(Device));
     }
 
     // Driver Framework always zero initializes an objects context memory
-    DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(device);
+    DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     {
         // initialize DEVICE_CONTEXT struct with PdoName
-        deviceContext->PdoName = GetTargetPropertyString(WdfDeviceGetIoTarget(device), DevicePropertyPhysicalDeviceObjectName);
+        deviceContext->PdoName = GetTargetPropertyString(WdfDeviceGetIoTarget(Device), DevicePropertyPhysicalDeviceObjectName);
         if (!deviceContext->PdoName.Buffer) {
             DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: PdoName query failed\n");
             return STATUS_UNSUCCESSFUL;
@@ -133,7 +133,7 @@ Arguments:
         queueConfig.EvtIoDeviceControl = EvtIoDeviceControlFilter; // filter IOCTL requests
 
         WDFQUEUE queue = 0; // auto-deleted when parent is deleted
-        NTSTATUS status = WdfIoQueueCreate(device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
+        NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
 
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfIoQueueCreate failed 0x%x\n", status);
@@ -142,7 +142,7 @@ Arguments:
     }
 
     // Initialize WMI provider
-    NTSTATUS status = WmiInitialize(device);
+    NTSTATUS status = WmiInitialize(Device);
     if (!NT_SUCCESS(status)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: Error initializing WMI 0x%x\n", status);
         return status;
@@ -186,12 +186,12 @@ Arguments:
 
     //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu)\n", IoControlCode, InputBufferLength);
 
-    WDFDEVICE device = WdfIoQueueGetDevice(Queue);
+    WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
 
     NTSTATUS status = STATUS_SUCCESS; //unhandled
     switch (IoControlCode) {
       case IOCTL_HID_SET_FEATURE: // 0xb0191
-        status = SetFeatureFilter(device, Request, InputBufferLength);
+        status = SetFeatureFilter(Device, Request, InputBufferLength);
         break;
     }
     // No NT_SUCCESS(status) check here since we don't want to fail blocked calls
@@ -200,7 +200,7 @@ Arguments:
     WDF_REQUEST_SEND_OPTIONS options = {};
     WDF_REQUEST_SEND_OPTIONS_INIT(&options, WDF_REQUEST_SEND_OPTION_SEND_AND_FORGET);
 
-    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(device), &options);
+    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), &options);
     if (ret == FALSE) {
         status = WdfRequestGetStatus(Request);
         DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfRequestSend failed with status: 0x%x\n", status);
