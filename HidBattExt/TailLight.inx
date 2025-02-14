@@ -32,8 +32,6 @@ TailLight.sys = 1
 [TailLight_Inst.NT]
 CopyFiles = @TailLight.sys
 
-[TailLight_Inst.NT.HW]
-
 [TailLight_Inst.NT.Filters]
 ; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-addfilter-directive
 AddFilter = TailLight, , Filter_Inst
