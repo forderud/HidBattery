@@ -39,11 +39,11 @@ NTSTATUS SetFeatureColor (
 {
     DebugEnter();
 
-    WDFIOTARGET_Wrap hidTarget;
+    WDFIOTARGET_Wrap pdoTarget;
     {
         // Use PDO for HID commands.
         // Using PDO, since WdfDeviceGetIoTarget(Device) leads to failing WdfIoTargetSendIoctlSynchronously(IOCTL_HID_SET_FEATURE,..) calls with 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD).
-        NTSTATUS status = WdfIoTargetCreate(Device, WDF_NO_OBJECT_ATTRIBUTES, &hidTarget);
+        NTSTATUS status = WdfIoTargetCreate(Device, WDF_NO_OBJECT_ATTRIBUTES, &pdoTarget);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfIoTargetCreate failed 0x%x\n", status);
             return status;
@@ -56,7 +56,7 @@ NTSTATUS SetFeatureColor (
         // We will let the framework to respond automatically to the pnp state changes of the target by closing and opening the handle.
         openParams.ShareAccess = FILE_SHARE_WRITE | FILE_SHARE_READ;
 
-        status = WdfIoTargetOpen(hidTarget, &openParams);
+        status = WdfIoTargetOpen(pdoTarget, &openParams);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfIoTargetOpen failed 0x%x\n", status);
             return status;
@@ -69,7 +69,7 @@ NTSTATUS SetFeatureColor (
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &collectionInfo, sizeof(HID_COLLECTION_INFORMATION));
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget, NULL,
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
             IOCTL_HID_GET_COLLECTION_INFORMATION,
             NULL, // input
             &outputDesc, // output
@@ -92,7 +92,7 @@ NTSTATUS SetFeatureColor (
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, static_cast<PHIDP_PREPARSED_DATA>(preparsedData), collectionInfo.DescriptorSize);
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget, NULL,
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
             IOCTL_HID_GET_COLLECTION_DESCRIPTOR, // same as HidD_GetPreparsedData in user-mode
             NULL, // input
             &outputDesc, // output
@@ -128,7 +128,7 @@ NTSTATUS SetFeatureColor (
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget, NULL,
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
             IOCTL_HID_GET_FEATURE,
             NULL, // input
             &outputDesc, // output
@@ -151,7 +151,7 @@ NTSTATUS SetFeatureColor (
         WDF_MEMORY_DESCRIPTOR inputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&inputDesc, &report, sizeof(report));
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(hidTarget, NULL,
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
             IOCTL_HID_SET_FEATURE,
             &inputDesc, // input
             NULL, // output
