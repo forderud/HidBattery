@@ -183,16 +183,16 @@ Arguments:
     IoControlCode - The driver or system defined IOCTL associated with the request
 --*/
 {
-    UNREFERENCED_PARAMETER(OutputBufferLength);
+    UNREFERENCED_PARAMETER(InputBufferLength);
 
-    //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu)\n", IoControlCode, InputBufferLength);
+    //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
 
     WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
 
     NTSTATUS status = STATUS_SUCCESS; //unhandled
     switch (IoControlCode) {
-      case IOCTL_HID_SET_FEATURE: // 0xb0191
-        status = SetFeatureFilter(Device, Request, InputBufferLength);
+      case IOCTL_HID_GET_FEATURE:
+        status = GetFeatureFilter(Device, Request, OutputBufferLength);
         break;
     }
     // No NT_SUCCESS(status) check here since we don't want to fail blocked calls

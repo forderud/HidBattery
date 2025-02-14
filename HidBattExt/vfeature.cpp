@@ -167,10 +167,10 @@ NTSTATUS SetFeatureColor (
 }
 
 
-NTSTATUS SetFeatureFilter(
+NTSTATUS GetFeatureFilter(
     _In_ WDFDEVICE  Device,
     _In_ WDFREQUEST Request,
-    _In_ size_t     InputBufferLength
+    _In_ size_t     OutputBufferLength
 )
 /*++
 Routine Description:
@@ -187,26 +187,20 @@ Arguments:
     DebugEnter();
     UNREFERENCED_PARAMETER(Device);
 
-    if (InputBufferLength != sizeof(TailLightReport)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: SetFeatureFilter: Incorrect InputBufferLength"));
+    if (OutputBufferLength < sizeof(TailLightReport)) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: GetFeatureFilter: Too small OutputBufferLength"));
         return STATUS_BUFFER_TOO_SMALL;
     }
 
     TailLightReport* packet = nullptr;
-    NTSTATUS status = WdfRequestRetrieveInputBuffer(Request, sizeof(TailLightReport), (void**)&packet, NULL);
+    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(TailLightReport), (void**)&packet, NULL);
     if (!NT_SUCCESS(status) || !packet) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestRetrieveInputBuffer failed 0x%x, packet=0x%p"), status, packet);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestRetrieveOutputBuffer failed 0x%x, packet=0x%p"), status, packet);
         return status;
     }
 
-    if (!packet->IsValid()) {
-        // If collection ID is not for control collection then handle
-        // this request just as you would for a regular collection.
-        return STATUS_INVALID_PARAMETER;
-    }
-
     // capture color before safety adjustments
-    packet->Print("SetFeatureFilter");
+    packet->Print("GetFeatureFilter");
 
     DebugExitStatus(status);
     return status;
