@@ -138,7 +138,7 @@ NTSTATUS SetFeatureColor (
             return status;
         }
 
-        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Previous color: Red=%u, Green=%u, Blue=%u\n", report.Red, report.Green, report.Blue); // always zero
+        report.Print("Previous color");
 #endif
     }
 
@@ -161,7 +161,7 @@ NTSTATUS SetFeatureColor (
             return status;
         }
 
-        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: New color: Red=%u, Green=%u, Blue=%u\n", report.Red, report.Green, report.Blue);
+        report.Print("New color");
     }
 
     DebugExit();
@@ -211,7 +211,7 @@ Arguments:
     UCHAR r = packet->Red;
     UCHAR g = packet->Green;
     UCHAR b = packet->Blue;
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Red=%u, Green=%u, Blue=%u\n", r, g, b);
+    packet->Print("Requested color");
 
     // Enforce safety limits (sets color to RED on failure)
     if (!packet->SafetyCheck()) {

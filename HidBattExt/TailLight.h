@@ -29,9 +29,7 @@ struct TailLightReport {
 
         return true;
     }
-#endif
 
-#ifdef _KERNEL_MODE
     bool SafetyCheck() {
         // RGB check
         unsigned int color_sum = Red + Green + Blue;
@@ -44,6 +42,11 @@ struct TailLightReport {
         }
 
         return true;
+    }
+
+    void Print(const char* prefix) const {
+        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight %s: Red=%u, Green=%u, Blue=%u\n", prefix, Red, Green, Blue);
+
     }
 #endif
 
