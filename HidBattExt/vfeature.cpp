@@ -39,10 +39,12 @@ NTSTATUS SetFeatureColor (
 {
     DebugEnter();
 
+#if 0
+    WDFIOTARGET localTarget = WdfDeviceGetIoTarget(Device);
+#endif
     WDFIOTARGET_Wrap pdoTarget;
     {
-        // Use PDO for HID commands.
-        // Using PDO, since WdfDeviceGetIoTarget(Device) leads to failing WdfIoTargetSendIoctlSynchronously(IOCTL_HID_SET_FEATURE,..) calls with 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD).
+        // Use PDO for HID commands instead of local IO target to avoid 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) on IOCTL_HID_SET_FEATURE
         NTSTATUS status = WdfIoTargetCreate(Device, WDF_NO_OBJECT_ATTRIBUTES, &pdoTarget);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfIoTargetCreate failed 0x%x\n", status);
@@ -157,6 +159,7 @@ NTSTATUS SetFeatureColor (
             NULL, // output
             NULL, NULL);
         if (!NT_SUCCESS(status)) {
+            // IOCTL_HID_SET_FEATURE fails with 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) if using the local IO target (WdfDeviceGetIoTarget)
             DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: IOCTL_HID_SET_FEATURE failed 0x%x\n", status);
             return status;
         }
