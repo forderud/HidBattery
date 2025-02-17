@@ -12,7 +12,7 @@ VOID EvtSetBlackTimer(_In_ WDFTIMER  Timer) {
 
     NTSTATUS status = SetFeatureColor(Device, 0);
     if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: EvtSetBlackTimer failure NTSTATUS=0x%x\n", status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: EvtSetBlackTimer failure 0x%x\n", status);
         return;
     }
 
