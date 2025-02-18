@@ -12,7 +12,7 @@ VOID EvtSetBlackTimer(_In_ WDFTIMER  Timer) {
 
     NTSTATUS status = SetFeatureColor(Device, 0);
     if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: EvtSetBlackTimer failure 0x%x\n", status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: EvtSetBlackTimer failure 0x%x"), status);
         return;
     }
 
@@ -32,7 +32,7 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
     WDFTIMER timer = nullptr;
     NTSTATUS status = WdfTimerCreate(&timerCfg, &attribs, &timer);
     if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, "WdfTimerCreate failed 0x%x\n", status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfTimerCreate failed 0x%x"), status);
         return status;
     }
 
@@ -52,7 +52,7 @@ UNICODE_STRING GetTargetPropertyString(WDFIOTARGET target, DEVICE_REGISTRY_PROPE
     WDFMEMORY memory = 0;
     NTSTATUS status = WdfIoTargetAllocAndQueryTargetProperty(target, DeviceProperty, NonPagedPoolNx, &attributes, &memory);
     if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfIoTargetAllocAndQueryTargetProperty with property=0x%x failed 0x%x\n", DeviceProperty, status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfIoTargetAllocAndQueryTargetProperty with property=0x%x failed 0x%x"), DeviceProperty, status);
         return {};
     }
 
@@ -103,7 +103,7 @@ Arguments:
 
         NTSTATUS status = WdfDeviceCreate(&DeviceInit, &attributes, &Device);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfDeviceCreate, Error %x\n", status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfDeviceCreate, Error %x"), status);
             return status;
         }
 
@@ -117,7 +117,7 @@ Arguments:
         // initialize DEVICE_CONTEXT struct with PdoName
         deviceContext->PdoName = GetTargetPropertyString(WdfDeviceGetIoTarget(Device), DevicePropertyPhysicalDeviceObjectName);
         if (!deviceContext->PdoName.Buffer) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: PdoName query failed\n");
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: PdoName query failed"));
             return STATUS_UNSUCCESSFUL;
         }
 
@@ -136,7 +136,7 @@ Arguments:
         NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
 
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfIoQueueCreate failed 0x%x\n", status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfIoQueueCreate failed 0x%x"), status);
             return status;
         }
     }
@@ -144,7 +144,7 @@ Arguments:
     // Initialize WMI provider
     NTSTATUS status = WmiInitialize(Device);
     if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: Error initializing WMI 0x%x\n", status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: Error initializing WMI 0x%x"), status);
         return status;
     }
 
@@ -203,7 +203,7 @@ Arguments:
     BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), &options);
     if (ret == FALSE) {
         status = WdfRequestGetStatus(Request);
-        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfRequestSend failed with status: 0x%x\n", status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestSend failed with status: 0x%x"), status);
         WdfRequestComplete(Request, status);
     }
 }

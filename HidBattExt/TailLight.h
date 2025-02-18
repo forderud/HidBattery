@@ -18,12 +18,12 @@ struct TailLightReport {
 #ifdef _KERNEL_MODE
     bool IsValid() const {
         if (ReportId != 36) {// 0x24
-            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: TailLightReport: Unsupported report id %d\n", ReportId);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: TailLightReport: Unsupported report id %d"), ReportId);
             return false;
         }
 
         if ((Unknown1 != 0xB2) || (Unknown2 != 0x03)) {
-            //DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: TailLightReport: Unknown control Code 0x%x 0x%x\n", Unknown1, Unknown2);
+            //DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: TailLightReport: Unknown control Code 0x%x 0x%x"), Unknown1, Unknown2);
             return false;
         }
 

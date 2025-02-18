@@ -47,7 +47,7 @@ NTSTATUS SetFeatureColor (
         // Use PDO for HID commands instead of local IO target to avoid 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) on IOCTL_HID_SET_FEATURE
         NTSTATUS status = WdfIoTargetCreate(Device, WDF_NO_OBJECT_ATTRIBUTES, &pdoTarget);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfIoTargetCreate failed 0x%x\n", status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfIoTargetCreate failed 0x%x"), status);
             return status;
         }
 
@@ -60,7 +60,7 @@ NTSTATUS SetFeatureColor (
 
         status = WdfIoTargetOpen(pdoTarget, &openParams);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfIoTargetOpen failed 0x%x\n", status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfIoTargetOpen failed 0x%x"), status);
             return status;
         }
     }
@@ -77,7 +77,7 @@ NTSTATUS SetFeatureColor (
             &outputDesc, // output
             NULL, NULL);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: IOCTL_HID_GET_COLLECTION_INFORMATION failed 0x%x\n", status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: IOCTL_HID_GET_COLLECTION_INFORMATION failed 0x%x"), status);
             return status;
         }
 
@@ -100,7 +100,7 @@ NTSTATUS SetFeatureColor (
             &outputDesc, // output
             NULL, NULL);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: IOCTL_HID_GET_COLLECTION_DESCRIPTOR failed 0x%x\n", status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: IOCTL_HID_GET_COLLECTION_DESCRIPTOR failed 0x%x"), status);
             return status;
         }
     }
@@ -116,7 +116,7 @@ NTSTATUS SetFeatureColor (
         //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage);
 
         if (caps.FeatureReportByteLength != sizeof(TailLightReport)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: FeatureReportByteLength mismatch (%u, %Iu).\n", caps.FeatureReportByteLength, sizeof(TailLightReport));
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: FeatureReportByteLength mismatch (%u, %Iu)."), caps.FeatureReportByteLength, sizeof(TailLightReport));
             return status;
         }
     }
@@ -136,7 +136,7 @@ NTSTATUS SetFeatureColor (
             &outputDesc, // output
             NULL, NULL);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: IOCTL_HID_GET_FEATURE failed 0x%x\n", status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
             return status;
         }
 
@@ -160,7 +160,7 @@ NTSTATUS SetFeatureColor (
             NULL, NULL);
         if (!NT_SUCCESS(status)) {
             // IOCTL_HID_SET_FEATURE fails with 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) if using the local IO target (WdfDeviceGetIoTarget)
-            DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: IOCTL_HID_SET_FEATURE failed 0x%x\n", status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: IOCTL_HID_SET_FEATURE failed 0x%x"), status);
             return status;
         }
 
@@ -193,14 +193,14 @@ Arguments:
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     if (InputBufferLength != sizeof(TailLightReport)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: SetFeatureFilter: Incorrect InputBufferLength\n");
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: SetFeatureFilter: Incorrect InputBufferLength"));
         return STATUS_BUFFER_TOO_SMALL;
     }
 
     TailLightReport* packet = nullptr;
     NTSTATUS status = WdfRequestRetrieveInputBuffer(Request, sizeof(TailLightReport), (void**)&packet, NULL);
     if (!NT_SUCCESS(status) || !packet) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, "TailLight: WdfRequestRetrieveInputBuffer failed 0x%x, packet=0x%p\n", status, packet);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestRetrieveInputBuffer failed 0x%x, packet=0x%p"), status, packet);
         return status;
     }
 
