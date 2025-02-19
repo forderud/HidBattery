@@ -34,12 +34,12 @@ Include = HidBatt.inf
 Needs = HidBatt_Inst
 CopyFiles = @TailLight.sys
 
-[TailLight_Inst.NT.Filters]
-; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-addfilter-directive
-AddFilter = TailLight, , Filter_Inst
+[TailLight_Inst.NT.HW]
+AddReg = TailLight_Inst.AddReg
 
-[Filter_Inst]
-FilterPosition = Lower
+[TailLight_Inst.AddReg]
+HKR,,"UpperFilters", %REG_TYPE_MULTI_SZ%, "TailLight"
+HKR,,"LowerFilters", %REG_TYPE_MULTI_SZ%, "TailLight"
 
 [TailLight_Inst.NT.Services]
 Include = HidBatt.inf
