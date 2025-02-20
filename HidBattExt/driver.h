@@ -5,9 +5,6 @@
 #include <initguid.h>
 #include <wdmguid.h>
 
-// Generated WMI class definitions (from TailLight.mof)
-#include "TailLightmof.h"
-
 // DML macro for white text (wbg) on red background (changed)
 #define DML_ERR(msg) ("<?dml?><col fg=\"wbg\" bg=\"changed\">"##msg##"</col>\n")
 
@@ -45,7 +42,6 @@ inline void DebugPrint(ULONG Level, PCSTR Format, ...) {
 #endif
 
 #include "device.h"
-#include "wmi.h"
 #include "vfeature.h"
 
 

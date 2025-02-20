@@ -152,16 +152,7 @@ Arguments:
         }
     }
 
-    // Initialize WMI provider
-    NTSTATUS status = WmiInitialize(Device);
-    if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: Error initializing WMI 0x%x"), status);
-        return status;
-    }
-
-    KeInitializeEvent(&deviceContext->SelfTestCompleted, SynchronizationEvent, FALSE);
-
-    return status;
+    return STATUS_SUCCESS;
 }
 
 
