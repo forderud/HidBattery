@@ -42,7 +42,7 @@ inline void DebugPrint(ULONG Level, PCSTR Format, ...) {
 #endif
 
 #include "device.h"
-#include "vfeature.h"
+#include "HidPd.hpp"
 
 
 /** Memory allocation tag name (for debugging leaks). */
