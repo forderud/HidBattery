@@ -115,6 +115,16 @@ Arguments:
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     {
+        if (WdfDeviceWdmGetPhysicalDevice(Device) == WdfDeviceWdmGetAttachedDevice(Device)) {
+            DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Running as Lower filter driver below HidBatt\n");
+            deviceContext->Mode = LowerFilter;
+        } else {
+            DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Running as Upper filter driver above HidBatt\n");
+            deviceContext->Mode = UpperFilter;
+        }
+    }
+
+    {
         // initialize DEVICE_CONTEXT struct with PdoName
         deviceContext->PdoName = GetTargetPropertyString(WdfDeviceGetIoTarget(Device), DevicePropertyPhysicalDeviceObjectName);
         if (!deviceContext->PdoName.Buffer) {
