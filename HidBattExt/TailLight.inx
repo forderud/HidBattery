@@ -44,7 +44,7 @@ HKR,,"LowerFilters", %REG_TYPE_MULTI_SZ%, "TailLight"
 [TailLight_Inst.NT.Services]
 Include = HidBatt.inf
 Needs = HidBatt_Inst.Services
-AddService = TailLight, , TailLight_Service_Inst, TailLight_EventLog_Inst
+AddService = TailLight, , TailLight_Service_Inst
 
 [TailLight_Service_Inst]
 ServiceType   = %SERVICE_KERNEL_DRIVER%
@@ -58,15 +58,6 @@ KmdfService = TailLight, TailLight_wdfsect
 [TailLight_wdfsect]
 KmdfLibraryVersion = $KMDFVERSION$
 
-[TailLight_EventLog_Inst]
-; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-addreg-directive
-AddReg = TailLight_EventLog_AddReg
-
-[TailLight_EventLog_AddReg]
-; Stored under "HKLM\SYSTEM\CurrentControlSet\Services\EventLog\System\TailLight" (deleted on driver uninstall)
-HKR,, EventMessageFile, %REG_EXPAND_SZ%, "%%SystemRoot%%\System32\IoLogMsg.dll;%13%\TailLight.sys"
-HKR,, TypesSupported,   %REG_DWORD%,     7
-
 [Strings]
 ; Strings for macro replacement
 Provider              = "IntelliMouse sample project"
@@ -79,5 +70,3 @@ SERVICE_DEMAND_START  = 3
 SERVICE_ERROR_IGNORE  = 0
 SERVICE_ERROR_NORMAL  = 1
 REG_TYPE_MULTI_SZ     = 0x00010000
-REG_EXPAND_SZ         = 0x00020000
-REG_DWORD             = 0x00010001
