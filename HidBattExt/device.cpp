@@ -14,7 +14,7 @@ VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
 
     NTSTATUS status = HidPdFeatureRequest(Device);
     if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: HidPdFeatureRequest failure 0x%x"), status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidPdFeatureRequest failure 0x%x"), status);
         return;
     }
 
@@ -39,7 +39,7 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
     }
 
     BOOLEAN inQueue = WdfTimerStart(timer, 0); // no wait
-    NT_ASSERTMSG("TailLight: timer already in queue", !inQueue);
+    NT_ASSERTMSG("HidBattExt: timer already in queue", !inQueue);
     UNREFERENCED_PARAMETER(inQueue);
 
     return status;
@@ -54,7 +54,7 @@ UNICODE_STRING GetTargetPropertyString(WDFIOTARGET target, DEVICE_REGISTRY_PROPE
     WDFMEMORY memory = 0;
     NTSTATUS status = WdfIoTargetAllocAndQueryTargetProperty(target, DeviceProperty, NonPagedPoolNx, &attributes, &memory);
     if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfIoTargetAllocAndQueryTargetProperty with property=0x%x failed 0x%x"), DeviceProperty, status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetAllocAndQueryTargetProperty with property=0x%x failed 0x%x"), DeviceProperty, status);
         return {};
     }
 
@@ -105,11 +105,11 @@ Arguments:
 
         NTSTATUS status = WdfDeviceCreate(&DeviceInit, &attributes, &Device);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfDeviceCreate, Error %x"), status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfDeviceCreate, Error %x"), status);
             return status;
         }
 
-        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: PDO(0x%p) FDO(0x%p), Lower(0x%p)\n", WdfDeviceWdmGetPhysicalDevice(Device), WdfDeviceWdmGetDeviceObject(Device), WdfDeviceWdmGetAttachedDevice(Device));
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: PDO(0x%p) FDO(0x%p), Lower(0x%p)\n", WdfDeviceWdmGetPhysicalDevice(Device), WdfDeviceWdmGetDeviceObject(Device), WdfDeviceWdmGetAttachedDevice(Device));
     }
 
     // Driver Framework always zero initializes an objects context memory
@@ -117,10 +117,10 @@ Arguments:
 
     {
         if (WdfDeviceWdmGetPhysicalDevice(Device) == WdfDeviceWdmGetAttachedDevice(Device)) {
-            DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Running as Lower filter driver below HidBatt\n");
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Lower filter driver below HidBatt\n");
             deviceContext->Mode = LowerFilter;
         } else {
-            DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Running as Upper filter driver above HidBatt\n");
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Upper filter driver above HidBatt\n");
             deviceContext->Mode = UpperFilter;
         }
     }
@@ -129,11 +129,11 @@ Arguments:
         // initialize DEVICE_CONTEXT struct with PdoName
         deviceContext->PdoName = GetTargetPropertyString(WdfDeviceGetIoTarget(Device), DevicePropertyPhysicalDeviceObjectName);
         if (!deviceContext->PdoName.Buffer) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: PdoName query failed"));
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: PdoName query failed"));
             return STATUS_UNSUCCESSFUL;
         }
 
-        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: PdoName: %wZ\n", deviceContext->PdoName); // outputs "\Device\00000083"
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: PdoName: %wZ\n", deviceContext->PdoName); // outputs "\Device\00000083"
     }
 
     {
@@ -153,7 +153,7 @@ Arguments:
         NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
 
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfIoQueueCreate failed 0x%x"), status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoQueueCreate failed 0x%x"), status);
             return status;
         }
     }
@@ -189,7 +189,7 @@ Arguments:
 {
     UNREFERENCED_PARAMETER(InputBufferLength);
 
-    //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
+    //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
 
     WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
 
@@ -208,7 +208,7 @@ Arguments:
     BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), &options);
     if (ret == FALSE) {
         status = WdfRequestGetStatus(Request);
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestSend failed with status: 0x%x"), status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestSend failed with status: 0x%x"), status);
         WdfRequestComplete(Request, status);
     }
 }
@@ -216,14 +216,14 @@ Arguments:
 
 void ParseReadHidBuffer(_In_ WDFREQUEST Request, _In_ size_t Length) {
     if (Length != sizeof(HidPdReport)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: EvtIoReadFilter: Incorrect Length"));
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: EvtIoReadFilter: Incorrect Length"));
         return;
     }
 
     HidPdReport* packet = nullptr;
     NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(HidPdReport), (void**)&packet, NULL);
     if (!NT_SUCCESS(status) || !packet) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestRetrieveOutputBuffer failed 0x%x, packet=0x%p"), status, packet);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestRetrieveOutputBuffer failed 0x%x, packet=0x%p"), status, packet);
         return;
     }
 
@@ -234,7 +234,7 @@ _IRQL_requires_same_
 _IRQL_requires_max_(DISPATCH_LEVEL)
 VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_t Length)
 {
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtIoReadFilter (Length=%Iu)\n", Length);
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoReadFilter (Length=%Iu)\n", Length);
 
     WDFDEVICE device = WdfIoQueueGetDevice(Queue);
 
@@ -247,7 +247,7 @@ VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_
     BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(device), &options);
     if (ret == FALSE) {
         NTSTATUS status = WdfRequestGetStatus(Request);
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestSend failed with status: 0x%x"), status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestSend failed with status: 0x%x"), status);
         WdfRequestComplete(Request, status);
     }
 }
@@ -278,18 +278,18 @@ Arguments:
     IoControlCode - The driver or system defined IOCTL associated with the request
 --*/
 {
-    //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
+    //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
 
     WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
 
     NTSTATUS status = STATUS_SUCCESS; //unhandled
     switch (IoControlCode) {
     case IOCTL_BATTERY_QUERY_INFORMATION:
-        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: IOCTL_BATTERY_QUERY_INFORMATION (InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: IOCTL_BATTERY_QUERY_INFORMATION (InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
         // TODO
         break;
     case IOCTL_BATTERY_QUERY_STATUS:
-        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: IOCTL_BATTERY_QUERY_STATUS (InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: IOCTL_BATTERY_QUERY_STATUS (InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
         // TODO
         break;
     }
@@ -302,7 +302,7 @@ Arguments:
     BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), &options);
     if (ret == FALSE) {
         status = WdfRequestGetStatus(Request);
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestSend failed with status: 0x%x"), status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestSend failed with status: 0x%x"), status);
         WdfRequestComplete(Request, status);
     }
 }

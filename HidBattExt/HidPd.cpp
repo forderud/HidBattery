@@ -36,7 +36,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
         // Use PDO for HID commands instead of local IO target to avoid 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) on IOCTL_HID_SET_FEATURE
         NTSTATUS status = WdfIoTargetCreate(Device, WDF_NO_OBJECT_ATTRIBUTES, &pdoTarget);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfIoTargetCreate failed 0x%x"), status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetCreate failed 0x%x"), status);
             return status;
         }
 
@@ -48,7 +48,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
 
         status = WdfIoTargetOpen(pdoTarget, &openParams);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfIoTargetOpen failed 0x%x"), status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetOpen failed 0x%x"), status);
             return status;
         }
     }
@@ -65,11 +65,11 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
             &outputDesc, // output
             NULL, NULL);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: IOCTL_HID_GET_COLLECTION_INFORMATION failed 0x%x"), status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_COLLECTION_INFORMATION failed 0x%x"), status);
             return status;
         }
 
-        //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInfo.ProductID, collectionInfo.VendorID, collectionInfo.VersionNumber, collectionInfo.DescriptorSize);
+        //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInfo.ProductID, collectionInfo.VendorID, collectionInfo.VersionNumber, collectionInfo.DescriptorSize);
     }
 
     PHIDP_PREPARSED_DATA_Wrap preparsedData(collectionInfo.DescriptorSize);
@@ -88,7 +88,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
             &outputDesc, // output
             NULL, NULL);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: IOCTL_HID_GET_COLLECTION_DESCRIPTOR failed 0x%x"), status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_COLLECTION_DESCRIPTOR failed 0x%x"), status);
             return status;
         }
     }
@@ -101,10 +101,10 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
             return status;
         }
 
-        //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage);
+        //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage);
 
         if (caps.FeatureReportByteLength != sizeof(HidPdReport)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: FeatureReportByteLength mismatch (%u, %Iu)."), caps.FeatureReportByteLength, sizeof(HidPdReport));
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: FeatureReportByteLength mismatch (%u, %Iu)."), caps.FeatureReportByteLength, sizeof(HidPdReport));
             return status;
         }
     }
@@ -122,7 +122,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
             &outputDesc, // output
             NULL, NULL);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
             return status;
         }
 
@@ -143,7 +143,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
             NULL, NULL);
         if (!NT_SUCCESS(status)) {
             // IOCTL_HID_SET_FEATURE fails with 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) if using the local IO target (WdfDeviceGetIoTarget)
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
             return status;
         }
 
@@ -166,14 +166,14 @@ NTSTATUS HidGetFeatureFilter(
     UNREFERENCED_PARAMETER(Device);
 
     if (OutputBufferLength < sizeof(HidPdReport)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: HidGetFeatureFilter: Too small OutputBufferLength"));
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidGetFeatureFilter: Too small OutputBufferLength"));
         return STATUS_BUFFER_TOO_SMALL;
     }
 
     HidPdReport* packet = nullptr;
     NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(HidPdReport), (void**)&packet, NULL);
     if (!NT_SUCCESS(status) || !packet) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestRetrieveOutputBuffer failed 0x%x, packet=0x%p"), status, packet);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestRetrieveOutputBuffer failed 0x%x, packet=0x%p"), status, packet);
         return status;
     }
 

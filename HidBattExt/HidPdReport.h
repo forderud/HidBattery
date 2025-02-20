@@ -38,7 +38,7 @@ struct HidPdReport {
     }
 
     void Print(const char* prefix) const {
-        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: %s Report=%s, Value=%u\n", prefix, TypeStr((ReportType)ReportId), Value);
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: %s Report=%s, Value=%u\n", prefix, TypeStr((ReportType)ReportId), Value);
     }
 #else
     void Print(const char* prefix) const {

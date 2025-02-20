@@ -7,7 +7,7 @@ NTSTATUS DriverEntry(
     _In_ PUNICODE_STRING RegistryPath
     )
 {
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: DriverEntry - WDF version built on %s %s\n", __DATE__, __TIME__);
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: DriverEntry - WDF version built on %s %s\n", __DATE__, __TIME__);
 
     WDF_DRIVER_CONFIG params = {};
     WDF_DRIVER_CONFIG_INIT(/*out*/&params, EvtDriverDeviceAdd);
@@ -22,7 +22,7 @@ NTSTATUS DriverEntry(
                              WDF_NO_HANDLE); // [out]
     if (!NT_SUCCESS(status)) {
         // Framework will automatically cleanup on error Status return
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: Error Creating WDFDRIVER 0x%x"), status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: Error Creating WDFDRIVER 0x%x"), status);
     }
 
     return status;
@@ -36,5 +36,5 @@ VOID EvtDriverUnload(
     )
 {
     UNREFERENCED_PARAMETER(Driver);
-    DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: DriverUnload.\n");
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: DriverUnload.\n");
 }
