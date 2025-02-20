@@ -35,6 +35,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
 {
     DebugEnter();
 
+    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
     WDFIOTARGET_Wrap pdoTarget;
     {
         // Use PDO for HID commands instead of local IO target to avoid 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) on IOCTL_HID_SET_FEATURE
@@ -45,9 +46,8 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
         }
 
         // open in shared read-write mode
-        DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
         WDF_IO_TARGET_OPEN_PARAMS openParams = {};
-        WDF_IO_TARGET_OPEN_PARAMS_INIT_OPEN_BY_NAME(&openParams, &deviceContext->PdoName, FILE_READ_ACCESS | FILE_WRITE_ACCESS);
+        WDF_IO_TARGET_OPEN_PARAMS_INIT_OPEN_BY_NAME(&openParams, &context->PdoName, FILE_READ_ACCESS | FILE_WRITE_ACCESS);
         // We will let the framework to respond automatically to the pnp state changes of the target by closing and opening the handle.
         openParams.ShareAccess = FILE_SHARE_WRITE | FILE_SHARE_READ;
 
@@ -131,6 +131,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
             return status;
         }
 
+        context->State.Temperature = report.Temperature;
         report.Print("IOCTL_HID_GET_FEATURE");
     }
     {
@@ -151,6 +152,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
             return status;
         }
 
+        context->State.Temperature = report.CycleCount;
         report.Print("IOCTL_HID_GET_FEATURE");
     }
 
@@ -190,6 +192,15 @@ Arguments:
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestRetrieveOutputBuffer failed 0x%x, packet=0x%p"), status, packet);
         return status;
     }
+
+    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
+    NT_ASSERTMSG("HidGetFeatureFilter context NULL\n", context);
+
+    // capture shared state
+    if (packet->ReportId == HidPdReport::CycleCount)
+        context->State.CycleCount = packet->CycleCount;
+    else if (packet->ReportId == HidPdReport::Temperature)
+        context->State.Temperature = packet->Temperature;
 
     // capture color before safety adjustments
     packet->Print("HidGetFeatureFilter");
