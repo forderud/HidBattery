@@ -1,8 +1,8 @@
 #include "driver.h"
 #include <Hidport.h>
 
-EVT_WDF_IO_QUEUE_IO_READ           EvtIoReadFilter;
-EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
+EVT_WDF_IO_QUEUE_IO_READ           EvtIoReadHidFilter;
+EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlHidFilter;
 
 
 VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
@@ -135,13 +135,13 @@ Arguments:
         DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: PdoName: %wZ\n", deviceContext->PdoName); // outputs "\Device\00000083"
     }
 
-    {
-        // create queue for filtering
+    if (deviceContext->Mode == LowerFilter) {
+        // create queue for HID Power Device (PD) filtering
         WDF_IO_QUEUE_CONFIG queueConfig = {};
         WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel); // don't synchronize
-        queueConfig.EvtIoRead = EvtIoReadFilter; // filter read requests 
+        queueConfig.EvtIoRead = EvtIoReadHidFilter; // filter read requests 
         //queueConfig.EvtIoWrite // pass-through write requests
-        queueConfig.EvtIoDeviceControl = EvtIoDeviceControlFilter; // filter IOCTL requests
+        queueConfig.EvtIoDeviceControl = EvtIoDeviceControlHidFilter; // filter IOCTL requests
 
         WDFQUEUE queue = 0; // auto-deleted when parent is deleted
         NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
@@ -156,7 +156,7 @@ Arguments:
 }
 
 
-VOID EvtIoDeviceControlFilter(
+VOID EvtIoDeviceControlHidFilter(
     _In_  WDFQUEUE          Queue,
     _In_  WDFREQUEST        Request,
     _In_  size_t            OutputBufferLength,
@@ -211,7 +211,7 @@ Arguments:
 }
 
 
-void ParseReadBuffer(_In_ WDFREQUEST Request, _In_ size_t Length) {
+void ParseReadHidBuffer(_In_ WDFREQUEST Request, _In_ size_t Length) {
     if (Length != sizeof(HidPdReport)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: EvtIoReadFilter: Incorrect Length"));
         return;
@@ -229,13 +229,13 @@ void ParseReadBuffer(_In_ WDFREQUEST Request, _In_ size_t Length) {
 
 _IRQL_requires_same_
 _IRQL_requires_max_(DISPATCH_LEVEL)
-VOID EvtIoReadFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_t Length)
+VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_t Length)
 {
     DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtIoReadFilter (Length=%Iu)\n", Length);
 
     WDFDEVICE device = WdfIoQueueGetDevice(Queue);
 
-    ParseReadBuffer(Request, Length);
+    ParseReadHidBuffer(Request, Length);
  
     // Forward the request down the driver stack
     WDF_REQUEST_SEND_OPTIONS options = {};
