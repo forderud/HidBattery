@@ -25,7 +25,7 @@ HidBattExt.sys = 1
 
 ; Models section
 ; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-models-section
-[HidBattExteMfg.NT$ARCH$]
+[HidBattExtMfg.NT$ARCH$]
 "HID Battery extension"=HidBattExt_Inst, HID_DEVICE_UP:0084_U:0004
 
 ; Install Section
