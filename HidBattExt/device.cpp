@@ -5,15 +5,15 @@ EVT_WDF_IO_QUEUE_IO_READ           EvtIoReadFilter;
 EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlFilter;
 
 
-VOID GetFeatureRequestTimer(_In_ WDFTIMER  Timer) {
+VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
     DebugEnter();
 
     WDFDEVICE Device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
-    NT_ASSERTMSG("GetFeatureRequestTimer Device NULL\n", Device);
+    NT_ASSERTMSG("HidPdFeatureRequest Device NULL\n", Device);
 
-    NTSTATUS status = GetFeatureRequest(Device);
+    NTSTATUS status = HidPdFeatureRequest(Device);
     if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: GetFeatureRequest failure 0x%x"), status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: HidPdFeatureRequest failure 0x%x"), status);
         return;
     }
 
@@ -23,7 +23,7 @@ VOID GetFeatureRequestTimer(_In_ WDFTIMER  Timer) {
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
     // schedule read of FEATURE reports
     WDF_TIMER_CONFIG timerCfg = {};
-    WDF_TIMER_CONFIG_INIT(&timerCfg, GetFeatureRequestTimer);
+    WDF_TIMER_CONFIG_INIT(&timerCfg, HidPdFeatureRequestTimer);
 
     WDF_OBJECT_ATTRIBUTES attribs = {};
     WDF_OBJECT_ATTRIBUTES_INIT(&attribs);

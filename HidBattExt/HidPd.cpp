@@ -26,7 +26,7 @@ private:
 };
 
 
-NTSTATUS GetFeatureRequest(_In_ WDFDEVICE Device)
+NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
 /*++
     This routine sets the HID feature by sending HID ioctls to our device.
     These IOCTLs will be handled by HIDUSB and converted into USB requests

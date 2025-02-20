@@ -26,7 +26,7 @@ private:
 };
 
 
-NTSTATUS GetFeatureRequest(_In_  WDFDEVICE Device);
+NTSTATUS HidPdFeatureRequest(_In_  WDFDEVICE Device);
 
 NTSTATUS GetFeatureFilter(
     _In_ WDFDEVICE  Device,
