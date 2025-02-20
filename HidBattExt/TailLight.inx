@@ -52,15 +52,6 @@ StartType     = %SERVICE_DEMAND_START%
 ErrorControl  = %SERVICE_ERROR_NORMAL%
 ServiceBinary = %13%\TailLight.sys
 
-[TailLight_Inst.NT.WMI]
-; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-ddinstall-wmi-section
-WMIInterface = {07982702-2086-4B83-9444-34989BB10554}, %SCWMI_CLOBBER_SECURITY%, WmiSecurity_AllFullAccess
-
-[WmiSecurity_AllFullAccess]
-; Relax security to allow "Everyone" read & write access (only administrators have access by default)
-; Stored in "HKLM\SYSTEM\CurrentControlSet\Control\WMI\Security\<GUID>" (NOT deleted on driver uninstall)
-Security = "O:BAG:BAD:(A;;0x120fff;;;WD)(A;;0x120fff;;;SY)"
-
 [TailLight_Inst.NT.Wdf]
 KmdfService = TailLight, TailLight_wdfsect
 
@@ -90,4 +81,3 @@ SERVICE_ERROR_NORMAL  = 1
 REG_TYPE_MULTI_SZ     = 0x00010000
 REG_EXPAND_SZ         = 0x00020000
 REG_DWORD             = 0x00010001
-SCWMI_CLOBBER_SECURITY = 0x00000001  ; replace existing security descriptor
