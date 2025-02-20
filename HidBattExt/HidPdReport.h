@@ -1,8 +1,8 @@
 #pragma once
 
-/** Tail-light feature report as observed in USBPcap/Wireshark. */
+/** HID Power Device report (https://www.usb.org/sites/default/files/pdcv11.pdf). */
 #pragma pack(push, 1) // no padding
-struct TailLightReport {
+struct HidPdReport {
     /** ReportID values taken from https://github.com/forderud/HidBattery/blob/master/src/HIDPowerDevice.h */
     enum ReportType : UCHAR {
         Zero = 0, // dummy report
@@ -26,9 +26,9 @@ struct TailLightReport {
         }
     }
 
-    TailLightReport() = default;
+    HidPdReport() = default;
 
-    TailLightReport(ReportType type) {
+    HidPdReport(ReportType type) {
         ReportId = type;
     }
 
@@ -51,4 +51,4 @@ struct TailLightReport {
     USHORT Value = 0;
 };
 #pragma pack(pop) // restore default settings
-static_assert(sizeof(TailLightReport) == 3);
+static_assert(sizeof(HidPdReport) == 3);

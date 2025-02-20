@@ -212,13 +212,13 @@ Arguments:
 
 
 void ParseReadBuffer(_In_ WDFREQUEST Request, _In_ size_t Length) {
-    if (Length != sizeof(TailLightReport)) {
+    if (Length != sizeof(HidPdReport)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: EvtIoReadFilter: Incorrect Length"));
         return;
     }
 
-    TailLightReport* packet = nullptr;
-    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(TailLightReport), (void**)&packet, NULL);
+    HidPdReport* packet = nullptr;
+    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(HidPdReport), (void**)&packet, NULL);
     if (!NT_SUCCESS(status) || !packet) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestRetrieveOutputBuffer failed 0x%x, packet=0x%p"), status, packet);
         return;

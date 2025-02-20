@@ -115,15 +115,15 @@ NTSTATUS SetFeatureColor (
 
         //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage);
 
-        if (caps.FeatureReportByteLength != sizeof(TailLightReport)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: FeatureReportByteLength mismatch (%u, %Iu)."), caps.FeatureReportByteLength, sizeof(TailLightReport));
+        if (caps.FeatureReportByteLength != sizeof(HidPdReport)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: FeatureReportByteLength mismatch (%u, %Iu)."), caps.FeatureReportByteLength, sizeof(HidPdReport));
             return status;
         }
     }
 
     {
-        // Get TailLightReport from device.
-        TailLightReport report(TailLightReport::Temperature);
+        // Get HidPdReport from device.
+        HidPdReport report(HidPdReport::Temperature);
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
@@ -141,8 +141,8 @@ NTSTATUS SetFeatureColor (
         report.Print("IOCTL_HID_GET_FEATURE");
     }
     {
-        // Get TailLightReport from device.
-        TailLightReport report(TailLightReport::CycleCount);
+        // Get HidPdReport from device.
+        HidPdReport report(HidPdReport::CycleCount);
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
@@ -186,13 +186,13 @@ Arguments:
     DebugEnter();
     UNREFERENCED_PARAMETER(Device);
 
-    if (OutputBufferLength < sizeof(TailLightReport)) {
+    if (OutputBufferLength < sizeof(HidPdReport)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: GetFeatureFilter: Too small OutputBufferLength"));
         return STATUS_BUFFER_TOO_SMALL;
     }
 
-    TailLightReport* packet = nullptr;
-    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(TailLightReport), (void**)&packet, NULL);
+    HidPdReport* packet = nullptr;
+    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(HidPdReport), (void**)&packet, NULL);
     if (!NT_SUCCESS(status) || !packet) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestRetrieveOutputBuffer failed 0x%x, packet=0x%p"), status, packet);
         return status;

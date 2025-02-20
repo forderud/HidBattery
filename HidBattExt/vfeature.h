@@ -1,5 +1,5 @@
 #pragma once
-#include "TailLight.h"
+#include "HidPdReport.h"
 
 
 /** RAII wrapper of WDFIOTARGET. */
