@@ -3,6 +3,7 @@
 
 EVT_WDF_IO_QUEUE_IO_READ           EvtIoReadHidFilter;
 EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlHidFilter;
+EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlBattFilter;
 
 
 VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
@@ -135,14 +136,19 @@ Arguments:
         DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: PdoName: %wZ\n", deviceContext->PdoName); // outputs "\Device\00000083"
     }
 
-    if (deviceContext->Mode == LowerFilter) {
-        // create queue for HID Power Device (PD) filtering
+    {
+        // create queue for filtering
         WDF_IO_QUEUE_CONFIG queueConfig = {};
         WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel); // don't synchronize
-        queueConfig.EvtIoRead = EvtIoReadHidFilter; // filter read requests 
-        //queueConfig.EvtIoWrite // pass-through write requests
-        queueConfig.EvtIoDeviceControl = EvtIoDeviceControlHidFilter; // filter IOCTL requests
-
+        if (deviceContext->Mode == LowerFilter) {
+            // HID Power Device (PD) filtering
+            queueConfig.EvtIoRead = EvtIoReadHidFilter; // filter read requests 
+            //queueConfig.EvtIoWrite // pass-through write requests
+            queueConfig.EvtIoDeviceControl = EvtIoDeviceControlHidFilter; // filter IOCTL requests
+        } else if (deviceContext->Mode == UpperFilter) {
+            // Battery device filtering
+            queueConfig.EvtIoDeviceControl = EvtIoDeviceControlBattFilter; // filter IOCTL requests
+        }
         WDFQUEUE queue = 0; // auto-deleted when parent is deleted
         NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
 
@@ -244,6 +250,64 @@ VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_
     BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(device), &options);
     if (ret == FALSE) {
         NTSTATUS status = WdfRequestGetStatus(Request);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestSend failed with status: 0x%x"), status);
+        WdfRequestComplete(Request, status);
+    }
+}
+
+
+VOID EvtIoDeviceControlBattFilter(
+    _In_  WDFQUEUE          Queue,
+    _In_  WDFREQUEST        Request,
+    _In_  size_t            OutputBufferLength,
+    _In_  size_t            InputBufferLength,
+    _In_  ULONG             IoControlCode
+)
+/*++
+Routine Description:
+    This event callback function is called when the driver receives an
+
+    (KMDF) IOCTL_HID_Xxx code when handling IRP_MJ_INTERNAL_DEVICE_CONTROL
+    (UMDF) IOCTL_HID_Xxx, IOCTL_UMDF_HID_Xxx when handling IRP_MJ_DEVICE_CONTROL
+
+Arguments:
+    Queue - A handle to the queue object that is associated with the I/O request
+
+    Request - A handle to a framework request object.
+
+    OutputBufferLength - The length, in bytes, of the request's output buffer,
+            if an output buffer is available.
+
+    InputBufferLength - The length, in bytes, of the request's input buffer, if
+            an input buffer is available.
+
+    IoControlCode - The driver or system defined IOCTL associated with the request
+--*/
+{
+    //DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
+
+    WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
+
+    NTSTATUS status = STATUS_SUCCESS; //unhandled
+    switch (IoControlCode) {
+    case IOCTL_BATTERY_QUERY_INFORMATION:
+        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: IOCTL_BATTERY_QUERY_INFORMATION (InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
+        // TODO
+        break;
+    case IOCTL_BATTERY_QUERY_STATUS:
+        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: IOCTL_BATTERY_QUERY_STATUS (InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
+        // TODO
+        break;
+    }
+    // No NT_SUCCESS(status) check here since we don't want to fail blocked calls
+
+    // Forward the request down the driver stack
+    WDF_REQUEST_SEND_OPTIONS options = {};
+    WDF_REQUEST_SEND_OPTIONS_INIT(&options, WDF_REQUEST_SEND_OPTION_SEND_AND_FORGET);
+
+    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), &options);
+    if (ret == FALSE) {
+        status = WdfRequestGetStatus(Request);
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: WdfRequestSend failed with status: 0x%x"), status);
         WdfRequestComplete(Request, status);
     }

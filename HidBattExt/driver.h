@@ -4,6 +4,7 @@
 #include <ntstrsafe.h>
 #include <initguid.h>
 #include <wdmguid.h>
+#include <Poclass.h> // for IOCTL_BATTERY_QUERY_INFORMATION
 
 // DML macro for white text (wbg) on red background (changed)
 #define DML_ERR(msg) ("<?dml?><col fg=\"wbg\" bg=\"changed\">"##msg##"</col>\n")
