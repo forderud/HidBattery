@@ -1,5 +1,5 @@
 ;/*++
-; Pro Intellimouse TailLight filter driver setup information (INF) file.
+; HidBatt extension filter driver setup information (INF) file.
 ;--*/
 [Version]
 Signature="$Windows NT$"
@@ -21,12 +21,12 @@ TailLight.sys = 1
 
 ; Manufacturer Section
 [Manufacturer]
-%Provider%=IntelliMouseSampleMfg,NT$ARCH$
+%Provider%=HidBattExtMfg,NT$ARCH$
 
 ; Models section
 ; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-models-section
-[IntelliMouseSampleMfg.NT$ARCH$]
-"Pro IntelliMouse TailLight"=TailLight_Inst, HID_DEVICE_UP:0084_U:0004
+[HidBattExteMfg.NT$ARCH$]
+"HID Battery extension"=TailLight_Inst, HID_DEVICE_UP:0084_U:0004
 
 ; Install Section
 [TailLight_Inst.NT]
@@ -60,7 +60,7 @@ KmdfLibraryVersion = $KMDFVERSION$
 
 [Strings]
 ; Strings for macro replacement
-Provider              = "IntelliMouse sample project"
+Provider              = "HidBattery sample project"
 SPSVCINST_ASSOCSERVICE= 0x00000002
 SERVICE_KERNEL_DRIVER = 1
 SERVICE_BOOT_START    = 0
