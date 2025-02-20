@@ -7,17 +7,17 @@ Class=Battery
 ClassGuid={72631e54-78a4-11d0-bcf7-00aa00b7b32a}
 Provider=%Provider%
 DriverVer=
-CatalogFile=TailLight.cat
+CatalogFile=HidBattExt.cat
 PnpLockdown=1
 
 [DestinationDirs]
 DefaultDestDir = 13
 
 [SourceDisksNames]
-1 = "TailLight Driver Disk"
+1 = "HidBattExt Driver Disk"
 
 [SourceDisksFiles]
-TailLight.sys = 1
+HidBattExt.sys = 1
 
 ; Manufacturer Section
 [Manufacturer]
@@ -32,28 +32,28 @@ TailLight.sys = 1
 [TailLight_Inst.NT]
 Include = HidBatt.inf
 Needs = HidBatt_Inst
-CopyFiles = @TailLight.sys
+CopyFiles = @HidBattExt.sys
 
 [TailLight_Inst.NT.HW]
 AddReg = TailLight_Inst.AddReg
 
 [TailLight_Inst.AddReg]
-HKR,,"UpperFilters", %REG_TYPE_MULTI_SZ%, "TailLight"
-HKR,,"LowerFilters", %REG_TYPE_MULTI_SZ%, "TailLight"
+HKR,,"UpperFilters", %REG_TYPE_MULTI_SZ%, "HidBattExt"
+HKR,,"LowerFilters", %REG_TYPE_MULTI_SZ%, "HidBattExt"
 
 [TailLight_Inst.NT.Services]
 Include = HidBatt.inf
 Needs = HidBatt_Inst.Services
-AddService = TailLight, , TailLight_Service_Inst
+AddService = HidBattExt, , TailLight_Service_Inst
 
 [TailLight_Service_Inst]
 ServiceType   = %SERVICE_KERNEL_DRIVER%
 StartType     = %SERVICE_DEMAND_START%
 ErrorControl  = %SERVICE_ERROR_NORMAL%
-ServiceBinary = %13%\TailLight.sys
+ServiceBinary = %13%\HidBattExt.sys
 
 [TailLight_Inst.NT.Wdf]
-KmdfService = TailLight, TailLight_wdfsect
+KmdfService = HidBattExt, TailLight_wdfsect
 
 [TailLight_wdfsect]
 KmdfLibraryVersion = $KMDFVERSION$

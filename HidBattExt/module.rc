@@ -17,7 +17,7 @@
 #define VER_FILEDESCRIPTION_STR   "HidBatt extension filter driver"
 #define VER_INTERNALNAME_STR      "" // doesn't show up in file properties
 #define VER_LEGALCOPYRIGHT_STR   L"\251 HidBattery sample project"
-#define VER_ORIGINALFILENAME_STR  "TailLight.sys"
-#define VER_PRODUCTNAME_STR       "TailLight"
+#define VER_ORIGINALFILENAME_STR  "HidBattExt.sys"
+#define VER_PRODUCTNAME_STR       "HidBattExt"
 
 #include <common.ver>

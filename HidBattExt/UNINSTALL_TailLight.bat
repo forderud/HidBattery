@@ -3,6 +3,6 @@
 cd /d "%~dp0"
 
 :: uninstall driver
-PNPUTIL /delete-driver TailLight.inf /uninstall /force
+PNPUTIL /delete-driver HidBattExt.inf /uninstall /force
 
 pause

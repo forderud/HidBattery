@@ -87,7 +87,7 @@
     </DriverSign>
     <PostBuildEvent>
       <Command>copy *.bat $(PackageDir)
-copy $(OutDir)\TailLight.cer $(PackageDir)</Command>
+copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -99,7 +99,7 @@ copy $(OutDir)\TailLight.cer $(PackageDir)</Command>
     </DriverSign>
     <PostBuildEvent>
       <Command>copy *.bat $(PackageDir)
-copy $(OutDir)\TailLight.cer $(PackageDir)</Command>
+copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -111,7 +111,7 @@ copy $(OutDir)\TailLight.cer $(PackageDir)</Command>
     </DriverSign>
     <PostBuildEvent>
       <Command>copy *.bat $(PackageDir)
-copy $(OutDir)\TailLight.cer $(PackageDir)</Command>
+copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -123,7 +123,7 @@ copy $(OutDir)\TailLight.cer $(PackageDir)</Command>
     </DriverSign>
     <PostBuildEvent>
       <Command>copy *.bat $(PackageDir)
-copy $(OutDir)\TailLight.cer $(PackageDir)</Command>
+copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -133,7 +133,7 @@ copy $(OutDir)\TailLight.cer $(PackageDir)</Command>
     <ResourceCompile Include="module.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="TailLight.inx" />
+    <Inf Include="HidBattExt.inx" />
     <FilesToPackage Include="$(TargetPath)" Condition="'$(ConfigurationType)'=='Driver' or '$(ConfigurationType)'=='DynamicLibrary'" />
   </ItemGroup>
   <ItemGroup>
