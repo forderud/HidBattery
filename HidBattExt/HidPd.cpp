@@ -159,7 +159,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
 }
 
 
-NTSTATUS GetFeatureFilter(
+NTSTATUS HidGetFeatureFilter(
     _In_ WDFDEVICE  Device,
     _In_ WDFREQUEST Request,
     _In_ size_t     OutputBufferLength
@@ -180,7 +180,7 @@ Arguments:
     UNREFERENCED_PARAMETER(Device);
 
     if (OutputBufferLength < sizeof(HidPdReport)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: GetFeatureFilter: Too small OutputBufferLength"));
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("TailLight: HidGetFeatureFilter: Too small OutputBufferLength"));
         return STATUS_BUFFER_TOO_SMALL;
     }
 
@@ -192,7 +192,7 @@ Arguments:
     }
 
     // capture color before safety adjustments
-    packet->Print("GetFeatureFilter");
+    packet->Print("HidGetFeatureFilter");
 
     DebugExitStatus(status);
     return status;

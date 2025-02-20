@@ -28,8 +28,4 @@ private:
 
 NTSTATUS HidPdFeatureRequest(_In_  WDFDEVICE Device);
 
-NTSTATUS GetFeatureFilter(
-    _In_ WDFDEVICE  Device,
-    _In_ WDFREQUEST Request,
-    _In_ size_t     OutputBufferLength
-);
+NTSTATUS HidGetFeatureFilter(_In_ WDFDEVICE  Device, _In_ WDFREQUEST Request, _In_ size_t OutputBufferLength);
