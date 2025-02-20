@@ -107,7 +107,7 @@ Arguments:
             return status;
         }
 
-        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: PDO=0x%p, FDO=0x%p\n", WdfDeviceWdmGetPhysicalDevice(Device), WdfDeviceWdmGetDeviceObject(Device));
+        DebugPrint(DPFLTR_INFO_LEVEL, "TailLight: PDO(0x%p) FDO(0x%p), Lower(0x%p)\n", WdfDeviceWdmGetPhysicalDevice(Device), WdfDeviceWdmGetDeviceObject(Device), WdfDeviceWdmGetAttachedDevice(Device));
     }
 
     // Driver Framework always zero initializes an objects context memory
