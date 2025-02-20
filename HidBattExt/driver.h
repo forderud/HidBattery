@@ -47,7 +47,7 @@ inline void DebugPrint(ULONG Level, PCSTR Format, ...) {
 
 
 /** Memory allocation tag name (for debugging leaks). */
-static constexpr ULONG POOL_TAG = 'iLaT'; // displayed as "TaLi"
+static constexpr ULONG POOL_TAG = 'xEBH'; // displayed as "HBEx"
 
 extern "C"
 DRIVER_INITIALIZE         DriverEntry;
