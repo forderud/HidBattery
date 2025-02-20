@@ -171,10 +171,7 @@ VOID EvtIoDeviceControlHidFilter(
 )
 /*++
 Routine Description:
-    This event callback function is called when the driver receives an
-
-    (KMDF) IOCTL_HID_Xxx code when handling IRP_MJ_INTERNAL_DEVICE_CONTROL
-    (UMDF) IOCTL_HID_Xxx, IOCTL_UMDF_HID_Xxx when handling IRP_MJ_DEVICE_CONTROL
+    Callback function for IOCTL_HID_xxx requests.
 
 Arguments:
     Queue - A handle to the queue object that is associated with the I/O request
@@ -265,10 +262,7 @@ VOID EvtIoDeviceControlBattFilter(
 )
 /*++
 Routine Description:
-    This event callback function is called when the driver receives an
-
-    (KMDF) IOCTL_HID_Xxx code when handling IRP_MJ_INTERNAL_DEVICE_CONTROL
-    (UMDF) IOCTL_HID_Xxx, IOCTL_UMDF_HID_Xxx when handling IRP_MJ_DEVICE_CONTROL
+    Callback function for IOCTL_BATTERY_xxx requests.
 
 Arguments:
     Queue - A handle to the queue object that is associated with the I/O request

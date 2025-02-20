@@ -27,11 +27,6 @@ private:
 
 
 NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
-/*++
-    This routine sets the HID feature by sending HID ioctls to our device.
-    These IOCTLs will be handled by HIDUSB and converted into USB requests
-    and send to the device.
---*/
 {
     DebugEnter();
 
@@ -166,17 +161,6 @@ NTSTATUS HidGetFeatureFilter(
     _In_ WDFREQUEST Request,
     _In_ size_t     OutputBufferLength
 )
-/*++
-Routine Description:
-    Handles IOCTL_HID_SET_FEATURE for all the collection.
-    For control collection (custom defined collection) it handles
-    the user-defined control codes for sideband communication
-
-Arguments:
-    QueueContext - The object context associated with the queue
-
-    Request - Pointer to Request Packet.
---*/
 {
     DebugEnter();
     UNREFERENCED_PARAMETER(Device);
