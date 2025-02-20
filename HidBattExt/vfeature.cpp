@@ -26,10 +26,7 @@ private:
 };
 
 
-NTSTATUS SetFeatureColor (
-    _In_ WDFDEVICE Device,
-    _In_ ULONG     Color
-    )
+NTSTATUS GetFeatureRequest(_In_ WDFDEVICE Device)
 /*++
     This routine sets the HID feature by sending HID ioctls to our device.
     These IOCTLs will be handled by HIDUSB and converted into USB requests
@@ -37,11 +34,7 @@ NTSTATUS SetFeatureColor (
 --*/
 {
     DebugEnter();
-    UNREFERENCED_PARAMETER(Color);
 
-#if 0
-    WDFIOTARGET localTarget = WdfDeviceGetIoTarget(Device);
-#endif
     WDFIOTARGET_Wrap pdoTarget;
     {
         // Use PDO for HID commands instead of local IO target to avoid 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) on IOCTL_HID_SET_FEATURE

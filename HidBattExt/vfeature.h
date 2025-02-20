@@ -26,10 +26,7 @@ private:
 };
 
 
-NTSTATUS SetFeatureColor (
-    _In_  WDFDEVICE Device,
-    _In_  ULONG     Color
-    );
+NTSTATUS GetFeatureRequest(_In_  WDFDEVICE Device);
 
 NTSTATUS GetFeatureFilter(
     _In_ WDFDEVICE  Device,
