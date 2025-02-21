@@ -45,6 +45,17 @@ private:
     BYTE* m_ptr = nullptr;
 };
 
+static void UpdateSharedState(SharedState& state, HidPdReport& report) {
+    // capture shared state
+    if (report.ReportId == HidPdReport::CycleCount) {
+        auto lock = state.Lock();
+        state.CycleCount = report.CycleCount;
+    } else if (report.ReportId == HidPdReport::Temperature) {
+        auto lock = state.Lock();
+        state.Temperature = report.Temperature;
+    }
+}
+
 
 NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
 {
@@ -146,10 +157,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
             return status;
         }
 
-        {
-            auto lock = context->LowState.Lock();
-            context->LowState.Temperature = report.Temperature;
-        }
+        UpdateSharedState(context->LowState, report);
         report.Print("IOCTL_HID_GET_FEATURE");
     }
     {
@@ -170,10 +178,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
             return status;
         }
 
-        {
-            auto lock = context->LowState.Lock();
-            context->LowState.CycleCount = report.CycleCount;
-        }
+        UpdateSharedState(context->LowState, report);
         report.Print("IOCTL_HID_GET_FEATURE");
     }
 
@@ -207,13 +212,7 @@ NTSTATUS HidGetFeatureFilter(
     NT_ASSERTMSG("HidGetFeatureFilter context NULL\n", context);
 
     // capture shared state
-    if (packet->ReportId == HidPdReport::CycleCount) {
-        auto lock = context->LowState.Lock();
-        context->LowState.CycleCount = packet->CycleCount;
-    } else if (packet->ReportId == HidPdReport::Temperature) {
-        auto lock = context->LowState.Lock();
-        context->LowState.Temperature = packet->Temperature;
-    }
+    UpdateSharedState(context->LowState, *packet);
 
     // capture color before safety adjustments
     packet->Print("HidGetFeatureFilter");
