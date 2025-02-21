@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{FF968AD9-B8FF-450D-93A0-4CC5AC2B49B5}</ProjectGuid>
+    <ProjectGuid>{E794293B-746E-43E2-B564-CC7F7F4DF463}</ProjectGuid>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">Win32</Platform>
   </PropertyGroup>
