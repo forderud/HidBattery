@@ -122,10 +122,24 @@ Arguments:
     {
         if (WdfDeviceWdmGetPhysicalDevice(Device) == WdfDeviceWdmGetAttachedDevice(Device)) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Lower filter driver below HidBatt\n");
+
             deviceContext->Mode = LowerFilter;
+
+            NTSTATUS status = deviceContext->Interface.Register(Device, deviceContext->State);
+            if (!NT_SUCCESS(status)) {
+                DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfDeviceAddQueryInterface error %x"), status);
+                return status;
+            }
         } else {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Upper filter driver above HidBatt\n");
+
             deviceContext->Mode = UpperFilter;
+
+            NTSTATUS status = deviceContext->Interface.Lookup(Device);
+            if (!NT_SUCCESS(status)) {
+                DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfFdoQueryForInterface error %x"), status);
+                return status;
+            }
         }
     }
 
