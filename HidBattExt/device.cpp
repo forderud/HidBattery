@@ -22,27 +22,31 @@ VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
 }
 
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
-    // schedule read of FEATURE reports
-    WDF_TIMER_CONFIG timerCfg = {};
-    WDF_TIMER_CONFIG_INIT(&timerCfg, HidPdFeatureRequestTimer);
+    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
-    WDF_OBJECT_ATTRIBUTES attribs = {};
-    WDF_OBJECT_ATTRIBUTES_INIT(&attribs);
-    attribs.ParentObject = Device;
-    attribs.ExecutionLevel = WdfExecutionLevelPassive; // required to access HID functions
+    if (context->Mode == LowerFilter) {
+        // schedule read of HID FEATURE reports
+        WDF_TIMER_CONFIG timerCfg = {};
+        WDF_TIMER_CONFIG_INIT(&timerCfg, HidPdFeatureRequestTimer);
 
-    WDFTIMER timer = nullptr;
-    NTSTATUS status = WdfTimerCreate(&timerCfg, &attribs, &timer);
-    if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfTimerCreate failed 0x%x"), status);
-        return status;
+        WDF_OBJECT_ATTRIBUTES attribs = {};
+        WDF_OBJECT_ATTRIBUTES_INIT(&attribs);
+        attribs.ParentObject = Device;
+        attribs.ExecutionLevel = WdfExecutionLevelPassive; // required to access HID functions
+
+        WDFTIMER timer = nullptr;
+        NTSTATUS status = WdfTimerCreate(&timerCfg, &attribs, &timer);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfTimerCreate failed 0x%x"), status);
+            return status;
+        }
+
+        BOOLEAN inQueue = WdfTimerStart(timer, 0); // no wait
+        NT_ASSERTMSG("HidBattExt: timer already in queue", !inQueue);
+        UNREFERENCED_PARAMETER(inQueue);
     }
 
-    BOOLEAN inQueue = WdfTimerStart(timer, 0); // no wait
-    NT_ASSERTMSG("HidBattExt: timer already in queue", !inQueue);
-    UNREFERENCED_PARAMETER(inQueue);
-
-    return status;
+    return STATUS_SUCCESS;
 }
 
 
