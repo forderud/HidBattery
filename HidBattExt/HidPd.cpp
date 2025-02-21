@@ -274,7 +274,7 @@ Arguments:
 }
 
 
-void ParseReadHidBuffer(_In_ WDFREQUEST Request, _In_ size_t Length) {
+void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t Length) {
     if (Length != sizeof(HidPdReport)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: EvtIoReadFilter: Incorrect Length"));
         return;
@@ -287,7 +287,9 @@ void ParseReadHidBuffer(_In_ WDFREQUEST Request, _In_ size_t Length) {
         return;
     }
 
-    packet->Print("INPUT");
+    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
+    UpdateSharedState(context->LowState, *packet);
+    //packet->Print("INPUT");
 }
 
 _IRQL_requires_same_
@@ -298,7 +300,7 @@ VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_
 
     WDFDEVICE device = WdfIoQueueGetDevice(Queue);
 
-    ParseReadHidBuffer(Request, Length);
+    ParseReadHidBuffer(device, Request, Length);
 
     // Forward the request down the driver stack
     WDF_REQUEST_SEND_OPTIONS options = {};
