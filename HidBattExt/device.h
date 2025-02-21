@@ -5,10 +5,41 @@ enum FilterMode {
     LowerFilter, // below HidBatt: Filters HID Power Device communication
 };
 
+/** RAII locking support class. */
+class SharedStateLock {
+public:
+    SharedStateLock(WDFSPINLOCK& Lock) : SpinLock(Lock) {
+        WdfSpinLockAcquire(SpinLock);
+    }
+    ~SharedStateLock() {
+        WdfSpinLockRelease(SpinLock);
+    }
+
+private:
+    WDFSPINLOCK SpinLock;
+};
+
 /** State to share between Upper and Lower filter driver instances. */
-struct SharedState {
+class SharedState {
+private:
+    WDFSPINLOCK SpinLock = 0;  // to protext member access
+public:
     ULONG CycleCount;  // BATTERY_INFORMATION::CycleCount value
     ULONG Temperature; // IOCTL_BATTERY_QUERY_INFORMATION BatteryTemperature value
+
+    void Initialize(WDFDEVICE device) {
+        WDF_OBJECT_ATTRIBUTES attribs{};
+        WDF_OBJECT_ATTRIBUTES_INIT(&attribs);
+        attribs.ParentObject = device;
+
+        NTSTATUS status = WdfSpinLockCreate(&attribs, &SpinLock);
+        NT_ASSERTMSG("WdfSpinLockCreate failed.\n", status == STATUS_SUCCESS);
+    }
+
+    SharedStateLock Lock() {
+        NT_ASSERTMSG("SharedStateLock::Lock() SpinLock not initialized.\n", SpinLock);
+        return SharedStateLock(SpinLock);
+    }
 };
 
 DEFINE_GUID(GUID_HIDBATTEXT_SHARED_STATE, 0x2f52277a, 0x88f8, 0x44f3, 0x87, 0xec, 0x48, 0xb2, 0xe9, 0x51, 0x84, 0x58);
@@ -48,7 +79,7 @@ struct HidBattExtIf : public INTERFACE {
 struct DEVICE_CONTEXT {
     FilterMode     Mode;
     UNICODE_STRING PdoName;
-    SharedState    State;
+    SharedState    LowState; // lower filter instance state (not accessible from Upper filter)
     HidBattExtIf   Interface;
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)

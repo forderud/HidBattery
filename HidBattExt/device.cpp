@@ -125,7 +125,9 @@ Arguments:
 
             deviceContext->Mode = LowerFilter;
 
-            NTSTATUS status = deviceContext->Interface.Register(Device, deviceContext->State);
+            deviceContext->LowState.Initialize(Device);
+
+            NTSTATUS status = deviceContext->Interface.Register(Device, deviceContext->LowState);
             if (!NT_SUCCESS(status)) {
                 DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfDeviceAddQueryInterface error %x"), status);
                 return status;
