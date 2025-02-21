@@ -2,6 +2,85 @@
 #include "driver.h"
 
 
+static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, SharedState& state) {
+    auto CycleCountBefore = bi.CycleCount;
+
+    auto lock = state.Lock();
+    bi.CycleCount = state.CycleCount;
+    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryInformation CycleCount before=%u, after=%u\n", CycleCountBefore, bi.CycleCount);
+}
+
+static void UpdateBatteryTemperature(ULONG& temp, SharedState& state) {
+    auto TempBefore = temp;
+
+    auto lock = state.Lock();
+    temp = state.Temperature;
+
+    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryTemperature before=%u, after=%u\n", TempBefore, temp);
+}
+
+
+void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  PWDF_REQUEST_COMPLETION_PARAMS Params, _In_  WDFCONTEXT Context) {
+    UNREFERENCED_PARAMETER(Target);
+    UNREFERENCED_PARAMETER(Context);
+
+    //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlBattFilterCompletion\n");
+
+    NTSTATUS status = Params->IoStatus.Status;
+    if (!NT_SUCCESS(status)) {
+        // status 0xc0000002 (STATUS_NOT_IMPLEMENTED)
+        // status 0xc00002b6 (STATUS_DEVICE_REMOVED)
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("ERROR: EvtIoDeviceControlBattFilterCompletion: status=0x%x\n"), status);
+        WdfRequestComplete(Request, status);
+        //WdfRequestCompleteWithInformation(Request, status, Params->IoStatus.Information);
+        return;
+    }
+
+    if (Params->Type != WdfRequestTypeDeviceControl) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("ERROR: EvtIoDeviceControlBattFilterCompletion: Invalid request type 0x%x\n"), Params->Type);
+        WdfRequestComplete(Request, status);
+        //WdfRequestCompleteWithInformation(Request, status, Params->IoStatus.Information);
+        return;
+    }
+
+    const ULONG IoControlCode = Params->Parameters.Ioctl.IoControlCode;
+    if (IoControlCode != IOCTL_BATTERY_QUERY_INFORMATION) {
+        DebugPrint(DPFLTR_INFO_LEVEL,"EvtIoDeviceControlBattFilterCompletion: Unsupported IOCTL code 0x%x\n", IoControlCode);
+        WdfRequestComplete(Request, status);
+        //WdfRequestCompleteWithInformation(Request, status, Params->IoStatus.Information);
+        return;
+    }
+
+    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: Modifying IOCTL_BATTERY_QUERY_INFORMATION...\n");
+    WDFDEVICE Device = WdfIoTargetGetDevice(Target);
+    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
+
+    WDFMEMORY OutputMem = Params->Parameters.Ioctl.Output.Buffer;
+    size_t OutputLength = Params->Parameters.Ioctl.Output.Length;
+
+    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: IOCTL_BATTERY_QUERY_INFORMATION (OutputBufferLength=%Iu)\n", OutputLength);
+    size_t inputSize = 0;
+    auto* inputPtr = (BATTERY_QUERY_INFORMATION*)WdfMemoryGetBuffer(Params->Parameters.Ioctl.Input.Buffer, &inputSize);
+
+    if (inputSize == sizeof(BATTERY_QUERY_INFORMATION)) {
+        if ((inputPtr->InformationLevel == BatteryInformation) && (OutputLength == sizeof(BATTERY_INFORMATION))) {
+            size_t memSize = 0;
+            auto* report = (BATTERY_INFORMATION*)WdfMemoryGetBuffer(OutputMem, &memSize);
+            NT_ASSERTMSG("BatteryInformation buffer size mismatch", memSize == OutputLength);
+            UpdateBatteryInformation(*report, *context->Interface.State);
+        }
+        if ((inputPtr->InformationLevel == BatteryTemperature) && (OutputLength == sizeof(ULONG))) {
+            size_t memSize = 0;
+            auto* temp = (ULONG*)WdfMemoryGetBuffer(OutputMem, &memSize);
+            NT_ASSERTMSG("BatteryTemperature buffer size mismatch", memSize == OutputLength);
+            UpdateBatteryTemperature(*temp, *context->Interface.State);
+        }
+    }
+
+    WdfRequestComplete(Request, status);
+    //WdfRequestCompleteWithInformation(Request, status, Params->IoStatus.Information);
+}
+
 VOID EvtIoDeviceControlBattFilter(
     _In_  WDFQUEUE          Queue,
     _In_  WDFREQUEST        Request,
@@ -27,30 +106,46 @@ Arguments:
     IoControlCode - The driver or system defined IOCTL associated with the request
 --*/
 {
-    //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
+    if (IoControlCode == IOCTL_BATTERY_QUERY_INFORMATION)
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlBattFilter (IoControlCode=IOCTL_BATTERY_QUERY_INFORMATION, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
+    else
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlBattFilter (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
+
 
     WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
 
-    NTSTATUS status = STATUS_SUCCESS; //unhandled
-    switch (IoControlCode) {
-    case IOCTL_BATTERY_QUERY_INFORMATION:
-        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: IOCTL_BATTERY_QUERY_INFORMATION (InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
-        // TODO
-        break;
-    case IOCTL_BATTERY_QUERY_STATUS:
-        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: IOCTL_BATTERY_QUERY_STATUS (InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
-        // TODO
-        break;
+    if (IoControlCode == IOCTL_BATTERY_QUERY_INFORMATION) {
+        if (InputBufferLength == sizeof(BATTERY_QUERY_INFORMATION)) {
+            BATTERY_QUERY_INFORMATION* bqi = nullptr;
+            size_t inLen = 0;
+            NTSTATUS status = WdfRequestRetrieveInputBuffer(Request, sizeof(BATTERY_QUERY_INFORMATION), (void**)&bqi, &inLen);
+            NT_ASSERTMSG("WdfRequestRetrieveInputBuffer failed", NT_SUCCESS(status));
+            if (bqi->InformationLevel == BatteryInformation) {
+                BATTERY_INFORMATION* bi = nullptr;
+                size_t outLen = 0;
+                status = WdfRequestRetrieveOutputBuffer(Request, sizeof(BATTERY_QUERY_INFORMATION), (void**)&bi, &outLen);
+                NT_ASSERTMSG("WdfRequestRetrieveOutputBuffer failed", NT_SUCCESS(status));
+                DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: DesignedCapacity=%u\n", bi->DesignedCapacity);                
+            }
+        }
     }
-    // No NT_SUCCESS(status) check here since we don't want to fail blocked calls
+
+
+#if 0
+    // Formating required if specifying a completion routine
+    WdfRequestFormatRequestUsingCurrentType(Request);
+    // set completion callback
+    WdfRequestSetCompletionRoutine(Request, EvtIoDeviceControlBattFilterCompletion, WDF_NO_CONTEXT);
 
     // Forward the request down the driver stack
+    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), WDF_NO_SEND_OPTIONS);
+#else
     WDF_REQUEST_SEND_OPTIONS options = {};
     WDF_REQUEST_SEND_OPTIONS_INIT(&options, WDF_REQUEST_SEND_OPTION_SEND_AND_FORGET);
-
     BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), &options);
+#endif
     if (ret == FALSE) {
-        status = WdfRequestGetStatus(Request);
+        NTSTATUS status = WdfRequestGetStatus(Request);
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestSend failed with status: 0x%x"), status);
         WdfRequestComplete(Request, status);
     }
