@@ -26,6 +26,8 @@ private:
 };
 
 
-NTSTATUS HidPdFeatureRequest(_In_  WDFDEVICE Device);
+VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer);
 
-NTSTATUS HidGetFeatureFilter(_In_ WDFDEVICE  Device, _In_ WDFREQUEST Request, _In_ size_t OutputBufferLength);
+
+EVT_WDF_IO_QUEUE_IO_READ           EvtIoReadHidFilter;
+EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlHidFilter;
