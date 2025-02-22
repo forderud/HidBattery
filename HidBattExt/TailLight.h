@@ -48,6 +48,11 @@ struct TailLightReport {
         DebugPrint(DPFLTR_INFO_LEVEL, "TailLight %s: Red=%u, Green=%u, Blue=%u\n", prefix, Red, Green, Blue);
 
     }
+#else
+    void Print(const wchar_t* prefix) const {
+        wprintf(L"%s Red=%u, Green=%u, Blue=%u\n", prefix, Red, Green, Blue);
+
+    }
 #endif
 
     //report ID of the collection to which the control request is sent
