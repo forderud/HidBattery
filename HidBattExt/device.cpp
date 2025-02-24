@@ -141,7 +141,7 @@ Arguments:
     {
         // create queue for filtering
         WDF_IO_QUEUE_CONFIG queueConfig = {};
-        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel); // don't synchronize
+        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchSequential); // must synchronize due to HidIoctl
         if (deviceContext->Mode == LowerFilter) {
             // HID Power Device (PD) filtering
             queueConfig.EvtIoRead = EvtIoReadHidFilter; // filter read requests 

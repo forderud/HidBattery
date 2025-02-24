@@ -187,40 +187,42 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
 }
 
 
-NTSTATUS HidGetFeatureFilter(
-    _In_ WDFDEVICE  Device,
-    _In_ WDFREQUEST Request,
-    _In_ size_t     OutputBufferLength
-)
-{
-    DebugEnter();
-    UNREFERENCED_PARAMETER(Device);
+void EvtIoDeviceControlHidFilterCompletion(_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  PWDF_REQUEST_COMPLETION_PARAMS Params, _In_  WDFCONTEXT Context) {
+    UNREFERENCED_PARAMETER(Target);
+    UNREFERENCED_PARAMETER(Context);
 
-    if (OutputBufferLength < sizeof(HidPdReport)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidGetFeatureFilter: Too small OutputBufferLength"));
-        return STATUS_BUFFER_TOO_SMALL;
+    auto* Ioctl = (IoctlOutput*)Context;
+
+    NTSTATUS status = Params->IoStatus.Status;
+    if (!NT_SUCCESS(status)) {
+        // status 0xc0000002 (STATUS_NOT_IMPLEMENTED)
+        // status 0xc00002b6 (STATUS_DEVICE_REMOVED)
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("ERROR: EvtIoDeviceControlHidFilterCompletion: IOCTL=0x%x, status=0x%x\n"), Ioctl->IoControlCode, status);
+        WdfRequestComplete(Request, status);
+        return;
     }
 
-    HidPdReport* packet = nullptr;
-    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(HidPdReport), (void**)&packet, NULL);
-    if (!NT_SUCCESS(status) || !packet) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestRetrieveOutputBuffer failed 0x%x, packet=0x%p"), status, packet);
-        return status;
+    if (Ioctl->IoControlCode != IOCTL_HID_GET_FEATURE) {
+        //DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlHidFilterCompletion: Unsupported IOCTL code 0x%x\n", Ioctl->IoControlCode);
+        WdfRequestComplete(Request, status);
+        return;
     }
 
+    WDFDEVICE Device = WdfIoTargetGetDevice(Target);
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
-    NT_ASSERTMSG("HidGetFeatureFilter context NULL\n", context);
 
-    // capture shared state
-    UpdateSharedState(context->LowState, *packet);
+    //DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlHidFilterCompletion: IOCTL_HID_GET_FEATURE (OutputBufferLength=%Iu)\n", Ioctl->OutputBufferLength);
+    if (Ioctl->OutputBufferLength == sizeof(HidPdReport)) {
+        auto* report = (HidPdReport*)Ioctl->OutputBuffer;
 
-    // capture color before safety adjustments
-    packet->Print("HidGetFeatureFilter");
+        // capture shared state
+        UpdateSharedState(context->LowState, *report);
 
-    DebugExitStatus(status);
-    return status;
+        report->Print("EvtIoDeviceControlHidFilterCompletion");
+    }
+
+    WdfRequestComplete(Request, status);
 }
-
 
 VOID EvtIoDeviceControlHidFilter(
     _In_  WDFQUEUE          Queue,
@@ -249,25 +251,24 @@ Arguments:
 {
     UNREFERENCED_PARAMETER(InputBufferLength);
 
-    //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControl (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
+    //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlHidFilter (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
 
     WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
+    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
-    NTSTATUS status = STATUS_SUCCESS; //unhandled
-    switch (IoControlCode) {
-    case IOCTL_HID_GET_FEATURE:
-        status = HidGetFeatureFilter(Device, Request, OutputBufferLength);
-        break;
-    }
-    // No NT_SUCCESS(status) check here since we don't want to fail blocked calls
+    if (IoControlCode == IOCTL_HID_GET_FEATURE)
+        context->HidIoctl.Update(IoControlCode, Request);
+    else
+        context->HidIoctl.Update(IoControlCode, nullptr);
 
-    // Forward the request down the driver stack
-    WDF_REQUEST_SEND_OPTIONS options = {};
-    WDF_REQUEST_SEND_OPTIONS_INIT(&options, WDF_REQUEST_SEND_OPTION_SEND_AND_FORGET);
+    // Formating required if specifying a completion routine
+    WdfRequestFormatRequestUsingCurrentType(Request);
+    // set completion callback
+    WdfRequestSetCompletionRoutine(Request, EvtIoDeviceControlHidFilterCompletion, &context->HidIoctl);
 
-    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), &options);
+    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), WDF_NO_SEND_OPTIONS);
     if (ret == FALSE) {
-        status = WdfRequestGetStatus(Request);
+        NTSTATUS status = WdfRequestGetStatus(Request);
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestSend failed with status: 0x%x"), status);
         WdfRequestComplete(Request, status);
     }

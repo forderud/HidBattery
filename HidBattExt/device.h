@@ -75,12 +75,29 @@ struct HidBattExtIf : public INTERFACE {
     }
 };
 
+struct IoctlOutput {
+    ULONG IoControlCode = 0;
+    size_t OutputBufferLength = 0;
+    void * OutputBuffer = nullptr;
+
+    void Update(ULONG ioctl, WDFREQUEST Request) {
+        IoControlCode = ioctl;
+        OutputBufferLength = 0;
+        OutputBuffer = nullptr;
+        if (Request) {
+            NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, 0, (void**)&OutputBuffer, &OutputBufferLength);
+            NT_ASSERTMSG("WdfRequestRetrieveOutputBuffer failed", NT_SUCCESS(status));
+        }
+    }
+};
+
 /** Driver-specific struct for storing instance-specific data. */
 struct DEVICE_CONTEXT {
     FilterMode     Mode;
     UNICODE_STRING PdoName;
     SharedState    LowState; // lower filter instance state (not accessible from Upper filter)
     HidBattExtIf   Interface;
+    IoctlOutput    HidIoctl;
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
 
