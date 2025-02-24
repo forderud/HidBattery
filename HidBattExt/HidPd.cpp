@@ -191,7 +191,7 @@ void EvtIoDeviceControlHidFilterCompletion(_In_  WDFREQUEST Request, _In_  WDFIO
     UNREFERENCED_PARAMETER(Target);
     UNREFERENCED_PARAMETER(Context);
 
-    auto* Ioctl = (IoctlOutput*)Context;
+    auto* Ioctl = (IoctlBuffers*)Context;
 
     NTSTATUS status = Params->IoStatus.Status;
     if (!NT_SUCCESS(status)) {
@@ -249,6 +249,7 @@ Arguments:
     IoControlCode - The driver or system defined IOCTL associated with the request
 --*/
 {
+    UNREFERENCED_PARAMETER(OutputBufferLength);
     UNREFERENCED_PARAMETER(InputBufferLength);
 
     //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlHidFilter (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
@@ -257,9 +258,9 @@ Arguments:
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     if (IoControlCode == IOCTL_HID_GET_FEATURE)
-        context->HidIoctl.Update(IoControlCode, Request);
+        context->HidIoctl.Update(IoControlCode, 0, Request);
     else
-        context->HidIoctl.Update(IoControlCode, nullptr);
+        context->HidIoctl.Update(IoControlCode, 0, nullptr);
 
     // Formating required if specifying a completion routine
     WdfRequestFormatRequestUsingCurrentType(Request);
@@ -297,7 +298,7 @@ _IRQL_requires_same_
 _IRQL_requires_max_(DISPATCH_LEVEL)
 VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_t Length)
 {
-    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoReadFilter (Length=%Iu)\n", Length);
+    //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoReadFilter (Length=%Iu)\n", Length);
 
     WDFDEVICE device = WdfIoQueueGetDevice(Queue);
 

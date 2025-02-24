@@ -75,13 +75,19 @@ struct HidBattExtIf : public INTERFACE {
     }
 };
 
-struct IoctlOutput {
+struct IoctlBuffers {
     ULONG IoControlCode = 0;
+    
+    ULONG InformationLevel = 0; // used for BATTERY_QUERY_INFORMATION_LEVEL
+
     size_t OutputBufferLength = 0;
     void * OutputBuffer = nullptr;
 
-    void Update(ULONG ioctl, WDFREQUEST Request) {
+    void Update(ULONG ioctl, ULONG infoLevel, WDFREQUEST Request) {
         IoControlCode = ioctl;
+
+        InformationLevel = infoLevel;
+
         OutputBufferLength = 0;
         OutputBuffer = nullptr;
         if (Request) {
@@ -97,7 +103,8 @@ struct DEVICE_CONTEXT {
     UNICODE_STRING PdoName;
     SharedState    LowState; // lower filter instance state (not accessible from Upper filter)
     HidBattExtIf   Interface;
-    IoctlOutput    HidIoctl;
+    IoctlBuffers   HidIoctl;
+    IoctlBuffers   BattIoctl;
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
 
