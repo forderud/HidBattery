@@ -10,7 +10,7 @@ The project is based on Alexander Bratchik's [HIDPowerDevice](https://github.com
 ## Setup & Usage
 Clone this repository to your Arduino libraries folder (`C:\Users\<username>\Documents\Arduino\libraries` on Windows). Then, open the `battery/battery.ino` sketch in Arduino IDE and press "Upload". The Operating System will afterwards detect one or more new batteries.
 
-The https://github.com/forderud/BatterySimulator `BatteryQuery.exe` tool can be used for querying battery parameters from the command line.
+The [`BatteryQuery.exe`](https://github.com/forderud/BatterySimulator) tool can be used for querying battery parameters from the command line.
 
 ### Additional setup on Linux
 Copy `linux/98-upower-hid.rules` file to the `/etc/udev/rules.d/` folder and reboot. This is required for Linux device manager (udev) to recognize the Arduino board as a battery. 
