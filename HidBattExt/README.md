@@ -10,7 +10,7 @@ The filter driver places itself both _above_ and _below_ HidBatt:
 The driver instance _below_ HidBatt first filters the HID Power Device (PD) communication with the battery to pick up the missing `CycleCount` and `Temperature` parameters. The driver instance _above_ HidBatt afterwards filters [`IOCTL_BATTERY_QUERY_INFORMATION`](https://learn.microsoft.com/en-us/windows/win32/power/ioctl-battery-query-information) communication to include these parameters in responses.
 
 ### Open issues
-See  [`windows` issues](https://github.com/forderud/HidBattery/issues?q=is%3Aissue%20state%3Aopen%20label%3Awindows) for a list of known issues and improvement plans.
+**WARNING**: The driver is still **work in progress** and only partially working. See  [_windows_ issues](https://github.com/forderud/HidBattery/issues?q=is%3Aissue%20state%3Aopen%20label%3Awindows) for a list of known issues and improvement plans.
 
 ## Background
 The driver is based on the [TailLight](https://github.com/forderud/IntelliMouseDriver/tree/main/TailLight) driver for Microsoft Pro IntelliMouse, which again is based on the Microsoft [firefly](https://github.com/microsoft/Windows-driver-samples/tree/main/hid/firefly) sample driver.
