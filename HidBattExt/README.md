@@ -12,6 +12,9 @@ The driver instance _below_ HidBatt first filters the HID Power Device (PD) comm
 ### Open issues
 **WARNING**: The driver is still **work in progress** and only partially working. See  [_windows_ issues](https://github.com/forderud/HidBattery/issues?q=is%3Aissue%20state%3Aopen%20label%3Awindows) for a list of known issues and improvement plans.
 
+### Driver testing
+See [Driver testing](https://github.com/forderud/IntelliMouseDriver/wiki/Driver-testing) for an introduction to how to install and test the driver on a dedicated Windows computer with `testsigning` enabled.
+
 ## Background
 The driver is based on the [TailLight](https://github.com/forderud/IntelliMouseDriver/tree/main/TailLight) driver for Microsoft Pro IntelliMouse, which again is based on the Microsoft [firefly](https://github.com/microsoft/Windows-driver-samples/tree/main/hid/firefly) sample driver.
 
