@@ -76,7 +76,7 @@ struct HidBattExtIf : public INTERFACE {
 };
 
 /** IOCTL buffer object to allow completion routines to access request bufffers.
-     Used because the "PWDF_REQUEST_COMPLETION_PARAMS Params" argument appear to contain garbage data. */
+     Used because the "WDF_REQUEST_COMPLETION_PARAMS* Params" argument appear to contain garbage data. */
 struct IoctlBuffers {
     ULONG IoControlCode = 0;
     
