@@ -7,6 +7,9 @@ NTSTATUS HidPdFeatureRequest(_In_  WDFDEVICE Device);
 NTSTATUS HidGetFeatureFilter(_In_ WDFDEVICE  Device, _In_ WDFREQUEST Request, _In_ size_t OutputBufferLength);
 
 
+_Function_class_(EVT_WDF_TIMER)
+_IRQL_requires_same_
+_IRQL_requires_max_(DISPATCH_LEVEL)
 VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
     DebugEnter();
 

@@ -48,6 +48,9 @@ private:
 };
 
 
+_Function_class_(EVT_WDF_TIMER)
+_IRQL_requires_same_
+_IRQL_requires_max_(DISPATCH_LEVEL)
 VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer);
 
 
