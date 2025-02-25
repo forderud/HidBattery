@@ -27,7 +27,7 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     UNREFERENCED_PARAMETER(Target);
     UNREFERENCED_PARAMETER(Context);
 
-    auto* Ioctl = (IoctlBuffers*)Context;
+    REQUEST_CONTEXT* Ioctl = WdfObjectGet_REQUEST_CONTEXT(Request);
 
     NTSTATUS status = Params->IoStatus.Status;
     if (!NT_SUCCESS(status)) {
@@ -97,7 +97,7 @@ VOID EvtIoDeviceControlBattFilter(
 #endif
 
     WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
-    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
+    REQUEST_CONTEXT* context = WdfObjectGet_REQUEST_CONTEXT(Request);
 
     // update completion context with IOCTL buffer information
     if ((IoControlCode == IOCTL_BATTERY_QUERY_INFORMATION) && (InputBufferLength == sizeof(BATTERY_QUERY_INFORMATION))) {
@@ -105,15 +105,15 @@ VOID EvtIoDeviceControlBattFilter(
         NTSTATUS status = WdfRequestRetrieveInputBuffer(Request, 0, (void**)&InputBuffer, nullptr);
         NT_ASSERTMSG("WdfRequestRetrieveInputBuffer failed", NT_SUCCESS(status)); status;
 
-        context->BattIoctl.Update(IoControlCode, InputBuffer->InformationLevel, Request);
+        context->Update(IoControlCode, InputBuffer->InformationLevel, Request);
     } else {
-        context->BattIoctl.Update(IoControlCode, 0, nullptr);
+        context->Update(IoControlCode, 0, nullptr);
     }
 
     // Formating required if specifying a completion routine
     WdfRequestFormatRequestUsingCurrentType(Request);
     // set completion callback
-    WdfRequestSetCompletionRoutine(Request, EvtIoDeviceControlBattFilterCompletion, &context->BattIoctl);
+    WdfRequestSetCompletionRoutine(Request, EvtIoDeviceControlBattFilterCompletion, nullptr);
 
     // Forward the request down the driver stack
     BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), WDF_NO_SEND_OPTIONS);

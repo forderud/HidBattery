@@ -65,7 +65,7 @@ struct HidBattExtIf : public INTERFACE {
 
 /** IOCTL buffer object to allow completion routines to access request bufffers.
      Used because the "WDF_REQUEST_COMPLETION_PARAMS* Params" argument appear to contain garbage data. */
-struct IoctlBuffers {
+struct REQUEST_CONTEXT {
     ULONG IoControlCode = 0;
     
     ULONG InformationLevel = 0; // contains BATTERY_QUERY_INFORMATION::InformationLevel in IOCTL_BATTERY_QUERY_INFORMATION requests
@@ -86,6 +86,7 @@ struct IoctlBuffers {
         }
     }
 };
+WDF_DECLARE_CONTEXT_TYPE(REQUEST_CONTEXT)
 
 /** Driver-specific struct for storing instance-specific data. */
 struct DEVICE_CONTEXT {
@@ -95,6 +96,5 @@ struct DEVICE_CONTEXT {
     UCHAR          CycleCountReportID;
     SharedState    LowState;  // lower filter instance state (not accessible from upper filter)
     HidBattExtIf   Interface; // for communication between driver instances
-    IoctlBuffers   BattIoctl; // for Battery request completion routine
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)

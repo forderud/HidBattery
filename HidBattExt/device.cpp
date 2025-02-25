@@ -71,6 +71,15 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &PnpPowerCallbacks);
     }
 
+    {
+        // reserve context space for request objects
+        WDF_OBJECT_ATTRIBUTES attributes{};
+        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&attributes, REQUEST_CONTEXT);
+
+        WdfDeviceInitSetRequestAttributes(DeviceInit, &attributes);
+    }
+
+
     WDFDEVICE Device = 0;
     {
         // create device
@@ -139,7 +148,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     } else if (deviceContext->Mode == UpperFilter) {
         // create queue for filtering Battery device requests
         WDF_IO_QUEUE_CONFIG queueConfig = {};
-        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchSequential); // must synchronize due to BattIoctl
+        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
         queueConfig.EvtIoDeviceControl = EvtIoDeviceControlBattFilter; // filter IOCTL requests
 
         WDFQUEUE queue = 0; // auto-deleted when parent is deleted
