@@ -231,6 +231,7 @@ VOID EvtIoDeviceControlHidFilter(
     // set completion callback
     WdfRequestSetCompletionRoutine(Request, EvtIoDeviceControlHidFilterCompletion, &context->HidIoctl);
 
+    // Forward the request down the driver stack
     BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), WDF_NO_SEND_OPTIONS);
     if (ret == FALSE) {
         NTSTATUS status = WdfRequestGetStatus(Request);
