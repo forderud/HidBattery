@@ -164,7 +164,7 @@ VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
     DebugExit();
 }
 
-
+#ifdef HID_IOCTL_FILTER
 void EvtIoDeviceControlHidFilterCompletion(_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  WDF_REQUEST_COMPLETION_PARAMS* Params, _In_  WDFCONTEXT Context) {
     UNREFERENCED_PARAMETER(Target);
     UNREFERENCED_PARAMETER(Context);
@@ -239,7 +239,7 @@ VOID EvtIoDeviceControlHidFilter(
         WdfRequestComplete(Request, status);
     }
 }
-
+#endif
 
 void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t Length) {
     if (Length != sizeof(HidPdReport)) {

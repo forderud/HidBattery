@@ -132,7 +132,9 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
             // HID Power Device (PD) filtering
             queueConfig.EvtIoRead = EvtIoReadHidFilter; // filter read requests 
             //queueConfig.EvtIoWrite // pass-through write requests
+#ifdef HID_IOCTL_FILTER
             queueConfig.EvtIoDeviceControl = EvtIoDeviceControlHidFilter; // filter IOCTL requests
+#endif
         } else if (deviceContext->Mode == UpperFilter) {
             // Battery device filtering
             queueConfig.EvtIoDeviceControl = EvtIoDeviceControlBattFilter; // filter IOCTL requests
