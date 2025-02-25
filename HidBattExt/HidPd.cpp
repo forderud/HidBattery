@@ -141,7 +141,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
     }
 
     {
-        // Get HidPdReport from device.
+        // Battery Temperature query
         HidPdReport report(HidPdReport::Temperature);
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
@@ -161,7 +161,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
         report.Print("IOCTL_HID_GET_FEATURE");
     }
     {
-        // Get HidPdReport from device.
+        // Battery CycleCount query
         HidPdReport report(HidPdReport::CycleCount);
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
