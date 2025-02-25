@@ -55,6 +55,3 @@ VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer);
 
 
 EVT_WDF_IO_QUEUE_IO_READ           EvtIoReadHidFilter;
-#ifdef HID_IOCTL_FILTER
-EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoDeviceControlHidFilter;
-#endif

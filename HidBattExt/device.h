@@ -95,7 +95,6 @@ struct DEVICE_CONTEXT {
     UCHAR          CycleCountReportID;
     SharedState    LowState;  // lower filter instance state (not accessible from upper filter)
     HidBattExtIf   Interface; // for communication between driver instances
-    IoctlBuffers   HidIoctl;  // for HID request completion routine
     IoctlBuffers   BattIoctl; // for Battery request completion routine
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)

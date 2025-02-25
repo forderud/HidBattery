@@ -127,14 +127,10 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     {
         // create queue for filtering
         WDF_IO_QUEUE_CONFIG queueConfig = {};
-        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchSequential); // must synchronize due to HidIoctl & BattIoctl
+        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchSequential); // must synchronize due to BattIoctl
         if (deviceContext->Mode == LowerFilter) {
             // HID Power Device (PD) filtering
             queueConfig.EvtIoRead = EvtIoReadHidFilter; // filter read requests 
-            //queueConfig.EvtIoWrite // pass-through write requests
-#ifdef HID_IOCTL_FILTER
-            queueConfig.EvtIoDeviceControl = EvtIoDeviceControlHidFilter; // filter IOCTL requests
-#endif
         } else if (deviceContext->Mode == UpperFilter) {
             // Battery device filtering
             queueConfig.EvtIoDeviceControl = EvtIoDeviceControlBattFilter; // filter IOCTL requests
