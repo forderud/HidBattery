@@ -106,8 +106,6 @@ Arguments:
         context->BattIoctl.Update(IoControlCode, 0, nullptr);
     }
 
-
-#if 1
     // Formating required if specifying a completion routine
     WdfRequestFormatRequestUsingCurrentType(Request);
     // set completion callback
@@ -115,11 +113,6 @@ Arguments:
 
     // Forward the request down the driver stack
     BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), WDF_NO_SEND_OPTIONS);
-#else
-    WDF_REQUEST_SEND_OPTIONS options = {};
-    WDF_REQUEST_SEND_OPTIONS_INIT(&options, WDF_REQUEST_SEND_OPTION_SEND_AND_FORGET);
-    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), &options);
-#endif
     if (ret == FALSE) {
         NTSTATUS status = WdfRequestGetStatus(Request);
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestSend failed with status: 0x%x"), status);
