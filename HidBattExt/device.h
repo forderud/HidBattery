@@ -5,7 +5,7 @@ enum FilterMode {
     LowerFilter, // below HidBatt: Filters HID Power Device communication
 };
 
-/** RAII locking support class. */
+/** SharedState RAII locking class. */
 class SharedStateLock {
 public:
     SharedStateLock(WDFSPINLOCK& Lock) : SpinLock(Lock) {
