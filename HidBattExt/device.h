@@ -101,10 +101,10 @@ struct IoctlBuffers {
 
 /** Driver-specific struct for storing instance-specific data. */
 struct DEVICE_CONTEXT {
-    FilterMode     Mode;
+    FilterMode     Mode;      // upper or lower driver instance
     UNICODE_STRING PdoName;
-    SharedState    LowState; // lower filter instance state (not accessible from Upper filter)
-    HidBattExtIf   Interface;
+    SharedState    LowState;  // lower filter instance state (not accessible from upper filter)
+    HidBattExtIf   Interface; // for communication between driver instances
     IoctlBuffers   HidIoctl;  // for HID request completion routine
     IoctlBuffers   BattIoctl; // for Battery request completion routine
 };
