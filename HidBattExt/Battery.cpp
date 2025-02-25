@@ -40,7 +40,17 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     }
 
     if (Ioctl->IoControlCode != IOCTL_BATTERY_QUERY_INFORMATION) {
-        DebugPrint(DPFLTR_INFO_LEVEL,"EvtIoDeviceControlBattFilterCompletion: Unsupported IOCTL code 0x%x\n", Ioctl->IoControlCode);
+        switch (Ioctl->IoControlCode) {
+        case IOCTL_BATTERY_QUERY_TAG:
+        case IOCTL_BATTERY_QUERY_INFORMATION:
+        case IOCTL_BATTERY_SET_INFORMATION:
+        case IOCTL_BATTERY_QUERY_STATUS:
+        case IOCTL_BATTERY_CHARGING_SOURCE_CHANGE:
+            break; // ignore known codes
+        default:
+            DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: Unknown IOCTL code 0x%x\n", Ioctl->IoControlCode);
+            break;
+        }
         WdfRequestComplete(Request, status);
         return;
     }
