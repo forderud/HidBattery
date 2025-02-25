@@ -46,6 +46,9 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
         case IOCTL_BATTERY_SET_INFORMATION:
         case IOCTL_BATTERY_QUERY_STATUS:
         case IOCTL_BATTERY_CHARGING_SOURCE_CHANGE:
+        case 0x294064: // TODO: Figure out what this FILE_DEVICE_BATTERY code is used for
+        case 0x0b01a8: // TODO: Figure out what this FILE_DEVICE_KEYBOARD code is used for
+        case 0x0b0193: // TODO: Figure out what this FILE_DEVICE_KEYBOARD code is used for
             break; // ignore known codes
         default:
             DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: Unknown IOCTL code 0x%x\n", Ioctl->IoControlCode);
