@@ -89,29 +89,27 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     // Driver Framework always zero initializes an objects context memory
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
-    {
-        if (WdfDeviceWdmGetPhysicalDevice(Device) == WdfDeviceWdmGetAttachedDevice(Device)) {
-            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Lower filter driver below HidBatt\n");
+    if (WdfDeviceWdmGetPhysicalDevice(Device) == WdfDeviceWdmGetAttachedDevice(Device)) {
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Lower filter driver below HidBatt\n");
 
-            deviceContext->Mode = LowerFilter;
+        deviceContext->Mode = LowerFilter;
 
-            deviceContext->LowState.Initialize(Device);
+        deviceContext->LowState.Initialize(Device);
 
-            NTSTATUS status = deviceContext->Interface.Register(Device, deviceContext->LowState);
-            if (!NT_SUCCESS(status)) {
-                DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfDeviceAddQueryInterface error %x"), status);
-                return status;
-            }
-        } else {
-            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Upper filter driver above HidBatt\n");
+        NTSTATUS status = deviceContext->Interface.Register(Device, deviceContext->LowState);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfDeviceAddQueryInterface error %x"), status);
+            return status;
+        }
+    } else {
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Upper filter driver above HidBatt\n");
 
-            deviceContext->Mode = UpperFilter;
+        deviceContext->Mode = UpperFilter;
 
-            NTSTATUS status = deviceContext->Interface.Lookup(Device);
-            if (!NT_SUCCESS(status)) {
-                DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfFdoQueryForInterface error %x"), status);
-                return status;
-            }
+        NTSTATUS status = deviceContext->Interface.Lookup(Device);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfFdoQueryForInterface error %x"), status);
+            return status;
         }
     }
 
