@@ -200,6 +200,10 @@ void EvtIoDeviceControlHidFilterCompletion(_In_  WDFREQUEST Request, _In_  WDFIO
     WdfRequestComplete(Request, status);
 }
 
+
+_Function_class_(EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL)
+_IRQL_requires_same_
+_IRQL_requires_max_(DISPATCH_LEVEL)
 VOID EvtIoDeviceControlHidFilter(
     _In_  WDFQUEUE          Queue,
     _In_  WDFREQUEST        Request,
