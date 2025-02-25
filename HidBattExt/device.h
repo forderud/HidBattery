@@ -19,7 +19,7 @@ public:
         attribs.ParentObject = device;
 
         NTSTATUS status = WdfSpinLockCreate(&attribs, &Lock);
-        NT_ASSERTMSG("WdfSpinLockCreate failed.\n", status == STATUS_SUCCESS);
+        NT_ASSERTMSG("WdfSpinLockCreate failed.\n", status == STATUS_SUCCESS); status;
     }
 };
 
@@ -75,7 +75,7 @@ struct IoctlBuffers {
         OutputBuffer = nullptr;
         if (Request) {
             NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, 0, (void**)&OutputBuffer, &OutputBufferLength);
-            NT_ASSERTMSG("WdfRequestRetrieveOutputBuffer failed", NT_SUCCESS(status));
+            NT_ASSERTMSG("WdfRequestRetrieveOutputBuffer failed", NT_SUCCESS(status)); status;
         }
     }
 };
