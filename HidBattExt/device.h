@@ -98,5 +98,3 @@ struct DEVICE_CONTEXT {
     IoctlBuffers   BattIoctl; // for Battery request completion routine
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
-
-EVT_WDF_DEVICE_CONTEXT_CLEANUP EvtDeviceContextCleanup;
