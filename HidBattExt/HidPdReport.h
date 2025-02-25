@@ -34,7 +34,7 @@ struct HidPdReport {
 
 #ifdef _KERNEL_MODE
     void Print(const char* prefix) const {
-        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: %s Report=%s, Value=%u\n", prefix, TypeStr((ReportType)ReportId), Value);
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: %s Report=%s, Value=%u\n", prefix, TypeStr((ReportType)ReportId), Value); prefix;
     }
 #else
     void Print(const char* prefix) const {
