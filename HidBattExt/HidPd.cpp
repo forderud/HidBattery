@@ -7,11 +7,11 @@ static void UpdateSharedState(SharedState& state, HidPdReport& report) {
     // capture shared state
     if (report.ReportId == HidPdReport::CycleCount) {
         WdfSpinLockAcquire(state.Lock);
-        state.CycleCount = report.CycleCount;
+        state.CycleCount = report.Value;
         WdfSpinLockRelease(state.Lock);
     } else if (report.ReportId == HidPdReport::Temperature) {
         WdfSpinLockAcquire(state.Lock);
-        state.Temperature = report.Temperature;
+        state.Temperature = report.Value;
         WdfSpinLockRelease(state.Lock);
     }
 }
