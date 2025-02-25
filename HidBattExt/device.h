@@ -75,6 +75,8 @@ struct HidBattExtIf : public INTERFACE {
     }
 };
 
+/** IOCTL buffer object to allow completion routines to access request bufffers.
+     Used because the "PWDF_REQUEST_COMPLETION_PARAMS Params" argument appear to contain garbage data. */
 struct IoctlBuffers {
     ULONG IoControlCode = 0;
     
@@ -103,8 +105,8 @@ struct DEVICE_CONTEXT {
     UNICODE_STRING PdoName;
     SharedState    LowState; // lower filter instance state (not accessible from Upper filter)
     HidBattExtIf   Interface;
-    IoctlBuffers   HidIoctl;
-    IoctlBuffers   BattIoctl;
+    IoctlBuffers   HidIoctl;  // for HID request completion routine
+    IoctlBuffers   BattIoctl; // for Battery request completion routine
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
 
