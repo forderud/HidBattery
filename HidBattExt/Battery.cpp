@@ -12,17 +12,6 @@ static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, SharedState& state
     DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryInformation CycleCount before=%u, after=%u\n", CycleCountBefore, bi.CycleCount); CycleCountBefore;
 }
 
-static void UpdateBatteryTemperature(ULONG& temp, SharedState& state) {
-    auto TempBefore = temp;
-
-    WdfSpinLockAcquire(state.Lock);
-    temp = state.Temperature;
-    WdfSpinLockRelease(state.Lock);
-
-    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryTemperature before=%u, after=%u\n", TempBefore, temp); TempBefore;
-}
-
-
 void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  WDF_REQUEST_COMPLETION_PARAMS* Params, _In_  WDFCONTEXT Context) {
     UNREFERENCED_PARAMETER(Target);
     UNREFERENCED_PARAMETER(Context);
@@ -69,9 +58,6 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     if ((Ioctl->InformationLevel == BatteryInformation) && (Ioctl->OutputBufferLength == sizeof(BATTERY_INFORMATION))) {
         auto* bi = (BATTERY_INFORMATION*)Ioctl->OutputBuffer;
         UpdateBatteryInformation(*bi, *context->Interface.State);
-    } else if ((Ioctl->InformationLevel == BatteryTemperature) && (Ioctl->OutputBufferLength == sizeof(ULONG))) {
-        auto* temp = (ULONG*)Ioctl->OutputBuffer;
-        UpdateBatteryTemperature(*temp, *context->Interface.State);
     }
 
     WdfRequestComplete(Request, status);

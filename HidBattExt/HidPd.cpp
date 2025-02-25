@@ -15,16 +15,6 @@ static void UpdateSharedState(SharedState& state, HidPdReport& report, DEVICE_CO
         if (state.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
         }
-    } else if (context->TemperatureReportID && (report.ReportId == context->TemperatureReportID)) {
-        auto TempBefore = state.Temperature;
-
-        WdfSpinLockAcquire(state.Lock);
-        state.Temperature = report.Value;
-        WdfSpinLockRelease(state.Lock);
-
-        if (state.Temperature != TempBefore) {
-            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating Temperature before=%u, after=%u\n", TempBefore, state.Temperature);
-        }
     }
 }
 
@@ -120,11 +110,6 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
         }
 
         for (USHORT i = 0; i < valueCapsLen; i++) {
-            if ((valueCaps[i].UsagePage == 0x84) && (valueCaps[i].NotRange.Usage == 0x36)) {
-                context->TemperatureReportID = valueCaps[i].ReportID;
-                DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Temperature ReportID=0x%x\n", valueCaps[i].ReportID);
-
-            }
             if ((valueCaps[i].UsagePage == 0x85) && (valueCaps[i].NotRange.Usage == 0x6B)) {
                 context->CycleCountReportID = valueCaps[i].ReportID;
                 DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: CycleCount ReportID=0x%x\n", valueCaps[i].ReportID);
@@ -134,25 +119,6 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
         delete[] valueCaps;
     }
 
-    if (context->TemperatureReportID) {
-        // Battery Temperature query
-        HidPdReport report(context->TemperatureReportID);
-
-        WDF_MEMORY_DESCRIPTOR outputDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
-
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
-            IOCTL_HID_GET_FEATURE,
-            NULL, // input
-            &outputDesc, // output
-            NULL, NULL);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
-            return status;
-        }
-
-        UpdateSharedState(context->LowState, report, context);
-    }
     if (context->CycleCountReportID) {
         // Battery CycleCount query
         HidPdReport report(context->CycleCountReportID);

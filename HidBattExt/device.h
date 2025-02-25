@@ -11,7 +11,6 @@ public:
     WDFSPINLOCK Lock = 0;  // to protext member access
 
     ULONG CycleCount;  // BATTERY_INFORMATION::CycleCount value
-    ULONG Temperature; // IOCTL_BATTERY_QUERY_INFORMATION BatteryTemperature value
 
     void Initialize(WDFDEVICE device) {
         WDF_OBJECT_ATTRIBUTES attribs{};
@@ -92,7 +91,6 @@ WDF_DECLARE_CONTEXT_TYPE(REQUEST_CONTEXT)
 struct DEVICE_CONTEXT {
     FilterMode     Mode;      // upper or lower driver instance
     UNICODE_STRING PdoName;
-    UCHAR          TemperatureReportID;
     UCHAR          CycleCountReportID;
     SharedState    LowState;  // lower filter instance state (not accessible from upper filter)
     HidBattExtIf   Interface; // for communication between driver instances
