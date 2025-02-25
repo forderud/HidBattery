@@ -220,6 +220,7 @@ VOID EvtIoDeviceControlHidFilter(
     WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
+    // update completion context with IOCTL buffer information
     if (IoControlCode == IOCTL_HID_GET_FEATURE)
         context->HidIoctl.Update(IoControlCode, 0, Request);
     else

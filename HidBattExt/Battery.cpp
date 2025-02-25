@@ -84,6 +84,7 @@ VOID EvtIoDeviceControlBattFilter(
     WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
+    // update completion context with IOCTL buffer information
     if ((IoControlCode == IOCTL_BATTERY_QUERY_INFORMATION) && (InputBufferLength == sizeof(BATTERY_QUERY_INFORMATION))) {
         BATTERY_QUERY_INFORMATION* InputBuffer = nullptr;
         NTSTATUS status = WdfRequestRetrieveInputBuffer(Request, 0, (void**)&InputBuffer, nullptr);
