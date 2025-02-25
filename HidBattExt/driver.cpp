@@ -11,11 +11,7 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT  DriverObject, _In_ PUNICODE_STRING Reg
     params.EvtDriverUnload = EvtDriverUnload;
 
     // Create the framework WDFDRIVER object, with the handle to it returned in Driver.
-    NTSTATUS status = WdfDriverCreate(DriverObject, 
-                             RegistryPath, 
-                             WDF_NO_OBJECT_ATTRIBUTES, 
-                             &params, 
-                             WDF_NO_HANDLE); // [out]
+    NTSTATUS status = WdfDriverCreate(DriverObject, RegistryPath, WDF_NO_OBJECT_ATTRIBUTES, &params, WDF_NO_HANDLE);
     if (!NT_SUCCESS(status)) {
         // Framework will automatically cleanup on error Status return
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: Error Creating WDFDRIVER 0x%x"), status);
