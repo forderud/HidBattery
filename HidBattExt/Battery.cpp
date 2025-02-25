@@ -27,7 +27,6 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     UNREFERENCED_PARAMETER(Target);
     UNREFERENCED_PARAMETER(Context);
 
-    //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlBattFilterCompletion\n");
     auto* Ioctl = (IoctlBuffers*)Context;
 
     NTSTATUS status = Params->IoStatus.Status;
@@ -66,7 +65,6 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: IOCTL_BATTERY_QUERY_INFORMATION (InformationLevel=%u, OutputBufferLength=%u)\n", Ioctl->InformationLevel, Ioctl->OutputBufferLength);
-
 
     if ((Ioctl->InformationLevel == BatteryInformation) && (Ioctl->OutputBufferLength == sizeof(BATTERY_INFORMATION))) {
         auto* bi = (BATTERY_INFORMATION*)Ioctl->OutputBuffer;
