@@ -50,8 +50,6 @@ struct HidBattExtIf : public INTERFACE {
 
     /** Lookup driver state from other driver instances. WILL OVERWRITE all fields in this object. */
     NTSTATUS Lookup(WDFDEVICE device) {
-        // We will provide an example on how to get a bus-specific direct
-        // call interface from a bus driver.
         return WdfFdoQueryForInterface(device, &GUID_HIDBATTEXT_SHARED_STATE, this, sizeof(HidBattExtIf), 1, NULL);
     }
 };
