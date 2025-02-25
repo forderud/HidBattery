@@ -6,13 +6,23 @@
 static void UpdateSharedState(SharedState& state, HidPdReport& report) {
     // capture shared state
     if (report.ReportId == HidPdReport::CycleCount) {
+        auto CycleCountBefore = state.CycleCount;
+
         WdfSpinLockAcquire(state.Lock);
         state.CycleCount = report.Value;
         WdfSpinLockRelease(state.Lock);
+
+        if (state.CycleCount != CycleCountBefore)
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
     } else if (report.ReportId == HidPdReport::Temperature) {
+        auto TempBefore = state.Temperature;
+
         WdfSpinLockAcquire(state.Lock);
         state.Temperature = report.Value;
         WdfSpinLockRelease(state.Lock);
+
+        if (state.Temperature != TempBefore)
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating Temperature before=%u, after=%u\n", TempBefore, state.Temperature);
     }
 }
 
@@ -117,7 +127,6 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
         }
 
         UpdateSharedState(context->LowState, report);
-        report.Print("IOCTL_HID_GET_FEATURE");
     }
     {
         // Battery CycleCount query
@@ -138,7 +147,6 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
         }
 
         UpdateSharedState(context->LowState, report);
-        report.Print("IOCTL_HID_GET_FEATURE");
     }
 
     DebugExit();
@@ -192,11 +200,7 @@ void EvtIoDeviceControlHidFilterCompletion(_In_  WDFREQUEST Request, _In_  WDFIO
     //DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlHidFilterCompletion: IOCTL_HID_GET_FEATURE (OutputBufferLength=%Iu)\n", Ioctl->OutputBufferLength);
     if (Ioctl->OutputBufferLength == sizeof(HidPdReport)) {
         auto* report = (HidPdReport*)Ioctl->OutputBuffer;
-
-        // capture shared state
         UpdateSharedState(context->LowState, *report);
-
-        report->Print("EvtIoDeviceControlHidFilterCompletion");
     }
 
     WdfRequestComplete(Request, status);
@@ -256,7 +260,6 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t L
 
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
     UpdateSharedState(context->LowState, *packet);
-    //packet->Print("INPUT");
 }
 
 
