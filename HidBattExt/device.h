@@ -29,6 +29,15 @@ DEFINE_GUID(GUID_HIDBATTEXT_SHARED_STATE, 0x2f52277a, 0x88f8, 0x44f3, 0x87, 0xec
 struct HidBattExtIf : public INTERFACE {
     SharedState* State = nullptr; // non-owning ptr.
 
+    HidBattExtIf() {
+        // clear all INTERFACE members
+        Size = 0;
+        Version = 0;
+        Context = 0;
+        InterfaceReference = nullptr;
+        InterfaceDereference = nullptr;
+    }
+
     /** Register this object so that it can be looked up by other driver instances. */
     NTSTATUS Register (WDFDEVICE device, SharedState& state) {
         // initialize INTERFACE header
