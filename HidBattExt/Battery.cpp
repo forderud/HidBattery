@@ -12,14 +12,15 @@ static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, SharedState& state
     DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryInformation CycleCount before=%u, after=%u\n", CycleCountBefore, bi.CycleCount); CycleCountBefore;
 }
 
-static void UpdateBatteryTemperature(ULONG& temp, SharedState& state) {
+static void UpdateBatteryTemperature(ULONG& temp, SharedState& state, NTSTATUS status) {
     auto TempBefore = temp;
 
     WdfSpinLockAcquire(state.Lock);
     temp = state.Temperature;
     WdfSpinLockRelease(state.Lock);
 
-    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryTemperature before=%u, after=%u\n", TempBefore, temp); TempBefore;
+    // error 0xc0000010 (STATUS_INVALID_DEVICE_REQUEST) observed here
+    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryTemperature before=%u, after=%u (status=0x%x)\n", TempBefore, temp, status); TempBefore;
 }
 
 
@@ -72,7 +73,7 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
         UpdateBatteryInformation(*bi, *context->Interface.State);
     } else if ((reqCtx->InformationLevel == BatteryTemperature) && (reqCtx->OutputBufferLength == sizeof(ULONG))) {
         auto* temp = (ULONG*)reqCtx->OutputBuffer;
-        UpdateBatteryTemperature(*temp, *context->Interface.State);
+        UpdateBatteryTemperature(*temp, *context->Interface.State, status);
     }
 
     WdfRequestComplete(Request, status);
