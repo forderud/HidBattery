@@ -4,8 +4,8 @@
 
 
 NTSTATUS HidPdFeatureRequest(_In_  WDFDEVICE Device);
-
 NTSTATUS HidGetFeatureFilter(_In_ WDFDEVICE  Device, _In_ WDFREQUEST Request, _In_ size_t OutputBufferLength);
+
 
 VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
     DebugEnter();
@@ -34,8 +34,7 @@ static void UpdateSharedState(SharedState& state, HidPdReport& report) {
 }
 
 
-NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device)
-{
+NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
     DebugEnter();
 
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
@@ -254,8 +253,7 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t L
 
 _IRQL_requires_same_
 _IRQL_requires_max_(DISPATCH_LEVEL)
-VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_t Length)
-{
+VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_t Length) {
     //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoReadFilter (Length=%Iu)\n", Length);
 
     WDFDEVICE device = WdfIoQueueGetDevice(Queue);

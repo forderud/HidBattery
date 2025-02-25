@@ -64,9 +64,7 @@ VOID EvtIoDeviceControlBattFilter(
     _In_  WDFREQUEST        Request,
     _In_  size_t            OutputBufferLength,
     _In_  size_t            InputBufferLength,
-    _In_  ULONG             IoControlCode
-)
-{
+    _In_  ULONG             IoControlCode) {
 #if 0
     if (IoControlCode == IOCTL_BATTERY_QUERY_INFORMATION)
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlBattFilter (IoControlCode=IOCTL_BATTERY_QUERY_INFORMATION, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
