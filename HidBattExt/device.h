@@ -91,6 +91,8 @@ struct IoctlBuffers {
 struct DEVICE_CONTEXT {
     FilterMode     Mode;      // upper or lower driver instance
     UNICODE_STRING PdoName;
+    UCHAR          TemperatureReportID;
+    UCHAR          CycleCountReportID;
     SharedState    LowState;  // lower filter instance state (not accessible from upper filter)
     HidBattExtIf   Interface; // for communication between driver instances
     IoctlBuffers   HidIoctl;  // for HID request completion routine

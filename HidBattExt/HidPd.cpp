@@ -109,6 +109,29 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: FeatureReportByteLength mismatch (%u, %Iu)."), caps.FeatureReportByteLength, sizeof(HidPdReport));
             return status;
         }
+
+        // get FEATURE report value caps
+        USHORT valueCapsLen = caps.NumberFeatureValueCaps;
+        HIDP_VALUE_CAPS* valueCaps = new HIDP_VALUE_CAPS[valueCapsLen];
+        status = HidP_GetValueCaps(HidP_Feature, valueCaps, &valueCapsLen, preparsedData);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetValueCaps failed 0x%x"), status);
+            return status;
+        }
+
+        for (USHORT i = 0; i < valueCapsLen; i++) {
+            if ((valueCaps[i].UsagePage == 0x84) && (valueCaps[i].NotRange.Usage == 0x36)) {
+                context->TemperatureReportID = valueCaps[i].ReportID;
+                DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Temperature ReportID=0x%x\n", valueCaps[i].ReportID);
+
+            }
+            if ((valueCaps[i].UsagePage == 0x85) && (valueCaps[i].NotRange.Usage == 0x6B)) {
+                context->CycleCountReportID = valueCaps[i].ReportID;
+                DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: CycleCount ReportID=0x%x\n", valueCaps[i].ReportID);
+            }
+        }
+
+        delete[] valueCaps;
     }
 
     {
