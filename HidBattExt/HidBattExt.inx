@@ -1,0 +1,72 @@
+;/*++
+; HidBatt extension filter driver setup information (INF) file.
+;--*/
+[Version]
+Signature="$Windows NT$"
+Class=Battery
+ClassGuid={72631e54-78a4-11d0-bcf7-00aa00b7b32a}
+Provider=%Provider%
+DriverVer=
+CatalogFile=HidBattExt.cat
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = "HidBattExt Driver Disk"
+
+[SourceDisksFiles]
+HidBattExt.sys = 1
+
+; Manufacturer Section
+[Manufacturer]
+%Provider%=HidBattExtMfg,NT$ARCH$
+
+; Models section
+; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-models-section
+[HidBattExtMfg.NT$ARCH$]
+"HID Battery extension"=HidBattExt_Inst, HID_DEVICE_UP:0084_U:0004
+
+; Install Section
+[HidBattExt_Inst.NT]
+Include = HidBatt.inf
+Needs = HidBatt_Inst
+CopyFiles = @HidBattExt.sys
+
+[HidBattExt_Inst.NT.HW]
+AddReg = HidBattExt_Inst.AddReg
+
+[HidBattExt_Inst.AddReg]
+HKR,,"UpperFilters", %REG_TYPE_MULTI_SZ%, "HidBattExt"
+HKR,,"LowerFilters", %REG_TYPE_MULTI_SZ%, "HidBattExt"
+
+[HidBattExt_Inst.NT.Services]
+Include = HidBatt.inf
+Needs = HidBatt_Inst.Services
+AddService = HidBattExt, , HidBattExt_Service_Inst
+
+[HidBattExt_Service_Inst]
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_DEMAND_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %13%\HidBattExt.sys
+
+[HidBattExt_Inst.NT.Wdf]
+KmdfService = HidBattExt, HidBattExt_wdfsect
+
+[HidBattExt_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+; Strings for macro replacement
+Provider              = "HidBattery sample project"
+SPSVCINST_ASSOCSERVICE= 0x00000002
+SERVICE_KERNEL_DRIVER = 1
+SERVICE_BOOT_START    = 0
+SERVICE_SYSTEM_START  = 1
+SERVICE_AUTO_START    = 2
+SERVICE_DEMAND_START  = 3
+SERVICE_ERROR_IGNORE  = 0
+SERVICE_ERROR_NORMAL  = 1
+REG_TYPE_MULTI_SZ     = 0x00010000
