@@ -1,5 +1,4 @@
 #include "driver.h"
-#include <hidpddi.h> // for PHIDP_PREPARSED_DATA
 #include <hidclass.h> // for HID_COLLECTION_INFORMATION
 #include "CppAllocator.hpp"
 
@@ -22,28 +21,6 @@ VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
 
     DebugExit();
 }
-
-
-/** RAII wrapper of PHIDP_PREPARSED_DATA. */
-class PHIDP_PREPARSED_DATA_Wrap {
-public:
-    PHIDP_PREPARSED_DATA_Wrap(size_t size) {
-        m_ptr = new BYTE[size];
-    }
-    ~PHIDP_PREPARSED_DATA_Wrap() {
-        if (m_ptr) {
-            delete[] m_ptr;
-            m_ptr = nullptr;
-        }
-    }
-
-    operator PHIDP_PREPARSED_DATA () const {
-        return (PHIDP_PREPARSED_DATA)m_ptr;
-    }
-
-private:
-    BYTE* m_ptr = nullptr;
-};
 
 static void UpdateSharedState(SharedState& state, HidPdReport& report) {
     // capture shared state

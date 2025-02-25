@@ -1,5 +1,6 @@
 #pragma once
 #include "HidPdReport.h"
+#include <hidpddi.h> // for PHIDP_PREPARSED_DATA
 
 
 /** RAII wrapper of WDFIOTARGET. */
@@ -23,6 +24,27 @@ public:
 
 private:
     WDFIOTARGET m_obj = NULL;
+};
+
+/** RAII wrapper of PHIDP_PREPARSED_DATA. */
+class PHIDP_PREPARSED_DATA_Wrap {
+public:
+    PHIDP_PREPARSED_DATA_Wrap(size_t size) {
+        m_ptr = new BYTE[size];
+    }
+    ~PHIDP_PREPARSED_DATA_Wrap() {
+        if (m_ptr) {
+            delete[] m_ptr;
+            m_ptr = nullptr;
+        }
+    }
+
+    operator PHIDP_PREPARSED_DATA () const {
+        return (PHIDP_PREPARSED_DATA)m_ptr;
+    }
+
+private:
+    BYTE* m_ptr = nullptr;
 };
 
 
