@@ -54,7 +54,7 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
         case CTL_CODE(FILE_DEVICE_KEYBOARD, 0x6a, METHOD_BUFFERED,  FILE_ANY_ACCESS): // TODO: Figure out what 0x0b01a8 is used for
             break; // ignore known codes
         default:
-            DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: Unknown IOCTL code 0x%x\n", Ioctl->IoControlCode);
+            //DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: Unknown IOCTL code 0x%x\n", Ioctl->IoControlCode);
             break;
         }
         WdfRequestComplete(Request, status);
