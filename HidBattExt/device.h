@@ -78,7 +78,7 @@ struct HidBattExtIf : public INTERFACE {
 struct IoctlBuffers {
     ULONG IoControlCode = 0;
     
-    ULONG InformationLevel = 0; // used for BATTERY_QUERY_INFORMATION_LEVEL
+    ULONG InformationLevel = 0; // BATTERY_QUERY_INFORMATION::InformationLevel in IOCTL_BATTERY_QUERY_INFORMATION requests
 
     size_t OutputBufferLength = 0;
     void * OutputBuffer = nullptr;
