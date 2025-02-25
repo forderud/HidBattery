@@ -32,8 +32,11 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
 
     NTSTATUS status = Params->IoStatus.Status;
     if (!NT_SUCCESS(status)) {
-        // status 0xc0000002 (STATUS_NOT_IMPLEMENTED)
-        // status 0xc00002b6 (STATUS_DEVICE_REMOVED)
+        // Observed error codes:
+        //   0xc0000002 (STATUS_NOT_IMPLEMENTED)
+        //   0xc0000005 (STATUS_ACCESS_VIOLATION)
+        //   0xc0000120 (STATUS_CANCELLED)
+        //   0xc00002b6 (STATUS_DEVICE_REMOVED)
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("ERROR: EvtIoDeviceControlBattFilterCompletion: status=0x%x\n"), status);
         WdfRequestComplete(Request, status);
         return;
