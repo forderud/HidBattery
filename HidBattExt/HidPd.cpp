@@ -3,28 +3,6 @@
 #include "CppAllocator.hpp"
 
 
-NTSTATUS HidPdFeatureRequest(_In_  WDFDEVICE Device);
-NTSTATUS HidGetFeatureFilter(_In_ WDFDEVICE  Device, _In_ WDFREQUEST Request, _In_ size_t OutputBufferLength);
-
-
-_Function_class_(EVT_WDF_TIMER)
-_IRQL_requires_same_
-_IRQL_requires_max_(DISPATCH_LEVEL)
-VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
-    DebugEnter();
-
-    WDFDEVICE Device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
-    NT_ASSERTMSG("HidPdFeatureRequest Device NULL\n", Device);
-
-    NTSTATUS status = HidPdFeatureRequest(Device);
-    if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidPdFeatureRequest failure 0x%x"), status);
-        return;
-    }
-
-    DebugExit();
-}
-
 static void UpdateSharedState(SharedState& state, HidPdReport& report) {
     // capture shared state
     if (report.ReportId == HidPdReport::CycleCount) {
@@ -165,6 +143,25 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
 
     DebugExit();
     return STATUS_SUCCESS;
+}
+
+
+_Function_class_(EVT_WDF_TIMER)
+_IRQL_requires_same_
+_IRQL_requires_max_(DISPATCH_LEVEL)
+VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
+    DebugEnter();
+
+    WDFDEVICE Device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
+    NT_ASSERTMSG("HidPdFeatureRequest Device NULL\n", Device);
+
+    NTSTATUS status = HidPdFeatureRequest(Device);
+    if (!NT_SUCCESS(status)) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidPdFeatureRequest failure 0x%x"), status);
+        return;
+    }
+
+    DebugExit();
 }
 
 
