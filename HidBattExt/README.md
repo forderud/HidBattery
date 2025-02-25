@@ -7,7 +7,7 @@ The HidBatt drivers inability to report these parameters have already been repor
 The filter driver places itself both _above_ and _below_ HidBatt:  
 ![image](https://github.com/user-attachments/assets/33d408cf-95e1-4501-9363-cfe81e34bf4c)
 
-The driver instance _below_ HidBatt first filters the HID Power Device (PD) communication with the battery to pick up the missing `CycleCount` and `Temperature` parameters. The driver instance _above_ HidBatt afterwards filters the battery communication to include these parameters.
+The driver instance _below_ HidBatt first filters the HID Power Device (PD) communication with the battery to pick up the missing `CycleCount` and `Temperature` parameters. The driver instance _above_ HidBatt afterwards filters [`IOCTL_BATTERY_QUERY_INFORMATION`](https://learn.microsoft.com/en-us/windows/win32/power/ioctl-battery-query-information) communication to include these parameters in responses.
 
 ### Open issues
 See  [`windows` issues](https://github.com/forderud/HidBattery/issues?q=is%3Aissue%20state%3Aopen%20label%3Awindows) for a list of known issues and improvement plans.
