@@ -5,16 +5,19 @@
 static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, SharedState& state) {
     auto CycleCountBefore = bi.CycleCount;
 
-    auto lock = state.Lock();
+    WdfSpinLockAcquire(state.Lock);
     bi.CycleCount = state.CycleCount;
+    WdfSpinLockRelease(state.Lock);
+
     DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryInformation CycleCount before=%u, after=%u\n", CycleCountBefore, bi.CycleCount);
 }
 
 static void UpdateBatteryTemperature(ULONG& temp, SharedState& state) {
     auto TempBefore = temp;
 
-    auto lock = state.Lock();
+    WdfSpinLockAcquire(state.Lock);
     temp = state.Temperature;
+    WdfSpinLockRelease(state.Lock);
 
     DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryTemperature before=%u, after=%u\n", TempBefore, temp);
 }

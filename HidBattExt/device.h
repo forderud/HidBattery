@@ -5,25 +5,11 @@ enum FilterMode {
     LowerFilter, // below HidBatt: Filters HID Power Device communication
 };
 
-/** SharedState RAII locking class. */
-class SharedStateLock {
-public:
-    SharedStateLock(WDFSPINLOCK& Lock) : SpinLock(Lock) {
-        WdfSpinLockAcquire(SpinLock);
-    }
-    ~SharedStateLock() {
-        WdfSpinLockRelease(SpinLock);
-    }
-
-private:
-    WDFSPINLOCK SpinLock;
-};
-
 /** State to share between Upper and Lower filter driver instances. */
 class SharedState {
-private:
-    WDFSPINLOCK SpinLock = 0;  // to protext member access
 public:
+    WDFSPINLOCK Lock = 0;  // to protext member access
+
     ULONG CycleCount;  // BATTERY_INFORMATION::CycleCount value
     ULONG Temperature; // IOCTL_BATTERY_QUERY_INFORMATION BatteryTemperature value
 
@@ -32,13 +18,8 @@ public:
         WDF_OBJECT_ATTRIBUTES_INIT(&attribs);
         attribs.ParentObject = device;
 
-        NTSTATUS status = WdfSpinLockCreate(&attribs, &SpinLock);
+        NTSTATUS status = WdfSpinLockCreate(&attribs, &Lock);
         NT_ASSERTMSG("WdfSpinLockCreate failed.\n", status == STATUS_SUCCESS);
-    }
-
-    SharedStateLock Lock() {
-        NT_ASSERTMSG("SharedStateLock::Lock() SpinLock not initialized.\n", SpinLock);
-        return SharedStateLock(SpinLock);
     }
 };
 

@@ -25,11 +25,13 @@ VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
 static void UpdateSharedState(SharedState& state, HidPdReport& report) {
     // capture shared state
     if (report.ReportId == HidPdReport::CycleCount) {
-        auto lock = state.Lock();
+        WdfSpinLockAcquire(state.Lock);
         state.CycleCount = report.CycleCount;
+        WdfSpinLockRelease(state.Lock);
     } else if (report.ReportId == HidPdReport::Temperature) {
-        auto lock = state.Lock();
+        WdfSpinLockAcquire(state.Lock);
         state.Temperature = report.Temperature;
+        WdfSpinLockRelease(state.Lock);
     }
 }
 
