@@ -206,26 +206,7 @@ VOID EvtIoDeviceControlHidFilter(
     _In_  WDFREQUEST        Request,
     _In_  size_t            OutputBufferLength,
     _In_  size_t            InputBufferLength,
-    _In_  ULONG             IoControlCode
-)
-/*++
-Routine Description:
-    Callback function for IOCTL_HID_xxx requests.
-
-Arguments:
-    Queue - A handle to the queue object that is associated with the I/O request
-
-    Request - A handle to a framework request object.
-
-    OutputBufferLength - The length, in bytes, of the request's output buffer,
-            if an output buffer is available.
-
-    InputBufferLength - The length, in bytes, of the request's input buffer, if
-            an input buffer is available.
-
-    IoControlCode - The driver or system defined IOCTL associated with the request
---*/
-{
+    _In_  ULONG             IoControlCode) {
     UNREFERENCED_PARAMETER(OutputBufferLength);
     UNREFERENCED_PARAMETER(InputBufferLength);
 
