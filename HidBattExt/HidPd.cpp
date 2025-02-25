@@ -3,9 +3,9 @@
 #include "CppAllocator.hpp"
 
 
-static void UpdateSharedState(SharedState& state, HidPdReport& report) {
+static void UpdateSharedState(SharedState& state, HidPdReport& report, DEVICE_CONTEXT* context) {
     // capture shared state
-    if (report.ReportId == HidPdReport::CycleCount) {
+    if (context->CycleCountReportID && (report.ReportId == context->CycleCountReportID)) {
         auto CycleCountBefore = state.CycleCount;
 
         WdfSpinLockAcquire(state.Lock);
@@ -15,7 +15,7 @@ static void UpdateSharedState(SharedState& state, HidPdReport& report) {
         if (state.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
         }
-    } else if (report.ReportId == HidPdReport::Temperature) {
+    } else if (context->TemperatureReportID && (report.ReportId == context->TemperatureReportID)) {
         auto TempBefore = state.Temperature;
 
         WdfSpinLockAcquire(state.Lock);
@@ -134,9 +134,9 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
         delete[] valueCaps;
     }
 
-    {
+    if (context->TemperatureReportID) {
         // Battery Temperature query
-        HidPdReport report(HidPdReport::Temperature);
+        HidPdReport report(context->TemperatureReportID);
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
@@ -151,11 +151,11 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        UpdateSharedState(context->LowState, report);
+        UpdateSharedState(context->LowState, report, context);
     }
-    {
+    if (context->CycleCountReportID) {
         // Battery CycleCount query
-        HidPdReport report(HidPdReport::CycleCount);
+        HidPdReport report(context->CycleCountReportID);
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
@@ -171,7 +171,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        UpdateSharedState(context->LowState, report);
+        UpdateSharedState(context->LowState, report, context);
     }
 
     DebugExit();
@@ -225,7 +225,7 @@ void EvtIoDeviceControlHidFilterCompletion(_In_  WDFREQUEST Request, _In_  WDFIO
     //DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlHidFilterCompletion: IOCTL_HID_GET_FEATURE (OutputBufferLength=%Iu)\n", Ioctl->OutputBufferLength);
     if (Ioctl->OutputBufferLength == sizeof(HidPdReport)) {
         auto* report = (HidPdReport*)Ioctl->OutputBuffer;
-        UpdateSharedState(context->LowState, *report);
+        UpdateSharedState(context->LowState, *report, context);
     }
 
     WdfRequestComplete(Request, status);
@@ -284,7 +284,7 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t L
     }
 
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
-    UpdateSharedState(context->LowState, *packet);
+    UpdateSharedState(context->LowState, *packet, context);
 }
 
 
