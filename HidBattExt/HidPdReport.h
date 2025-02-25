@@ -33,10 +33,6 @@ struct HidPdReport {
     }
 
 #ifdef _KERNEL_MODE
-    bool IsValid() const {
-        return true;
-    }
-
     void Print(const char* prefix) const {
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: %s Report=%s, Value=%u\n", prefix, TypeStr((ReportType)ReportId), Value);
     }
