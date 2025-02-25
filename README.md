@@ -44,5 +44,5 @@ Limitation: MacOS displays the battery as a UPS. The UI furthermore only display
 Limtation: Linux seem to assume charge values in `%`, regardless of the actual unit ([upower issue #300](https://gitlab.freedesktop.org/upower/upower/-/issues/300)).
 
 
-# Windows HidBatt extension driver
-This repo also contains a [`HidBattExt`](HidBattExt/) driver that extends the in-built `HidBatt` driver in Windows to also parse and report `CycleCount` and `Temperature` battery parameters.
+# Windows HidBatt filter driver
+This repo also contains a [`HidBattExt`](HidBattExt/) filter driver that extends the in-built `HidBatt` driver in Windows to also parse and report `CycleCount` and `Temperature` battery parameters.
