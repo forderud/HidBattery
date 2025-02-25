@@ -2,11 +2,7 @@
 
 /** Driver entry point.
     Initialize the framework and register driver event handlers. */
-NTSTATUS DriverEntry(
-    _In_ PDRIVER_OBJECT  DriverObject,
-    _In_ PUNICODE_STRING RegistryPath
-    )
-{
+NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT  DriverObject, _In_ PUNICODE_STRING RegistryPath ) {
     DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: DriverEntry - WDF version built on %s %s\n", __DATE__, __TIME__);
 
     WDF_DRIVER_CONFIG params = {};
@@ -31,10 +27,7 @@ NTSTATUS DriverEntry(
 
 /** Driver unload callback.
     Used to perform operations that must take place before the driver is unloaded.  */
-VOID EvtDriverUnload(
-    _In_ WDFDRIVER Driver
-    )
-{
+VOID EvtDriverUnload(_In_ WDFDRIVER Driver) {
     UNREFERENCED_PARAMETER(Driver);
     DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: DriverUnload.\n");
 }
