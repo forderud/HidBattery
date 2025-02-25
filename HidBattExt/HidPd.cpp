@@ -12,8 +12,9 @@ static void UpdateSharedState(SharedState& state, HidPdReport& report) {
         state.CycleCount = report.Value;
         WdfSpinLockRelease(state.Lock);
 
-        if (state.CycleCount != CycleCountBefore)
+        if (state.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
+        }
     } else if (report.ReportId == HidPdReport::Temperature) {
         auto TempBefore = state.Temperature;
 
@@ -21,8 +22,9 @@ static void UpdateSharedState(SharedState& state, HidPdReport& report) {
         state.Temperature = report.Value;
         WdfSpinLockRelease(state.Lock);
 
-        if (state.Temperature != TempBefore)
+        if (state.Temperature != TempBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating Temperature before=%u, after=%u\n", TempBefore, state.Temperature);
+        }
     }
 }
 
