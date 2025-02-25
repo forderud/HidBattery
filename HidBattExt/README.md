@@ -13,3 +13,7 @@ The driver instance _below_ HidBatt first filters the HID Power Device (PD) comm
 The driver is based on the [TailLight](https://github.com/forderud/IntelliMouseDriver/tree/main/TailLight) driver for Microsoft Pro IntelliMouse, which again is based on the Microsoft [firefly](https://github.com/microsoft/Windows-driver-samples/tree/main/hid/firefly) sample driver.
 
 The filter driver design is furthermore influenced by valuable feedback from Tim Roberts, Mark Roddy and Doron Holan in the OSR [How to continuously obtain HID input reports from non-HIDClass driver?](https://community.osr.com/t/how-to-continuously-obtain-hid-input-reports-from-non-hidclass-driver/59447/19) forum posting.
+
+## Documentation updates
+Windows driver documentation updates triggered by this driver:
+* [Extend WdfRequestSetCompletionRoutine to mention need for request formatting](https://github.com/MicrosoftDocs/windows-driver-docs-ddi/pull/1601)
