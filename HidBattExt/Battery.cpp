@@ -46,7 +46,7 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
         case IOCTL_BATTERY_SET_INFORMATION:
         case IOCTL_BATTERY_QUERY_STATUS:
         case IOCTL_BATTERY_CHARGING_SOURCE_CHANGE:
-        case 0x294064: // TODO: Figure out what this FILE_DEVICE_BATTERY code is used for
+        case CTL_CODE(FILE_DEVICE_BATTERY, 0x19, METHOD_BUFFERED, FILE_READ_ACCESS): // TODO: Figure out what 0x294064 is used for
         case 0x0b0192: // TODO: Figure out what this FILE_DEVICE_KEYBOARD code is used for
         case 0x0b0193: // TODO: Figure out what this FILE_DEVICE_KEYBOARD code is used for
         case 0x0b01a8: // TODO: Figure out what this FILE_DEVICE_KEYBOARD code is used for
