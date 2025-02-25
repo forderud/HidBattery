@@ -124,17 +124,24 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: PdoName: %wZ\n", deviceContext->PdoName); // outputs "\Device\00000083"
     }
 
-    {
-        // create queue for filtering
+    if (deviceContext->Mode == LowerFilter) {
+        // create queue for filtering HID Power Device requests
+        WDF_IO_QUEUE_CONFIG queueConfig = {};
+        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
+        queueConfig.EvtIoRead = EvtIoReadHidFilter; // filter read requests
+
+        WDFQUEUE queue = 0; // auto-deleted when parent is deleted
+        NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoQueueCreate failed 0x%x"), status);
+            return status;
+        }
+    } else if (deviceContext->Mode == UpperFilter) {
+        // create queue for filtering Battery device requests
         WDF_IO_QUEUE_CONFIG queueConfig = {};
         WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchSequential); // must synchronize due to BattIoctl
-        if (deviceContext->Mode == LowerFilter) {
-            // HID Power Device (PD) filtering
-            queueConfig.EvtIoRead = EvtIoReadHidFilter; // filter read requests 
-        } else if (deviceContext->Mode == UpperFilter) {
-            // Battery device filtering
-            queueConfig.EvtIoDeviceControl = EvtIoDeviceControlBattFilter; // filter IOCTL requests
-        }
+        queueConfig.EvtIoDeviceControl = EvtIoDeviceControlBattFilter; // filter IOCTL requests
+
         WDFQUEUE queue = 0; // auto-deleted when parent is deleted
         NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
         if (!NT_SUCCESS(status)) {
