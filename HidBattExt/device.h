@@ -92,9 +92,9 @@ WDF_DECLARE_CONTEXT_TYPE(REQUEST_CONTEXT)
 struct DEVICE_CONTEXT {
     FilterMode     Mode;      // upper or lower driver instance
     UNICODE_STRING PdoName;
-    UCHAR          TemperatureReportID;
-    UCHAR          CycleCountReportID;
-    SharedState    LowState;  // lower filter instance state (not accessible from upper filter)
+    UCHAR          TemperatureReportID; // for lower filter usage
+    UCHAR          CycleCountReportID;  // for lower filter usage
+    SharedState    LowState;  // lower filter instance state (not directly accessible from upper filter)
     HidBattExtIf   Interface; // for communication between driver instances
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
