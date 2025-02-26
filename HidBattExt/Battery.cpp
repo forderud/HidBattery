@@ -28,7 +28,7 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     UNREFERENCED_PARAMETER(Context);
     // only the IoStatus field is valid in the Params argument
 
-    REQUEST_CONTEXT* Ioctl = WdfObjectGet_REQUEST_CONTEXT(Request);
+    REQUEST_CONTEXT* reqCtx = WdfObjectGet_REQUEST_CONTEXT(Request);
 
     NTSTATUS status = Params->IoStatus.Status;
     if (!NT_SUCCESS(status)) {
@@ -42,8 +42,8 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
         return;
     }
 
-    if (Ioctl->IoControlCode != IOCTL_BATTERY_QUERY_INFORMATION) {
-        switch (Ioctl->IoControlCode) {
+    if (reqCtx->IoControlCode != IOCTL_BATTERY_QUERY_INFORMATION) {
+        switch (reqCtx->IoControlCode) {
         case IOCTL_BATTERY_QUERY_TAG:
         case IOCTL_BATTERY_QUERY_INFORMATION:
         case IOCTL_BATTERY_SET_INFORMATION:
@@ -55,7 +55,7 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
         case CTL_CODE(FILE_DEVICE_KEYBOARD, 0x6a, METHOD_BUFFERED,  FILE_ANY_ACCESS): // TODO: Figure out what 0x0b01a8 is used for
             break; // ignore known codes
         default:
-            //DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: Unknown IOCTL code 0x%x\n", Ioctl->IoControlCode);
+            //DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: Unknown IOCTL code 0x%x\n", reqCtx->IoControlCode);
             break;
         }
         WdfRequestComplete(Request, status);
@@ -65,13 +65,13 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     WDFDEVICE Device = WdfIoTargetGetDevice(Target);
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
-    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: IOCTL_BATTERY_QUERY_INFORMATION (InformationLevel=%u, OutputBufferLength=%u)\n", Ioctl->InformationLevel, Ioctl->OutputBufferLength);
+    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: IOCTL_BATTERY_QUERY_INFORMATION (InformationLevel=%u, OutputBufferLength=%u)\n", reqCtx->InformationLevel, reqCtx->OutputBufferLength);
 
-    if ((Ioctl->InformationLevel == BatteryInformation) && (Ioctl->OutputBufferLength == sizeof(BATTERY_INFORMATION))) {
-        auto* bi = (BATTERY_INFORMATION*)Ioctl->OutputBuffer;
+    if ((reqCtx->InformationLevel == BatteryInformation) && (reqCtx->OutputBufferLength == sizeof(BATTERY_INFORMATION))) {
+        auto* bi = (BATTERY_INFORMATION*)reqCtx->OutputBuffer;
         UpdateBatteryInformation(*bi, *context->Interface.State);
-    } else if ((Ioctl->InformationLevel == BatteryTemperature) && (Ioctl->OutputBufferLength == sizeof(ULONG))) {
-        auto* temp = (ULONG*)Ioctl->OutputBuffer;
+    } else if ((reqCtx->InformationLevel == BatteryTemperature) && (reqCtx->OutputBufferLength == sizeof(ULONG))) {
+        auto* temp = (ULONG*)reqCtx->OutputBuffer;
         UpdateBatteryTemperature(*temp, *context->Interface.State);
     }
 
