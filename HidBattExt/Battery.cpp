@@ -26,6 +26,7 @@ static void UpdateBatteryTemperature(ULONG& temp, SharedState& state) {
 void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  WDF_REQUEST_COMPLETION_PARAMS* Params, _In_  WDFCONTEXT Context) {
     UNREFERENCED_PARAMETER(Target);
     UNREFERENCED_PARAMETER(Context);
+    // only the IoStatus field is valid in the Params argument
 
     REQUEST_CONTEXT* Ioctl = WdfObjectGet_REQUEST_CONTEXT(Request);
 
