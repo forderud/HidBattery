@@ -98,7 +98,7 @@ VOID EvtIoDeviceControlBattFilter(
 #endif
 
     WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
-    REQUEST_CONTEXT* context = WdfObjectGet_REQUEST_CONTEXT(Request);
+    REQUEST_CONTEXT* reqCtx = WdfObjectGet_REQUEST_CONTEXT(Request);
 
     // update completion context with IOCTL buffer information
     if ((IoControlCode == IOCTL_BATTERY_QUERY_INFORMATION) && (InputBufferLength == sizeof(BATTERY_QUERY_INFORMATION))) {
@@ -106,9 +106,9 @@ VOID EvtIoDeviceControlBattFilter(
         NTSTATUS status = WdfRequestRetrieveInputBuffer(Request, 0, (void**)&InputBuffer, nullptr);
         NT_ASSERTMSG("WdfRequestRetrieveInputBuffer failed", NT_SUCCESS(status)); status;
 
-        context->Update(IoControlCode, InputBuffer->InformationLevel, Request);
+        reqCtx->Update(IoControlCode, InputBuffer->InformationLevel, Request);
     } else {
-        context->Update(IoControlCode, 0, nullptr);
+        reqCtx->Update(IoControlCode, 0, nullptr);
     }
 
     // Formating required if specifying a completion routine
