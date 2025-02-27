@@ -113,9 +113,14 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
         // get FEATURE report value caps
         USHORT valueCapsLen = caps.NumberFeatureValueCaps;
         HIDP_VALUE_CAPS* valueCaps = new HIDP_VALUE_CAPS[valueCapsLen];
+        if (!valueCaps) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: new HIDP_VALUE_CAPS[%u] allocation failure."), valueCapsLen);
+            return status;
+        }
         status = HidP_GetValueCaps(HidP_Feature, valueCaps, &valueCapsLen, preparsedData);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetValueCaps failed 0x%x"), status);
+            delete[] valueCaps;
             return status;
         }
 
