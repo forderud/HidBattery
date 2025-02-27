@@ -129,12 +129,12 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
         for (USHORT i = 0; i < valueCapsLen; i++) {
             if ((valueCaps[i].UsagePage == HidPdReport::s_Temperature_UsagePage) && (valueCaps[i].NotRange.Usage == HidPdReport::s_Temperature_Usage)) {
                 context->TemperatureReportID = valueCaps[i].ReportID;
-                DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Temperature ReportID=0x%x\n", valueCaps[i].ReportID);
+                DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Temperature ReportID is 0x%x\n", valueCaps[i].ReportID);
 
             }
             if ((valueCaps[i].UsagePage == HidPdReport::s_CycleCount_UsagePage) && (valueCaps[i].NotRange.Usage == HidPdReport::s_CycleCount_Usage)) {
                 context->CycleCountReportID = valueCaps[i].ReportID;
-                DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: CycleCount ReportID=0x%x\n", valueCaps[i].ReportID);
+                DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: CycleCount ReportID is 0x%x\n", valueCaps[i].ReportID);
             }
         }
 
