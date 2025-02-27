@@ -31,16 +31,10 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     REQUEST_CONTEXT* reqCtx = WdfObjectGet_REQUEST_CONTEXT(Request);
 
     if (!NT_SUCCESS(WdfRequestGetStatus(Request))) {
-        // Observed error codes:
-        //   0xc0000002 (STATUS_NOT_IMPLEMENTED)
-        //   0xc0000005 (STATUS_ACCESS_VIOLATION)
-        //   0xc0000120 (STATUS_CANCELLED)
-        //   0xc00002b6 (STATUS_DEVICE_REMOVED)
-
         if ((reqCtx->IoControlCode == IOCTL_BATTERY_QUERY_INFORMATION) && (reqCtx->InformationLevel == BatteryTemperature) && (WdfRequestGetStatus(Request) == STATUS_INVALID_DEVICE_REQUEST)) {
             // continue despite IOCTL_BATTERY_QUERY_INFORMATION BatteryTemperature failure to filter query
         } else {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("ERROR: EvtIoDeviceControlBattFilterCompletion: IOCTL=0x%x, status=0x%x"), reqCtx->IoControlCode, WdfRequestGetStatus(Request));
+            //DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("ERROR: EvtIoDeviceControlBattFilterCompletion: IOCTL=0x%x, status=0x%x"), reqCtx->IoControlCode, WdfRequestGetStatus(Request));
             WdfRequestComplete(Request, WdfRequestGetStatus(Request));
             return;
         }
