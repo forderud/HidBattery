@@ -9,7 +9,7 @@ The filter driver places itself both _above_ and _below_ HidBatt:
 
 The driver instance _below_ HidBatt first filters the [HID Power Device](https://www.usb.org/sites/default/files/pdcv11.pdf) communication with the battery to pick up the missing `CycleCount` and `Temperature` parameters from HID `FEATURE` and `INPUT` reports. The driver instance _above_ HidBatt afterwards filters [`IOCTL_BATTERY_QUERY_INFORMATION`](https://learn.microsoft.com/en-us/windows/win32/power/ioctl-battery-query-information) communication to include these parameters in the HidBatt responses.
 
-### Driver testing
+## Driver testing
 See [Driver testing](https://github.com/forderud/IntelliMouseDriver/wiki/Driver-testing) for an introduction to how to install and test drivers on a dedicated Windows computer with `testsigning` enabled.
 
 The Arduino [battery.ino](/battery/battery.ino) sketch in this repo can be used for testing multi-battery setups.  
