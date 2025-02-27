@@ -26,7 +26,6 @@ static void UpdateBatteryTemperature(ULONG& temp, SharedState& state, NTSTATUS s
 
 void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  WDF_REQUEST_COMPLETION_PARAMS* Params, _In_  WDFCONTEXT Context) {
     UNREFERENCED_PARAMETER(Context);
-    // only the IoStatus field is valid in the Params argument
 
     REQUEST_CONTEXT* reqCtx = WdfObjectGet_REQUEST_CONTEXT(Request);
 
@@ -65,11 +64,11 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     WDFDEVICE Device = WdfIoTargetGetDevice(Target);
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
+    // use WdfRequestRetrieveOutputBuffer since the Params argument have been invalidated by WdfRequestFormatRequestUsingCurrentType (except for IoStatus)
     void* OutputBuffer = nullptr;
     size_t OutputBufferLength = 0;
     status = WdfRequestRetrieveOutputBuffer(Request, 0, (void**)&OutputBuffer, &OutputBufferLength);
     NT_ASSERTMSG("WdfRequestRetrieveOutputBuffer failed", NT_SUCCESS(status));
-
 
     DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: IOCTL_BATTERY_QUERY_INFORMATION (InformationLevel=%u, OutputBufferLength=%u)\n", reqCtx->InformationLevel, OutputBufferLength);
 
