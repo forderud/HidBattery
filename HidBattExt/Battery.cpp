@@ -88,10 +88,7 @@ VOID EvtIoDeviceControlBattFilter(
     _In_  size_t            InputBufferLength,
     _In_  ULONG             IoControlCode) {
 #if 0
-    if (IoControlCode == IOCTL_BATTERY_QUERY_INFORMATION)
-        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlBattFilter (IoControlCode=IOCTL_BATTERY_QUERY_INFORMATION, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
-    else
-        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlBattFilter (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlBattFilter (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
 #endif
     UNREFERENCED_PARAMETER(OutputBufferLength);
 
