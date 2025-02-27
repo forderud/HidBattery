@@ -73,7 +73,7 @@ struct REQUEST_CONTEXT {
     size_t OutputBufferLength = 0;
     void * OutputBuffer = nullptr;
 
-    void Update(ULONG ioctl, ULONG infoLevel, WDFREQUEST Request) {
+    void Configure(ULONG ioctl, ULONG infoLevel, WDFREQUEST Request) {
         IoControlCode = ioctl;
 
         InformationLevel = infoLevel;
