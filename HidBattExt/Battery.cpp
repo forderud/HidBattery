@@ -20,12 +20,11 @@ static void UpdateBatteryTemperature(ULONG& temp, SharedState& state, NTSTATUS s
     WdfSpinLockRelease(state.Lock);
 
     // error 0xc0000010 (STATUS_INVALID_DEVICE_REQUEST) observed here
-    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryTemperature before=%u, after=%u (status=0x%x)\n", TempBefore, temp, status); TempBefore;
+    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryTemperature before=%u, after=%u (status=0x%x)\n", TempBefore, temp, status); TempBefore; status;
 }
 
 
 void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  WDF_REQUEST_COMPLETION_PARAMS* Params, _In_  WDFCONTEXT Context) {
-    UNREFERENCED_PARAMETER(Target);
     UNREFERENCED_PARAMETER(Context);
     // only the IoStatus field is valid in the Params argument
 
