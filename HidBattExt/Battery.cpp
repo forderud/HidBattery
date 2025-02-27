@@ -93,8 +93,6 @@ VOID EvtIoDeviceControlBattFilter(
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlBattFilter (IoControlCode=IOCTL_BATTERY_QUERY_INFORMATION, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", InputBufferLength, OutputBufferLength);
     else
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlBattFilter (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
-#else
-    UNREFERENCED_PARAMETER(OutputBufferLength);
 #endif
 
     WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
