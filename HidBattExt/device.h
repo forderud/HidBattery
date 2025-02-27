@@ -57,7 +57,7 @@ struct HidBattExtIf : public INTERFACE {
         return WdfDeviceAddQueryInterface(device, &cfg);
     }
 
-    /** Lookup driver state from other driver instances. WILL OVERWRITE all fields in this object. */
+    /** Lookup state from other driver instance in same driver stack. WILL OVERWRITE all fields in this object. */
     NTSTATUS Lookup(WDFDEVICE device) {
         return WdfFdoQueryForInterface(device, &GUID_HIDBATTEXT_SHARED_STATE, this, sizeof(HidBattExtIf), 1, NULL);
     }
