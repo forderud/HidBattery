@@ -25,11 +25,12 @@ static void UpdateBatteryTemperature(ULONG& temp, SharedState& state, NTSTATUS s
 
 
 void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  WDF_REQUEST_COMPLETION_PARAMS* Params, _In_  WDFCONTEXT Context) {
+    UNREFERENCED_PARAMETER(Params); // invalidated by WdfRequestFormatRequestUsingCurrentType
     UNREFERENCED_PARAMETER(Context);
 
     REQUEST_CONTEXT* reqCtx = WdfObjectGet_REQUEST_CONTEXT(Request);
 
-    NTSTATUS status = Params->IoStatus.Status;
+    NTSTATUS status = WdfRequestGetStatus(Request);
     if (!NT_SUCCESS(status)) {
         // Observed error codes:
         //   0xc0000002 (STATUS_NOT_IMPLEMENTED)
@@ -64,7 +65,7 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     WDFDEVICE Device = WdfIoTargetGetDevice(Target);
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
-    // use WdfRequestRetrieveOutputBuffer since the Params argument have been invalidated by WdfRequestFormatRequestUsingCurrentType (except for IoStatus)
+    // use WdfRequestRetrieveOutputBuffer since the Params argument have been invalidated by WdfRequestFormatRequestUsingCurrentType
     void* OutputBuffer = nullptr;
     size_t OutputBufferLength = 0;
     status = WdfRequestRetrieveOutputBuffer(Request, 0, (void**)&OutputBuffer, &OutputBufferLength);
