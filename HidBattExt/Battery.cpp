@@ -53,7 +53,11 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     void* OutputBuffer = nullptr;
     size_t OutputBufferLength = 0;
     NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, 0, (void**)&OutputBuffer, &OutputBufferLength);
-    NT_ASSERTMSG("WdfRequestRetrieveOutputBuffer failed", NT_SUCCESS(status)); status;
+    if (!NT_SUCCESS(status)) {
+        // no output buffer to modify
+        WdfRequestComplete(Request, WdfRequestGetStatus(Request));
+        return;
+    }
 
     DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: IOCTL_BATTERY_QUERY_INFORMATION (InformationLevel=%u, OutputBufferLength=%u, Information=%u, Status=0x%x)\n", reqCtx->InformationLevel, OutputBufferLength, WdfRequestGetInformation(Request), WdfRequestGetStatus(Request));
 
