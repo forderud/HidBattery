@@ -108,9 +108,13 @@ VOID EvtIoDeviceControlBattFilter(
         NTSTATUS status = WdfRequestRetrieveInputBuffer(Request, 0, (void**)&InputBuffer, nullptr);
         NT_ASSERTMSG("WdfRequestRetrieveInputBuffer failed", NT_SUCCESS(status)); status;
 
-        reqCtx->Configure(IoControlCode, InputBuffer->InformationLevel, Request);
+        void* OutputBuffer = nullptr;
+        status = WdfRequestRetrieveOutputBuffer(Request, 0, (void**)&OutputBuffer, nullptr);
+        NT_ASSERTMSG("WdfRequestRetrieveOutputBuffer failed", NT_SUCCESS(status));
+
+        reqCtx->Set(IoControlCode, InputBuffer->InformationLevel, OutputBuffer, OutputBufferLength);
     } else {
-        reqCtx->Configure(IoControlCode, 0, nullptr);
+        reqCtx->Set(IoControlCode, 0, nullptr, 0);
     }
 
     // Formating required if specifying a completion routine

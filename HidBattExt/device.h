@@ -70,20 +70,16 @@ struct REQUEST_CONTEXT {
     
     ULONG InformationLevel = 0; // contains BATTERY_QUERY_INFORMATION::InformationLevel in IOCTL_BATTERY_QUERY_INFORMATION requests
 
+    void* OutputBuffer = nullptr;
     size_t OutputBufferLength = 0;
-    void * OutputBuffer = nullptr;
 
-    void Configure(ULONG ioctl, ULONG infoLevel, WDFREQUEST Request) {
+    void Set(ULONG ioctl, ULONG infoLevel, void* outputBuffer, size_t outputBufferLength) {
         IoControlCode = ioctl;
 
         InformationLevel = infoLevel;
 
-        OutputBufferLength = 0;
-        OutputBuffer = nullptr;
-        if (Request) {
-            NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, 0, (void**)&OutputBuffer, &OutputBufferLength);
-            NT_ASSERTMSG("WdfRequestRetrieveOutputBuffer failed", NT_SUCCESS(status)); status;
-        }
+        OutputBuffer = outputBuffer;
+        OutputBufferLength = outputBufferLength;
     }
 };
 WDF_DECLARE_CONTEXT_TYPE(REQUEST_CONTEXT)
