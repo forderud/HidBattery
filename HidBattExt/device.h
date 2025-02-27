@@ -67,19 +67,11 @@ struct HidBattExtIf : public INTERFACE {
     Needed because the "WDF_REQUEST_COMPLETION_PARAMS* Params" argument have been invalidated by WdfRequestFormatRequestUsingCurrentType. */
 struct REQUEST_CONTEXT {
     ULONG IoControlCode = 0;
-    
     ULONG InformationLevel = 0; // contains BATTERY_QUERY_INFORMATION::InformationLevel in IOCTL_BATTERY_QUERY_INFORMATION requests
 
-    void* OutputBuffer = nullptr;
-    size_t OutputBufferLength = 0;
-
-    void Set(ULONG ioctl, ULONG infoLevel, void* outputBuffer, size_t outputBufferLength) {
+    void Set(ULONG ioctl, ULONG infoLevel) {
         IoControlCode = ioctl;
-
         InformationLevel = infoLevel;
-
-        OutputBuffer = outputBuffer;
-        OutputBufferLength = outputBufferLength;
     }
 };
 WDF_DECLARE_CONTEXT_TYPE(REQUEST_CONTEXT)
