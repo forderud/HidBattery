@@ -30,15 +30,14 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
 
     REQUEST_CONTEXT* reqCtx = WdfObjectGet_REQUEST_CONTEXT(Request);
 
-    NTSTATUS status = WdfRequestGetStatus(Request);
-    if (!NT_SUCCESS(status)) {
+    if (!NT_SUCCESS(WdfRequestGetStatus(Request))) {
         // Observed error codes:
         //   0xc0000002 (STATUS_NOT_IMPLEMENTED)
         //   0xc0000005 (STATUS_ACCESS_VIOLATION)
         //   0xc0000120 (STATUS_CANCELLED)
         //   0xc00002b6 (STATUS_DEVICE_REMOVED)
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("ERROR: EvtIoDeviceControlBattFilterCompletion: IOCTL=0x%x, status=0x%x"), reqCtx->IoControlCode, status);
-        WdfRequestComplete(Request, status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("ERROR: EvtIoDeviceControlBattFilterCompletion: IOCTL=0x%x, status=0x%x"), reqCtx->IoControlCode, WdfRequestGetStatus(Request));
+        WdfRequestComplete(Request, WdfRequestGetStatus(Request));
         return;
     }
 
@@ -58,7 +57,7 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
             //DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: Unknown IOCTL code 0x%x\n", reqCtx->IoControlCode);
             break;
         }
-        WdfRequestComplete(Request, status);
+        WdfRequestComplete(Request, WdfRequestGetStatus(Request));
         return;
     }
 
@@ -68,8 +67,8 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     // use WdfRequestRetrieveOutputBuffer since the Params argument have been invalidated by WdfRequestFormatRequestUsingCurrentType
     void* OutputBuffer = nullptr;
     size_t OutputBufferLength = 0;
-    status = WdfRequestRetrieveOutputBuffer(Request, 0, (void**)&OutputBuffer, &OutputBufferLength);
-    NT_ASSERTMSG("WdfRequestRetrieveOutputBuffer failed", NT_SUCCESS(status));
+    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, 0, (void**)&OutputBuffer, &OutputBufferLength);
+    NT_ASSERTMSG("WdfRequestRetrieveOutputBuffer failed", NT_SUCCESS(status)); status;
 
     DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: IOCTL_BATTERY_QUERY_INFORMATION (InformationLevel=%u, OutputBufferLength=%u, Information=%u)\n", reqCtx->InformationLevel, OutputBufferLength, WdfRequestGetInformation(Request));
 
@@ -78,10 +77,10 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
         UpdateBatteryInformation(*bi, *context->Interface.State);
     } else if ((reqCtx->InformationLevel == BatteryTemperature) && (OutputBufferLength == sizeof(ULONG))) {
         auto* temp = (ULONG*)OutputBuffer;
-        UpdateBatteryTemperature(*temp, *context->Interface.State, status);
+        UpdateBatteryTemperature(*temp, *context->Interface.State, WdfRequestGetStatus(Request));
     }
 
-    WdfRequestComplete(Request, status);
+    WdfRequestComplete(Request, WdfRequestGetStatus(Request));
 }
 
 
