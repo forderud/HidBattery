@@ -60,7 +60,7 @@ KmdfLibraryVersion = $KMDFVERSION$
 
 [Strings]
 ; Strings for macro replacement
-Provider              = "HidBattery sample project"
+Provider              = "https://github.com/forderud/HidBattery"
 SPSVCINST_ASSOCSERVICE= 0x00000002
 SERVICE_KERNEL_DRIVER = 1
 SERVICE_BOOT_START    = 0
