@@ -7,7 +7,7 @@ The HidBatt drivers inability to report these parameters have already been repor
 The filter driver places itself both _above_ and _below_ HidBatt:  
 ![image](https://github.com/user-attachments/assets/f9d4bb64-09ea-44aa-8224-5ea80d652e82)
 
-The driver instance _below_ HidBatt first filters the HID Power Device communication with the battery to pick up the missing `CycleCount` and `Temperature` parameters from HID `FEATURE` and `INPUT` reports. The driver instance _above_ HidBatt afterwards filters [`IOCTL_BATTERY_QUERY_INFORMATION`](https://learn.microsoft.com/en-us/windows/win32/power/ioctl-battery-query-information) communication to include these parameters in the HidBatt responses.
+The driver instance _below_ HidBatt first filters the [HID Power Device](https://www.usb.org/sites/default/files/pdcv11.pdf) communication with the battery to pick up the missing `CycleCount` and `Temperature` parameters from HID `FEATURE` and `INPUT` reports. The driver instance _above_ HidBatt afterwards filters [`IOCTL_BATTERY_QUERY_INFORMATION`](https://learn.microsoft.com/en-us/windows/win32/power/ioctl-battery-query-information) communication to include these parameters in the HidBatt responses.
 
 ### Driver testing
 See [Driver testing](https://github.com/forderud/IntelliMouseDriver/wiki/Driver-testing) for an introduction to how to install and test drivers on a dedicated Windows computer with `testsigning` enabled.
