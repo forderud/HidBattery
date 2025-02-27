@@ -10,7 +10,7 @@ The filter driver places itself both _above_ and _below_ HidBatt:
 The driver instance _below_ HidBatt first filters the HID Power Device communication with the battery to pick up the missing `CycleCount` and `Temperature` parameters from HID `FEATURE` and `INPUT` reports. The driver instance _above_ HidBatt afterwards filters [`IOCTL_BATTERY_QUERY_INFORMATION`](https://learn.microsoft.com/en-us/windows/win32/power/ioctl-battery-query-information) communication to include these parameters in the HidBatt responses.
 
 ### Open issues
-**WARNING**: The driver does work, but please be warned that it's **work in progress** and not yet ready for production usage. See  [_windows_ issues](https://github.com/forderud/HidBattery/issues?q=is%3Aissue%20state%3Aopen%20label%3Awindows) for a list of known issues and improvement plans.
+See [_windows_ issues](https://github.com/forderud/HidBattery/issues?q=is%3Aissue%20state%3Aopen%20label%3Awindows) for a list of known issues and improvement plans.
 
 ### Driver testing
 See [Driver testing](https://github.com/forderud/IntelliMouseDriver/wiki/Driver-testing) for an introduction to how to install and test the driver on a dedicated Windows computer with `testsigning` enabled.
