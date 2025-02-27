@@ -3,8 +3,6 @@
 /** HID Power Device report (https://www.usb.org/sites/default/files/pdcv11.pdf). */
 #pragma pack(push, 1) // no padding
 struct HidPdReport {
-    HidPdReport() = default;
-
     HidPdReport(UCHAR type) {
         ReportId = type;
     }
