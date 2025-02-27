@@ -103,6 +103,7 @@ VOID EvtIoDeviceControlBattFilter(
 
     // update completion context with IOCTL buffer information
     if ((IoControlCode == IOCTL_BATTERY_QUERY_INFORMATION) && (InputBufferLength == sizeof(BATTERY_QUERY_INFORMATION))) {
+        // capture InformationLevel from input buffer
         BATTERY_QUERY_INFORMATION* InputBuffer = nullptr;
         NTSTATUS status = WdfRequestRetrieveInputBuffer(Request, 0, (void**)&InputBuffer, nullptr);
         NT_ASSERTMSG("WdfRequestRetrieveInputBuffer failed", NT_SUCCESS(status)); status;
