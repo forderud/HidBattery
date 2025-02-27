@@ -36,9 +36,14 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
         //   0xc0000005 (STATUS_ACCESS_VIOLATION)
         //   0xc0000120 (STATUS_CANCELLED)
         //   0xc00002b6 (STATUS_DEVICE_REMOVED)
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("ERROR: EvtIoDeviceControlBattFilterCompletion: IOCTL=0x%x, status=0x%x"), reqCtx->IoControlCode, WdfRequestGetStatus(Request));
-        WdfRequestComplete(Request, WdfRequestGetStatus(Request));
-        return;
+
+        if ((reqCtx->IoControlCode == IOCTL_BATTERY_QUERY_INFORMATION) && (reqCtx->InformationLevel == BatteryTemperature) && (WdfRequestGetStatus(Request) == STATUS_INVALID_DEVICE_REQUEST)) {
+            // continue despite IOCTL_BATTERY_QUERY_INFORMATION BatteryTemperature failure to filter query
+        } else {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("ERROR: EvtIoDeviceControlBattFilterCompletion: IOCTL=0x%x, status=0x%x"), reqCtx->IoControlCode, WdfRequestGetStatus(Request));
+            WdfRequestComplete(Request, WdfRequestGetStatus(Request));
+            return;
+        }
     }
 
     if (reqCtx->IoControlCode != IOCTL_BATTERY_QUERY_INFORMATION) {
@@ -78,6 +83,11 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     } else if ((reqCtx->InformationLevel == BatteryTemperature) && (OutputBufferLength == sizeof(ULONG))) {
         auto* temp = (ULONG*)OutputBuffer;
         UpdateBatteryTemperature(*temp, *context->Interface.State, WdfRequestGetStatus(Request));
+        if (WdfRequestGetStatus(Request) == STATUS_INVALID_DEVICE_REQUEST) {
+            // fix failing query by making status succeed and increase output size
+            WdfRequestCompleteWithInformation(Request, STATUS_SUCCESS, sizeof(ULONG));
+            return;
+        }
     }
 
     WdfRequestComplete(Request, WdfRequestGetStatus(Request));
