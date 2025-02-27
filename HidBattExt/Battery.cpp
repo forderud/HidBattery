@@ -47,21 +47,7 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
     }
 
     if (reqCtx->IoControlCode != IOCTL_BATTERY_QUERY_INFORMATION) {
-        switch (reqCtx->IoControlCode) {
-        case IOCTL_BATTERY_QUERY_TAG:
-        case IOCTL_BATTERY_QUERY_INFORMATION:
-        case IOCTL_BATTERY_SET_INFORMATION:
-        case IOCTL_BATTERY_QUERY_STATUS:
-        case IOCTL_BATTERY_CHARGING_SOURCE_CHANGE:
-        case CTL_CODE(FILE_DEVICE_BATTERY,  0x19, METHOD_BUFFERED,  FILE_READ_ACCESS):// TODO: Figure out what 0x294064 is used for
-        case CTL_CODE(FILE_DEVICE_KEYBOARD, 0x64, METHOD_OUT_DIRECT,FILE_ANY_ACCESS): // TODO: Figure out what 0x0b0192 is used for
-        case CTL_CODE(FILE_DEVICE_KEYBOARD, 0x64, METHOD_NEITHER,   FILE_ANY_ACCESS): // TODO: Figure out what 0x0b0193 is used for
-        case CTL_CODE(FILE_DEVICE_KEYBOARD, 0x6a, METHOD_BUFFERED,  FILE_ANY_ACCESS): // TODO: Figure out what 0x0b01a8 is used for
-            break; // ignore known codes
-        default:
-            //DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: Unknown IOCTL code 0x%x\n", reqCtx->IoControlCode);
-            break;
-        }
+        // don't touch other IOCTL codes
         WdfRequestComplete(Request, WdfRequestGetStatus(Request));
         return;
     }
