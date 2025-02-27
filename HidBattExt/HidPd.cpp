@@ -19,7 +19,8 @@ static void UpdateSharedState(SharedState& state, HidPdReport& report, DEVICE_CO
         auto TempBefore = state.Temperature;
 
         WdfSpinLockAcquire(state.Lock);
-        state.Temperature = report.Value;
+        // convert HID PD unit from (Kelvin) to BATTERY_QUERY_INFORMATION unit (10ths of a degree Kelvin)
+        state.Temperature = 10*report.Value;
         WdfSpinLockRelease(state.Lock);
 
         if (state.Temperature != TempBefore) {
