@@ -12,6 +12,8 @@ The driver instance _below_ HidBatt first filters the HID Power Device communica
 ### Driver testing
 See [Driver testing](https://github.com/forderud/IntelliMouseDriver/wiki/Driver-testing) for an introduction to how to install and test the driver on a dedicated Windows computer with `testsigning` enabled.
 
+The Arduino [battery.ino](/battery/battery.ino) sketch in this repo can be used for testing multi-battery setups.
+
 ## Background
 The driver is based on the [TailLight](https://github.com/forderud/IntelliMouseDriver/tree/main/TailLight) driver for Microsoft Pro IntelliMouse, which again is based on the Microsoft [firefly](https://github.com/microsoft/Windows-driver-samples/tree/main/hid/firefly) sample driver.
 
