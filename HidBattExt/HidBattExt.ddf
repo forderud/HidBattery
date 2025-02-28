@@ -17,12 +17,14 @@
 ;
 ; x64 driver files
 .Set DestinationDir=x64
-..\x64\Release\HidBattExt.inf
-..\x64\Release\HidBattExt.sys
+..\x64\Release\HidBattExt\HidBattExt.inf
+..\x64\Release\HidBattExt\HidBattExt.sys
+..\x64\Release\HidBattExt\HidBattExt.cat
 ..\x64\Release\HidBattExt.pdb
 ;
 ; ARM64 driver files
 .Set DestinationDir=ARM64
-..\ARM64\Release\HidBattExt.inf
-..\ARM64\Release\HidBattExt.sys
+..\ARM64\Release\HidBattExt\HidBattExt.inf
+..\ARM64\Release\HidBattExt\HidBattExt.sys
+..\ARM64\Release\HidBattExt\HidBattExt.cat
 ..\ARM64\Release\HidBattExt.pdb
