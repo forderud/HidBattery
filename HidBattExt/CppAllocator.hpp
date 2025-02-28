@@ -8,6 +8,7 @@ void* operator new (size_t size) noexcept {
     return ExAllocatePool2(POOL_FLAG_NON_PAGED, size, POOL_TAG);
 }
 
+_Ret_writes_maybenull_(size)
 void* operator new[] (size_t size) noexcept {
     // allocate in non-paged pool (will always reside in RAM)
     return ExAllocatePool2(POOL_FLAG_NON_PAGED, size, POOL_TAG);
