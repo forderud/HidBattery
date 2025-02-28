@@ -15,11 +15,11 @@ void* operator new[] (size_t size) noexcept {
 }
 
 void operator delete (void *ptr, size_t /*size*/) noexcept {
-    return ExFreePool(ptr);
+    return ExFreePoolWithTag(ptr, POOL_TAG);
 }
 
 void operator delete[] (void* ptr) noexcept {
-    return ExFreePool(ptr);
+    return ExFreePoolWithTag(ptr, POOL_TAG);
 }
 
 #endif // _KERNEL_MODE
