@@ -230,15 +230,15 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t L
         return;
     }
 
-    HidPdReport* packet = nullptr;
-    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(HidPdReport), (void**)&packet, NULL);
-    if (!NT_SUCCESS(status) || !packet) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestRetrieveOutputBuffer failed 0x%x, packet=0x%p"), status, packet);
+    HidPdReport* report = nullptr;
+    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(HidPdReport), (void**)&report, NULL);
+    if (!NT_SUCCESS(status) || !report) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestRetrieveOutputBuffer failed 0x%x, report=0x%p"), status, report);
         return;
     }
 
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
-    UpdateSharedState(context->LowState, *packet, context);
+    UpdateSharedState(context->LowState, *report, context);
 }
 
 
