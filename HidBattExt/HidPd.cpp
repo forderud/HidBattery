@@ -113,15 +113,14 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
 
         // get FEATURE report value caps
         USHORT valueCapsLen = caps.NumberFeatureValueCaps;
-        HIDP_VALUE_CAPS* valueCaps = new HIDP_VALUE_CAPS[valueCapsLen];
+        RamArray<HIDP_VALUE_CAPS> valueCaps(valueCapsLen);
         if (!valueCaps) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: new HIDP_VALUE_CAPS[%u] allocation failure."), valueCapsLen);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HIDP_VALUE_CAPS[%u] allocation failure."), valueCapsLen);
             return status;
         }
         status = HidP_GetValueCaps(HidP_Feature, valueCaps, &valueCapsLen, preparsedData);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetValueCaps failed 0x%x"), status);
-            delete[] valueCaps;
             return status;
         }
 
@@ -137,8 +136,6 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
                 DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: CycleCount ReportID is 0x%x\n", valueCaps[i].ReportID);
             }
         }
-
-        delete[] valueCaps;
     }
 
     if (context->TemperatureReportID) {
