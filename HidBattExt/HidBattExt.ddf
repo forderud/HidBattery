@@ -23,8 +23,8 @@
 ..\x64\Release\HidBattExt.pdb
 ;
 ; ARM64 driver files
-.Set DestinationDir=ARM64
-..\ARM64\Release\HidBattExt\HidBattExt.inf
-..\ARM64\Release\HidBattExt\HidBattExt.sys
-..\ARM64\Release\HidBattExt\HidBattExt.cat
-..\ARM64\Release\HidBattExt.pdb
+;.Set DestinationDir=ARM64
+;..\ARM64\Release\HidBattExt\HidBattExt.inf
+;..\ARM64\Release\HidBattExt\HidBattExt.sys
+;..\ARM64\Release\HidBattExt\HidBattExt.cat
+;..\ARM64\Release\HidBattExt.pdb
