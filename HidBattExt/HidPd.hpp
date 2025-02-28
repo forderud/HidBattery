@@ -26,27 +26,6 @@ private:
     WDFIOTARGET m_obj = NULL;
 };
 
-/** RAII wrapper of PHIDP_PREPARSED_DATA. */
-class PHIDP_PREPARSED_DATA_Wrap {
-public:
-    PHIDP_PREPARSED_DATA_Wrap(size_t size) {
-        m_ptr = new BYTE[size];
-    }
-    ~PHIDP_PREPARSED_DATA_Wrap() {
-        if (m_ptr) {
-            delete[] m_ptr;
-            m_ptr = nullptr;
-        }
-    }
-
-    operator PHIDP_PREPARSED_DATA () const {
-        return (PHIDP_PREPARSED_DATA)m_ptr;
-    }
-
-private:
-    BYTE* m_ptr = nullptr;
-};
-
 
 _Function_class_(EVT_WDF_TIMER)
 _IRQL_requires_same_
