@@ -1,3 +1,4 @@
+#pragma once
 #include <ntddk.h>
 #include <wdf.h>
 #define NTSTRSAFE_LIB
