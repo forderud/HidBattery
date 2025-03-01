@@ -3,6 +3,9 @@
 #include "Battery.hpp"
 
 
+_Function_class_(EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT)
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
