@@ -27,7 +27,7 @@ private:
 
 static void UpdateSharedState(SharedState& state, HidPdReport& report, DEVICE_CONTEXT* context) {
     // capture shared state
-    if (context->CycleCountReportID && (report.ReportId == context->CycleCountReportID)) {
+    if (context->Hid.CycleCountReportID && (report.ReportId == context->Hid.CycleCountReportID)) {
         auto CycleCountBefore = state.CycleCount;
 
         WdfSpinLockAcquire(state.Lock);
@@ -37,7 +37,7 @@ static void UpdateSharedState(SharedState& state, HidPdReport& report, DEVICE_CO
         if (state.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
         }
-    } else if (context->TemperatureReportID && (report.ReportId == context->TemperatureReportID)) {
+    } else if (context->Hid.TemperatureReportID && (report.ReportId == context->Hid.TemperatureReportID)) {
         auto TempBefore = state.Temperature;
 
         WdfSpinLockAcquire(state.Lock);
@@ -149,20 +149,20 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
         // identify ReportID codes for Temperature and CycleCount
         for (USHORT i = 0; i < valueCapsLen; i++) {
             if ((valueCaps[i].UsagePage == HidPdReport::s_Temperature_UsagePage) && (valueCaps[i].NotRange.Usage == HidPdReport::s_Temperature_Usage)) {
-                context->TemperatureReportID = valueCaps[i].ReportID;
+                context->Hid.TemperatureReportID = valueCaps[i].ReportID;
                 DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Temperature ReportID is 0x%x\n", valueCaps[i].ReportID);
 
             }
             if ((valueCaps[i].UsagePage == HidPdReport::s_CycleCount_UsagePage) && (valueCaps[i].NotRange.Usage == HidPdReport::s_CycleCount_Usage)) {
-                context->CycleCountReportID = valueCaps[i].ReportID;
+                context->Hid.CycleCountReportID = valueCaps[i].ReportID;
                 DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: CycleCount ReportID is 0x%x\n", valueCaps[i].ReportID);
             }
         }
     }
 
-    if (context->TemperatureReportID) {
+    if (context->Hid.TemperatureReportID) {
         // Battery Temperature query
-        HidPdReport report(context->TemperatureReportID);
+        HidPdReport report(context->Hid.TemperatureReportID);
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
@@ -179,9 +179,9 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
 
         UpdateSharedState(context->LowState, report, context);
     }
-    if (context->CycleCountReportID) {
+    if (context->Hid.CycleCountReportID) {
         // Battery CycleCount query
-        HidPdReport report(context->CycleCountReportID);
+        HidPdReport report(context->Hid.CycleCountReportID);
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));

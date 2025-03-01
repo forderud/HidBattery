@@ -5,6 +5,12 @@ enum FilterMode {
     LowerFilter, // below HidBatt: Filters HID Power Device communication
 };
 
+/** HID-related state for usage by the Lower filter driver instance. */
+struct HidState {
+    UCHAR TemperatureReportID;
+    UCHAR CycleCountReportID;
+};
+
 /** State to share between Upper and Lower filter driver instances. */
 class SharedState {
 public:
@@ -67,8 +73,7 @@ struct HidBattExtIf : public INTERFACE {
 struct DEVICE_CONTEXT {
     FilterMode     Mode;      // upper or lower driver instance
     UNICODE_STRING PdoName;
-    UCHAR          TemperatureReportID; // for lower filter usage
-    UCHAR          CycleCountReportID;  // for lower filter usage
+    HidState       Hid;       // for lower filter usage
     SharedState    LowState;  // lower filter instance state (not directly accessible from upper filter)
     HidBattExtIf   Interface; // for communication between driver instances
 };
