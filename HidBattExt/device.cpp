@@ -1,4 +1,4 @@
-#include "driver.h"
+#include "device.h"
 #include <Hidport.h>
 #include "Battery.hpp"
 #include "HidPd.hpp"

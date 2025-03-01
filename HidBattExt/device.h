@@ -1,4 +1,6 @@
 #pragma once
+#include "driver.h"
+
 
 enum FilterMode {
     UpperFilter, // above HidBatt: Filters battery IOCTL communication
