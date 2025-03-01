@@ -1,6 +1,7 @@
 #include "driver.h"
 #include <Hidport.h>
 #include "Battery.hpp"
+#include "HidPd.hpp"
 
 
 _Function_class_(EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT)
