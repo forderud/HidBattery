@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "HidPd.hpp"
 #include <hidclass.h> // for HID_COLLECTION_INFORMATION
 #include "CppAllocator.hpp"
 
