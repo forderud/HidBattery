@@ -63,6 +63,18 @@ struct HidBattExtIf : public INTERFACE {
     }
 };
 
+/** Driver-specific struct for storing instance-specific data. */
+struct DEVICE_CONTEXT {
+    FilterMode     Mode;      // upper or lower driver instance
+    UNICODE_STRING PdoName;
+    UCHAR          TemperatureReportID; // for lower filter usage
+    UCHAR          CycleCountReportID;  // for lower filter usage
+    SharedState    LowState;  // lower filter instance state (not directly accessible from upper filter)
+    HidBattExtIf   Interface; // for communication between driver instances
+};
+WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
+
+
 /** IOCTL buffer object to allow completion routines to access request bufffers.
     Needed because the "WDF_REQUEST_COMPLETION_PARAMS* Params" argument have been invalidated by WdfRequestFormatRequestUsingCurrentType. */
 struct REQUEST_CONTEXT {
@@ -75,14 +87,3 @@ struct REQUEST_CONTEXT {
     }
 };
 WDF_DECLARE_CONTEXT_TYPE(REQUEST_CONTEXT)
-
-/** Driver-specific struct for storing instance-specific data. */
-struct DEVICE_CONTEXT {
-    FilterMode     Mode;      // upper or lower driver instance
-    UNICODE_STRING PdoName;
-    UCHAR          TemperatureReportID; // for lower filter usage
-    UCHAR          CycleCountReportID;  // for lower filter usage
-    SharedState    LowState;  // lower filter instance state (not directly accessible from upper filter)
-    HidBattExtIf   Interface; // for communication between driver instances
-};
-WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
