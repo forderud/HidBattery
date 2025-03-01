@@ -24,7 +24,7 @@ public:
     void Initialize(WDFDEVICE device) {
         WDF_OBJECT_ATTRIBUTES attribs{};
         WDF_OBJECT_ATTRIBUTES_INIT(&attribs);
-        attribs.ParentObject = device;
+        attribs.ParentObject = device; // auto-deleted when "device" is deleted
 
         NTSTATUS status = WdfSpinLockCreate(&attribs, &Lock);
         NT_ASSERTMSG("WdfSpinLockCreate failed.\n", status == STATUS_SUCCESS); status;
