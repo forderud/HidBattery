@@ -141,8 +141,8 @@ copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
   <ItemGroup>
     <ClInclude Include="Battery.hpp" />
     <ClInclude Include="CppAllocator.hpp" />
-    <ClInclude Include="device.h" />
-    <ClInclude Include="driver.h" />
+    <ClInclude Include="device.hpp" />
+    <ClInclude Include="driver.hpp" />
     <ClInclude Include="HidPdReport.h" />
     <ClInclude Include="HidPd.hpp" />
   </ItemGroup>

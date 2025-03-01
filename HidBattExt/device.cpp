@@ -1,4 +1,4 @@
-#include "device.h"
+#include "device.hpp"
 #include <Hidport.h>
 #include "Battery.hpp"
 #include "HidPd.hpp"

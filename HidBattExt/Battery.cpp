@@ -1,5 +1,5 @@
 #include "Battery.hpp"
-#include "device.h"
+#include "device.hpp"
 
 
 static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, SharedState& state) {
