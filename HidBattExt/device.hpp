@@ -18,8 +18,8 @@ class SharedState {
 public:
     WDFSPINLOCK Lock = 0;  // to protext member access
 
-    ULONG CycleCount;  // BATTERY_INFORMATION::CycleCount value
-    ULONG Temperature; // IOCTL_BATTERY_QUERY_INFORMATION BatteryTemperature value
+    ULONG CycleCount = 0;  // BATTERY_INFORMATION::CycleCount value
+    ULONG Temperature = 0; // IOCTL_BATTERY_QUERY_INFORMATION BatteryTemperature value
 
     void Initialize(WDFDEVICE device) {
         WDF_OBJECT_ATTRIBUTES attribs{};
