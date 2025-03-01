@@ -35,6 +35,16 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
 }
 
 
+_Function_class_(EVT_WDF_DEVICE_SELF_MANAGED_IO_CLEANUP)
+_IRQL_requires_same_
+_IRQL_requires_max_(PASSIVE_LEVEL)
+void EvtSelfManagedIoCleanup(WDFDEVICE Device) {
+    UNREFERENCED_PARAMETER(Device);
+
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Device removed FDO(0x%p)\n", WdfDeviceWdmGetDeviceObject(Device));
+}
+
+
 UNICODE_STRING GetTargetPropertyString(WDFIOTARGET target, DEVICE_REGISTRY_PROPERTY DeviceProperty) {
     WDF_OBJECT_ATTRIBUTES attributes = {};
     WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
@@ -71,6 +81,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         WDF_PNPPOWER_EVENT_CALLBACKS PnpPowerCallbacks;
         WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&PnpPowerCallbacks);
         PnpPowerCallbacks.EvtDeviceSelfManagedIoInit = EvtSelfManagedIoInit;
+        PnpPowerCallbacks.EvtDeviceSelfManagedIoCleanup = EvtSelfManagedIoCleanup;
         WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &PnpPowerCallbacks);
     }
 
@@ -95,7 +106,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
             return status;
         }
 
-        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: PDO(0x%p) FDO(0x%p), Lower(0x%p)\n", WdfDeviceWdmGetPhysicalDevice(Device), WdfDeviceWdmGetDeviceObject(Device), WdfDeviceWdmGetAttachedDevice(Device));
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Device added PDO(0x%p) FDO(0x%p), Lower(0x%p)\n", WdfDeviceWdmGetPhysicalDevice(Device), WdfDeviceWdmGetDeviceObject(Device), WdfDeviceWdmGetAttachedDevice(Device));
     }
 
     // Driver Framework always zero initializes an objects context memory
