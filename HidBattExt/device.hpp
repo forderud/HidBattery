@@ -9,8 +9,8 @@ enum FilterMode {
 
 /** HID-related state for usage by the Lower filter driver instance. */
 struct HidState {
-    UCHAR TemperatureReportID;
-    UCHAR CycleCountReportID;
+    UCHAR TemperatureReportID = 0;
+    UCHAR CycleCountReportID = 0;
 };
 
 /** State to share between Upper and Lower filter driver instances. */
