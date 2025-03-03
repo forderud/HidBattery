@@ -140,11 +140,6 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
 
         //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Usage=%x, UsagePage=%x, InputReportByteLength=%u, FeatureReportByteLength=%u\n", caps.Usage, caps.UsagePage, caps.InputReportByteLength, caps.FeatureReportByteLength);
 
-        if (caps.FeatureReportByteLength != sizeof(HidPdReport)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: FeatureReportByteLength mismatch (%u, %Iu)."), caps.FeatureReportByteLength, sizeof(HidPdReport));
-            return status;
-        }
-
         // get FEATURE report value caps
         USHORT valueCapsLen = caps.NumberFeatureValueCaps;
         RamArray<HIDP_VALUE_CAPS> valueCaps(valueCapsLen);

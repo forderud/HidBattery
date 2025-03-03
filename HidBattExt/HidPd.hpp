@@ -1,5 +1,4 @@
 #pragma once
-#include "HidPdReport.h"
 #include <hidpddi.h> // for PHIDP_PREPARSED_DATA
 
 
