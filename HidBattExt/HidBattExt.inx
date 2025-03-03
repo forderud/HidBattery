@@ -1,5 +1,5 @@
 ;/*++
-; HidBatt extension filter driver setup information (INF) file.
+; HidBatt extension filter driver - https://github.com/forderud/HidBattery/
 ;
 ; Require Windows 10 build 16299 (1709) or newer due to DefaultDestDir=13 usage.
 ;--*/
