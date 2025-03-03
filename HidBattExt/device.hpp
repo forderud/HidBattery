@@ -23,6 +23,13 @@ struct HidState {
     }
 };
 
+/** HID Power Device report UsagePage and Usage codes from https://www.usb.org/sites/default/files/pdcv11.pdf */
+static constexpr UCHAR Temperature_UsagePage = 0x84; // from 4.1 Power Device Page (x84) Table 2.
+static constexpr UCHAR Temperature_Usage = 0x36;
+static constexpr UCHAR CycleCount_UsagePage = 0x85; // from 4.2 Battery System Page (x85) Table 3.
+static constexpr UCHAR CycleCount_Usage = 0x6B;
+
+
 /** State to share between Upper and Lower filter driver instances. */
 class SharedState {
 public:
