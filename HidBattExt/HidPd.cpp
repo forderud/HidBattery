@@ -98,17 +98,23 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
         //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInfo.ProductID, collectionInfo.VendorID, collectionInfo.VersionNumber, collectionInfo.DescriptorSize);
     }
 
-    PHIDP_PREPARSED_DATA_Wrap preparsedData(collectionInfo.DescriptorSize);
-    if (!preparsedData) {
-        return STATUS_INSUFFICIENT_RESOURCES;
-    }
-
     {
-        // populate "preparsedData"
-        WDF_MEMORY_DESCRIPTOR outputDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, static_cast<PHIDP_PREPARSED_DATA>(preparsedData), collectionInfo.DescriptorSize);
+        WDF_OBJECT_ATTRIBUTES attr{};
+        WDF_OBJECT_ATTRIBUTES_INIT(&attr);
+        attr.ParentObject = Device; // auto-delete when "Device" is deleted
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
+        // allocate "preparsedData"
+        NTSTATUS status = WdfMemoryCreate(&attr, NonPagedPoolNx, POOL_TAG, collectionInfo.DescriptorSize, &context->Hid.Preparsed, nullptr);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfMemoryCreate failed 0x%x"), status);
+            return status;
+        }
+
+        WDF_MEMORY_DESCRIPTOR outputDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_HANDLE(&outputDesc, context->Hid.Preparsed, NULL);
+
+        // populate "preparsedData"
+        status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
             IOCTL_HID_GET_COLLECTION_DESCRIPTOR, // same as HidD_GetPreparsedData in user-mode
             NULL, // input
             &outputDesc, // output
@@ -122,7 +128,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
     {
         // get capabilities
         HIDP_CAPS caps = {};
-        NTSTATUS status = HidP_GetCaps(preparsedData, &caps);
+        NTSTATUS status = HidP_GetCaps((PHIDP_PREPARSED_DATA)context->Hid.GetPreparsedData(), &caps);
         if (!NT_SUCCESS(status)) {
             return status;
         }
@@ -141,7 +147,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HIDP_VALUE_CAPS[%u] allocation failure."), valueCapsLen);
             return status;
         }
-        status = HidP_GetValueCaps(HidP_Feature, valueCaps, &valueCapsLen, preparsedData);
+        status = HidP_GetValueCaps(HidP_Feature, valueCaps, &valueCapsLen, (PHIDP_PREPARSED_DATA)context->Hid.GetPreparsedData());
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetValueCaps failed 0x%x"), status);
             return status;

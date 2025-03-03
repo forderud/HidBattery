@@ -11,6 +11,13 @@ enum FilterMode {
 struct HidState {
     UCHAR TemperatureReportID = 0;
     UCHAR CycleCountReportID = 0;
+
+    WDFMEMORY Preparsed; // preparsed HID report descriptor
+
+    void* GetPreparsedData() const {
+        NT_ASSERTMSG("WDFMEMORY Preparsed null", Preparsed);
+        return WdfMemoryGetBuffer(Preparsed, nullptr);
+    }
 };
 
 /** State to share between Upper and Lower filter driver instances. */
