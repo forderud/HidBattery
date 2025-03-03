@@ -4,6 +4,25 @@
 #include "HidPd.hpp"
 
 
+_Function_class_(EVT_WDF_TIMER)
+_IRQL_requires_same_
+_IRQL_requires_max_(DISPATCH_LEVEL)
+VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
+    DebugEnter();
+
+    WDFDEVICE Device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
+    NT_ASSERTMSG("HidPdFeatureRequest Device NULL\n", Device);
+
+    NTSTATUS status = HidPdFeatureRequest(Device);
+    if (!NT_SUCCESS(status)) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidPdFeatureRequest failure 0x%x"), status);
+        return;
+    }
+
+    DebugExit();
+}
+
+
 _Function_class_(EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT)
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
