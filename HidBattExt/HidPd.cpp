@@ -4,28 +4,6 @@
 #include "CppAllocator.hpp"
 
 
-/** RAII wrapper of PHIDP_PREPARSED_DATA. */
-class PHIDP_PREPARSED_DATA_Wrap {
-public:
-    PHIDP_PREPARSED_DATA_Wrap(size_t size) {
-        // allocate in non-paged pool (will always reside in RAM)
-        m_ptr = (BYTE*)ExAllocatePool2(POOL_FLAG_NON_PAGED, size, POOL_TAG);
-    }
-    ~PHIDP_PREPARSED_DATA_Wrap() {
-        if (m_ptr) {
-            ExFreePoolWithTag(m_ptr, POOL_TAG);
-            m_ptr = nullptr;
-        }
-    }
-
-    operator PHIDP_PREPARSED_DATA () const {
-        return (PHIDP_PREPARSED_DATA)m_ptr;
-    }
-
-private:
-    BYTE* m_ptr = nullptr;
-};
-
 static void UpdateSharedState(SharedState& state, HidPdReport& report, DEVICE_CONTEXT* context) {
     // capture shared state
     if (context->Hid.CycleCountReportID && (report.ReportId == context->Hid.CycleCountReportID)) {
