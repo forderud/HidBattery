@@ -97,7 +97,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInfo.ProductID, collectionInfo.VendorID, collectionInfo.VersionNumber, collectionInfo.DescriptorSize);
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: ProductID=%x, VendorID=%x, VersionNumber=%u, DescriptorSize=%u\n", collectionInfo.ProductID, collectionInfo.VendorID, collectionInfo.VersionNumber, collectionInfo.DescriptorSize);
     }
 
     {
@@ -138,7 +138,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
         context->Hid.InputReportByteLength = caps.InputReportByteLength;
         context->Hid.FeatureReportByteLength = caps.FeatureReportByteLength;
 
-        //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Usage=%x, UsagePage=%x, InputReportByteLength=%u, FeatureReportByteLength=%u\n", caps.Usage, caps.UsagePage, caps.InputReportByteLength, caps.FeatureReportByteLength);
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Usage=%x, UsagePage=%x, InputReportByteLength=%u, FeatureReportByteLength=%u\n", caps.Usage, caps.UsagePage, caps.InputReportByteLength, caps.FeatureReportByteLength);
 
         // get FEATURE report value caps
         USHORT valueCapsLen = caps.NumberFeatureValueCaps;
