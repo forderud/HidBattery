@@ -15,7 +15,7 @@ struct HidState {
     UCHAR TemperatureReportID = 0;
     UCHAR CycleCountReportID = 0;
 
-    WDFMEMORY Preparsed; // preparsed HID report descriptor
+    WDFMEMORY Preparsed = 0; // preparsed HID report descriptor
 
     void* GetPreparsedData() const {
         NT_ASSERTMSG("WDFMEMORY Preparsed null", Preparsed);
