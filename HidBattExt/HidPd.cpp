@@ -4,26 +4,48 @@
 #include "CppAllocator.hpp"
 
 
-static void UpdateSharedState(SharedState& state, CHAR* reportBuf, DEVICE_CONTEXT* context) {
-    HidPdReport* report = (HidPdReport*)reportBuf;
+static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, CHAR* report, DEVICE_CONTEXT* context) {
+    USHORT reportLen = 0;
+    if (reportType == HidP_Input)
+        reportLen = context->Hid.InputReportByteLength;
+    else if (reportType == HidP_Feature)
+        reportLen = context->Hid.FeatureReportByteLength;
+    else
+        NT_ASSERTMSG("UpdateSharedState invalid reportType", false);
+
+    CHAR reportId = report[0];
 
     // capture shared state
-    if (context->Hid.CycleCountReportID && (report->ReportId == context->Hid.CycleCountReportID)) {
+    if (context->Hid.CycleCountReportID && (reportId == context->Hid.CycleCountReportID)) {
+        ULONG value = 0;
+        NTSTATUS status = HidP_GetUsageValue(reportType, CycleCount_UsagePage, /*default link collection*/0, CycleCount_Usage, &value, (PHIDP_PREPARSED_DATA)context->Hid.GetPreparsedData(), report, reportLen);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed 0x%x"), status);
+            return;
+        }
+
         auto CycleCountBefore = state.CycleCount;
 
         WdfSpinLockAcquire(state.Lock);
-        state.CycleCount = report->Value;
+        state.CycleCount = value;
         WdfSpinLockRelease(state.Lock);
 
         if (state.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
         }
-    } else if (context->Hid.TemperatureReportID && (report->ReportId == context->Hid.TemperatureReportID)) {
+    } else if (context->Hid.TemperatureReportID && (reportId == context->Hid.TemperatureReportID)) {
+        ULONG value = 0;
+        NTSTATUS status = HidP_GetUsageValue(reportType, Temperature_UsagePage, /*default link collection*/0, Temperature_Usage, &value, (PHIDP_PREPARSED_DATA)context->Hid.GetPreparsedData(), report, reportLen);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed 0x%x"), status);
+            return;
+        }
+
         auto TempBefore = state.Temperature;
 
         WdfSpinLockAcquire(state.Lock);
         // convert HID PD unit from (Kelvin) to BATTERY_QUERY_INFORMATION unit (10ths of a degree Kelvin)
-        state.Temperature = 10*report->Value;
+        state.Temperature = 10*value;
         WdfSpinLockRelease(state.Lock);
 
         if (state.Temperature != TempBefore) {
@@ -168,7 +190,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        UpdateSharedState(context->LowState, report, context);
+        UpdateSharedState(context->LowState, HidP_Feature, report, context);
     }
     if (context->Hid.CycleCountReportID) {
         // Battery CycleCount query
@@ -189,7 +211,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        UpdateSharedState(context->LowState, report, context);
+        UpdateSharedState(context->LowState, HidP_Feature, report, context);
     }
 
     DebugExit();
@@ -231,7 +253,7 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t L
         return;
     }
 
-    UpdateSharedState(context->LowState, report, context);
+    UpdateSharedState(context->LowState, HidP_Input, report, context);
 }
 
 
