@@ -16,13 +16,13 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
         WDF_TIMER_CONFIG timerCfg = {};
         WDF_TIMER_CONFIG_INIT(&timerCfg, HidPdFeatureRequestTimer);
 
-        WDF_OBJECT_ATTRIBUTES attribs = {};
-        WDF_OBJECT_ATTRIBUTES_INIT(&attribs);
-        attribs.ParentObject = Device;
-        attribs.ExecutionLevel = WdfExecutionLevelPassive; // required to access HID functions
+        WDF_OBJECT_ATTRIBUTES attr = {};
+        WDF_OBJECT_ATTRIBUTES_INIT(&attr);
+        attr.ParentObject = Device;
+        attr.ExecutionLevel = WdfExecutionLevelPassive; // required to access HID functions
 
         WDFTIMER timer = nullptr;
-        NTSTATUS status = WdfTimerCreate(&timerCfg, &attribs, &timer);
+        NTSTATUS status = WdfTimerCreate(&timerCfg, &attr, &timer);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfTimerCreate failed 0x%x"), status);
             return status;
@@ -48,12 +48,12 @@ void EvtSelfManagedIoCleanup(WDFDEVICE Device) {
 
 
 UNICODE_STRING GetTargetPropertyString(WDFIOTARGET target, DEVICE_REGISTRY_PROPERTY DeviceProperty) {
-    WDF_OBJECT_ATTRIBUTES attributes = {};
-    WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-    attributes.ParentObject = target; // auto-delete with I/O target
+    WDF_OBJECT_ATTRIBUTES attr = {};
+    WDF_OBJECT_ATTRIBUTES_INIT(&attr);
+    attr.ParentObject = target; // auto-delete with I/O target
 
     WDFMEMORY memory = 0;
-    NTSTATUS status = WdfIoTargetAllocAndQueryTargetProperty(target, DeviceProperty, NonPagedPoolNx, &attributes, &memory);
+    NTSTATUS status = WdfIoTargetAllocAndQueryTargetProperty(target, DeviceProperty, NonPagedPoolNx, &attr, &memory);
     if (!NT_SUCCESS(status)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetAllocAndQueryTargetProperty with property=0x%x failed 0x%x"), DeviceProperty, status);
         return {};
@@ -89,20 +89,20 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
 
     {
         // reserve context space for request objects
-        WDF_OBJECT_ATTRIBUTES attributes{};
-        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&attributes, REQUEST_CONTEXT);
+        WDF_OBJECT_ATTRIBUTES attr{};
+        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&attr, REQUEST_CONTEXT);
 
-        WdfDeviceInitSetRequestAttributes(DeviceInit, &attributes);
+        WdfDeviceInitSetRequestAttributes(DeviceInit, &attr);
     }
 
 
     WDFDEVICE Device = 0;
     {
         // create device
-        WDF_OBJECT_ATTRIBUTES attributes = {};
-        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&attributes, DEVICE_CONTEXT);
+        WDF_OBJECT_ATTRIBUTES attr = {};
+        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&attr, DEVICE_CONTEXT);
 
-        NTSTATUS status = WdfDeviceCreate(&DeviceInit, &attributes, &Device);
+        NTSTATUS status = WdfDeviceCreate(&DeviceInit, &attr, &Device);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfDeviceCreate, Error %x"), status);
             return status;

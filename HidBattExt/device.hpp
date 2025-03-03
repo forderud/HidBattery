@@ -22,11 +22,11 @@ public:
     ULONG Temperature = 0; // IOCTL_BATTERY_QUERY_INFORMATION BatteryTemperature value
 
     void Initialize(WDFDEVICE device) {
-        WDF_OBJECT_ATTRIBUTES attribs{};
-        WDF_OBJECT_ATTRIBUTES_INIT(&attribs);
-        attribs.ParentObject = device; // auto-deleted when "device" is deleted
+        WDF_OBJECT_ATTRIBUTES attr{};
+        WDF_OBJECT_ATTRIBUTES_INIT(&attr);
+        attr.ParentObject = device; // auto-deleted when "device" is deleted
 
-        NTSTATUS status = WdfSpinLockCreate(&attribs, &Lock);
+        NTSTATUS status = WdfSpinLockCreate(&attr, &Lock);
         NT_ASSERTMSG("WdfSpinLockCreate failed.\n", status == STATUS_SUCCESS); status;
     }
 };
