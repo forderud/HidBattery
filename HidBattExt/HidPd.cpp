@@ -4,24 +4,26 @@
 #include "CppAllocator.hpp"
 
 
-static void UpdateSharedState(SharedState& state, HidPdReport& report, DEVICE_CONTEXT* context) {
+static void UpdateSharedState(SharedState& state, CHAR* reportBuf, DEVICE_CONTEXT* context) {
+    HidPdReport* report = (HidPdReport*)reportBuf;
+
     // capture shared state
-    if (context->Hid.CycleCountReportID && (report.ReportId == context->Hid.CycleCountReportID)) {
+    if (context->Hid.CycleCountReportID && (report->ReportId == context->Hid.CycleCountReportID)) {
         auto CycleCountBefore = state.CycleCount;
 
         WdfSpinLockAcquire(state.Lock);
-        state.CycleCount = report.Value;
+        state.CycleCount = report->Value;
         WdfSpinLockRelease(state.Lock);
 
         if (state.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
         }
-    } else if (context->Hid.TemperatureReportID && (report.ReportId == context->Hid.TemperatureReportID)) {
+    } else if (context->Hid.TemperatureReportID && (report->ReportId == context->Hid.TemperatureReportID)) {
         auto TempBefore = state.Temperature;
 
         WdfSpinLockAcquire(state.Lock);
         // convert HID PD unit from (Kelvin) to BATTERY_QUERY_INFORMATION unit (10ths of a degree Kelvin)
-        state.Temperature = 10*report.Value;
+        state.Temperature = 10*report->Value;
         WdfSpinLockRelease(state.Lock);
 
         if (state.Temperature != TempBefore) {
@@ -150,10 +152,11 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
 
     if (context->Hid.TemperatureReportID) {
         // Battery Temperature query
-        HidPdReport report(context->Hid.TemperatureReportID);
+        RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
+        report[0] = context->Hid.TemperatureReportID;
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, context->Hid.FeatureReportByteLength);
 
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
             IOCTL_HID_GET_FEATURE,
@@ -169,10 +172,11 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
     }
     if (context->Hid.CycleCountReportID) {
         // Battery CycleCount query
-        HidPdReport report(context->Hid.CycleCountReportID);
+        RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
+        report[0] = context->Hid.CycleCountReportID;
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, context->Hid.FeatureReportByteLength);
 
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
             IOCTL_HID_GET_FEATURE,
@@ -213,20 +217,21 @@ VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
 
 
 void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t Length) {
-    if (Length != sizeof(HidPdReport)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: EvtIoReadFilter: Incorrect Length"));
+    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
+
+    if (Length != context->Hid.InputReportByteLength) {
+        DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: EvtIoReadFilter: Incorrect Length\n");
         return;
     }
 
-    HidPdReport* report = nullptr;
-    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(HidPdReport), (void**)&report, NULL);
+    CHAR* report = nullptr;
+    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, Length, (void**)&report, NULL);
     if (!NT_SUCCESS(status) || !report) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestRetrieveOutputBuffer failed 0x%x, report=0x%p"), status, report);
         return;
     }
 
-    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
-    UpdateSharedState(context->LowState, *report, context);
+    UpdateSharedState(context->LowState, report, context);
 }
 
 
