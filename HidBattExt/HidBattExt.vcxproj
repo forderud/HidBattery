@@ -143,7 +143,6 @@ copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
     <ClInclude Include="CppAllocator.hpp" />
     <ClInclude Include="device.hpp" />
     <ClInclude Include="driver.hpp" />
-    <ClInclude Include="HidPdReport.h" />
     <ClInclude Include="HidPd.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

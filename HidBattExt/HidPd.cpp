@@ -4,24 +4,48 @@
 #include "CppAllocator.hpp"
 
 
-static void UpdateSharedState(SharedState& state, HidPdReport& report, DEVICE_CONTEXT* context) {
+static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, CHAR* report, DEVICE_CONTEXT* context) {
+    USHORT reportLen = 0;
+    if (reportType == HidP_Input)
+        reportLen = context->Hid.InputReportByteLength;
+    else if (reportType == HidP_Feature)
+        reportLen = context->Hid.FeatureReportByteLength;
+    else
+        NT_ASSERTMSG("UpdateSharedState invalid reportType", false);
+
+    CHAR reportId = report[0];
+
     // capture shared state
-    if (context->Hid.CycleCountReportID && (report.ReportId == context->Hid.CycleCountReportID)) {
+    if (context->Hid.CycleCountReportID && (reportId == context->Hid.CycleCountReportID)) {
+        ULONG value = 0;
+        NTSTATUS status = HidP_GetUsageValue(reportType, CycleCount_UsagePage, /*default link collection*/0, CycleCount_Usage, &value, (PHIDP_PREPARSED_DATA)context->Hid.GetPreparsedData(), report, reportLen);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed 0x%x"), status);
+            return;
+        }
+
         auto CycleCountBefore = state.CycleCount;
 
         WdfSpinLockAcquire(state.Lock);
-        state.CycleCount = report.Value;
+        state.CycleCount = value;
         WdfSpinLockRelease(state.Lock);
 
         if (state.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
         }
-    } else if (context->Hid.TemperatureReportID && (report.ReportId == context->Hid.TemperatureReportID)) {
+    } else if (context->Hid.TemperatureReportID && (reportId == context->Hid.TemperatureReportID)) {
+        ULONG value = 0;
+        NTSTATUS status = HidP_GetUsageValue(reportType, Temperature_UsagePage, /*default link collection*/0, Temperature_Usage, &value, (PHIDP_PREPARSED_DATA)context->Hid.GetPreparsedData(), report, reportLen);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed 0x%x"), status);
+            return;
+        }
+
         auto TempBefore = state.Temperature;
 
         WdfSpinLockAcquire(state.Lock);
         // convert HID PD unit from (Kelvin) to BATTERY_QUERY_INFORMATION unit (10ths of a degree Kelvin)
-        state.Temperature = 10*report.Value;
+        state.Temperature = 10*value;
         WdfSpinLockRelease(state.Lock);
 
         if (state.Temperature != TempBefore) {
@@ -116,11 +140,6 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
 
         //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Usage=%x, UsagePage=%x, InputReportByteLength=%u, FeatureReportByteLength=%u\n", caps.Usage, caps.UsagePage, caps.InputReportByteLength, caps.FeatureReportByteLength);
 
-        if (caps.FeatureReportByteLength != sizeof(HidPdReport)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: FeatureReportByteLength mismatch (%u, %Iu)."), caps.FeatureReportByteLength, sizeof(HidPdReport));
-            return status;
-        }
-
         // get FEATURE report value caps
         USHORT valueCapsLen = caps.NumberFeatureValueCaps;
         RamArray<HIDP_VALUE_CAPS> valueCaps(valueCapsLen);
@@ -150,10 +169,11 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
 
     if (context->Hid.TemperatureReportID) {
         // Battery Temperature query
-        HidPdReport report(context->Hid.TemperatureReportID);
+        RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
+        report[0] = context->Hid.TemperatureReportID;
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, context->Hid.FeatureReportByteLength);
 
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
             IOCTL_HID_GET_FEATURE,
@@ -165,14 +185,15 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        UpdateSharedState(context->LowState, report, context);
+        UpdateSharedState(context->LowState, HidP_Feature, report, context);
     }
     if (context->Hid.CycleCountReportID) {
         // Battery CycleCount query
-        HidPdReport report(context->Hid.CycleCountReportID);
+        RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
+        report[0] = context->Hid.CycleCountReportID;
 
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &report, sizeof(report));
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, context->Hid.FeatureReportByteLength);
 
         NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
             IOCTL_HID_GET_FEATURE,
@@ -185,7 +206,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        UpdateSharedState(context->LowState, report, context);
+        UpdateSharedState(context->LowState, HidP_Feature, report, context);
     }
 
     DebugExit();
@@ -213,20 +234,21 @@ VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
 
 
 void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t Length) {
-    if (Length != sizeof(HidPdReport)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: EvtIoReadFilter: Incorrect Length"));
+    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
+
+    if (Length != context->Hid.InputReportByteLength) {
+        DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: EvtIoReadFilter: Incorrect Length\n");
         return;
     }
 
-    HidPdReport* report = nullptr;
-    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, sizeof(HidPdReport), (void**)&report, NULL);
+    CHAR* report = nullptr;
+    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, Length, (void**)&report, NULL);
     if (!NT_SUCCESS(status) || !report) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestRetrieveOutputBuffer failed 0x%x, report=0x%p"), status, report);
         return;
     }
 
-    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
-    UpdateSharedState(context->LowState, *report, context);
+    UpdateSharedState(context->LowState, HidP_Input, report, context);
 }
 
 
