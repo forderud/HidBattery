@@ -12,6 +12,7 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
 
     if (context->Mode == LowerFilter) {
         // schedule read of HID FEATURE reports
+        // cannot call HidPdFeatureRequestTimer immediately, since WdfIoTargetOpen of PDO will then fail with 0xc000000e (STATUS_NO_SUCH_DEVICE)
         WDF_TIMER_CONFIG timerCfg = {};
         WDF_TIMER_CONFIG_INIT(&timerCfg, HidPdFeatureRequestTimer);
 
