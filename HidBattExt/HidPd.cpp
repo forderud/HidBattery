@@ -111,6 +111,9 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             return status;
         }
 
+        context->Hid.InputReportByteLength = caps.InputReportByteLength;
+        context->Hid.FeatureReportByteLength = caps.FeatureReportByteLength;
+
         //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Usage=%x, UsagePage=%x\n", caps.Usage, caps.UsagePage);
 
         if (caps.FeatureReportByteLength != sizeof(HidPdReport)) {
