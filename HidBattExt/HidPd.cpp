@@ -18,7 +18,7 @@ static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, C
     // capture shared state
     if (hid.CycleCountReportID && (reportId == hid.CycleCountReportID)) {
         ULONG value = 0;
-        NTSTATUS status = HidP_GetUsageValue(reportType, CycleCount_UsagePage, /*default link collection*/0, CycleCount_Usage, &value, (PHIDP_PREPARSED_DATA)hid.GetPreparsedData(), report, reportLen);
+        NTSTATUS status = HidP_GetUsageValue(reportType, CycleCount_UsagePage, /*default link collection*/0, CycleCount_Usage, &value, hid.GetPreparsedData(), report, reportLen);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed 0x%x"), status);
             return;
@@ -35,7 +35,7 @@ static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, C
         }
     } else if (hid.TemperatureReportID && (reportId == hid.TemperatureReportID)) {
         ULONG value = 0;
-        NTSTATUS status = HidP_GetUsageValue(reportType, Temperature_UsagePage, /*default link collection*/0, Temperature_Usage, &value, (PHIDP_PREPARSED_DATA)hid.GetPreparsedData(), report, reportLen);
+        NTSTATUS status = HidP_GetUsageValue(reportType, Temperature_UsagePage, /*default link collection*/0, Temperature_Usage, &value, hid.GetPreparsedData(), report, reportLen);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed 0x%x"), status);
             return;
@@ -130,7 +130,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     {
         // get capabilities
         HIDP_CAPS caps = {};
-        NTSTATUS status = HidP_GetCaps((PHIDP_PREPARSED_DATA)context->Hid.GetPreparsedData(), &caps);
+        NTSTATUS status = HidP_GetCaps(context->Hid.GetPreparsedData(), &caps);
         if (!NT_SUCCESS(status)) {
             return status;
         }
@@ -147,7 +147,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HIDP_VALUE_CAPS[%u] allocation failure."), valueCapsLen);
             return status;
         }
-        status = HidP_GetValueCaps(HidP_Feature, valueCaps, &valueCapsLen, (PHIDP_PREPARSED_DATA)context->Hid.GetPreparsedData());
+        status = HidP_GetValueCaps(HidP_Feature, valueCaps, &valueCapsLen, context->Hid.GetPreparsedData());
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetValueCaps failed 0x%x"), status);
             return status;

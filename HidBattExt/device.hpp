@@ -1,5 +1,6 @@
 #pragma once
 #include "driver.hpp"
+#include "HidPd.hpp"
 
 
 enum FilterMode {
@@ -12,9 +13,9 @@ enum FilterMode {
 struct HidState {
     WDFMEMORY Preparsed = 0; // preparsed HID report descriptor
 
-    void* GetPreparsedData() const {
+    PHIDP_PREPARSED_DATA GetPreparsedData() const {
         NT_ASSERTMSG("WDFMEMORY Preparsed null", Preparsed);
-        return WdfMemoryGetBuffer(Preparsed, nullptr);
+        return (PHIDP_PREPARSED_DATA)WdfMemoryGetBuffer(Preparsed, nullptr);
     }
 
     USHORT InputReportByteLength = 0;
