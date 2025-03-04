@@ -9,7 +9,7 @@ static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, SharedState& state
     bi.CycleCount = state.CycleCount;
     WdfSpinLockRelease(state.Lock);
 
-    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryInformation CycleCount before=%u, after=%u\n", CycleCountBefore, bi.CycleCount); CycleCountBefore;
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: UpdateBatteryInformation CycleCount before=%u, after=%u\n", CycleCountBefore, bi.CycleCount); CycleCountBefore;
 }
 
 static void UpdateBatteryTemperature(ULONG& temp, SharedState& state) {
@@ -20,7 +20,7 @@ static void UpdateBatteryTemperature(ULONG& temp, SharedState& state) {
     WdfSpinLockRelease(state.Lock);
 
     // error 0xc0000010 (STATUS_INVALID_DEVICE_REQUEST) observed here
-    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: UpdateBatteryTemperature before=%u, after=%u\n", TempBefore, temp); TempBefore;
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: UpdateBatteryTemperature before=%u, after=%u\n", TempBefore, temp); TempBefore;
 }
 
 
