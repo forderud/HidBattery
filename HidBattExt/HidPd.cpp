@@ -209,6 +209,9 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
         UpdateSharedState(context->LowState, HidP_Feature, report, context->Hid);
     }
 
+    // flag HidState struct as initialized
+    InterlockedIncrement(&context->Hid.Initialized);
+
     DebugExit();
     return STATUS_SUCCESS;
 }
@@ -217,8 +220,11 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
 void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t Length) {
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
+    if (!context->Hid.Initialized)
+        return;
+
     if (Length != context->Hid.InputReportByteLength) {
-        DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: EvtIoReadFilter: Incorrect Length\n");
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: EvtIoReadFilter: Incorrect Length"));
         return;
     }
 
