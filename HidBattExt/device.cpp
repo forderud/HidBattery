@@ -22,13 +22,19 @@ VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
     {
         // create queue for filtering HID Power Device requests now that HidState have been initialized
         WDF_IO_QUEUE_CONFIG queueConfig = {};
-        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
+        WDF_IO_QUEUE_CONFIG_INIT(&queueConfig, WdfIoQueueDispatchParallel);
         queueConfig.EvtIoRead = EvtIoReadHidFilter; // filter read requests
 
         WDFQUEUE queue = 0; // auto-deleted when "Device" is deleted
         status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoQueueCreate failed 0x%x"), status);
+            return;
+        }
+
+        status = WdfDeviceConfigureRequestDispatching(Device, queue, WdfRequestTypeRead);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfDeviceConfigureRequestDispatching(queue, RequestTypeRead) failed 0x%x"), status);
             return;
         }
     }
