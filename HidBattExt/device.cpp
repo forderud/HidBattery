@@ -189,7 +189,17 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     }
 
     if (deviceContext->Mode == LowerFilter) {
-        // defer queue creation until after HidState have been initialized
+        // dummy queue to satisfy WDF filter driver requireents
+        // the actual filtering queue will be created after HidState have been initialized
+        WDF_IO_QUEUE_CONFIG queueConfig = {};
+        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
+        //queueConfig.EvtIoRead = // no filtering yet
+        WDFQUEUE queue = 0; // auto-deleted when "Device" is deleted
+        NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoQueueCreate failed 0x%x"), status);
+            return status;
+        }
     } else if (deviceContext->Mode == UpperFilter) {
         // create queue for filtering Battery device requests
         WDF_IO_QUEUE_CONFIG queueConfig = {};
