@@ -56,8 +56,6 @@ static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, C
 
 
 NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
-    DebugEnter();
-
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
     WDFIOTARGET_Wrap pdoTarget;
     {
@@ -212,7 +210,6 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     // flag HidState struct as initialized
     InterlockedIncrement(&context->Hid.Initialized);
 
-    DebugExit();
     return STATUS_SUCCESS;
 }
 
