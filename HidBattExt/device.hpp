@@ -3,9 +3,9 @@
 #include "HidPd.hpp"
 
 
-enum FilterMode {
-    UpperFilter, // above HidBatt: Filters battery IOCTL communication
-    LowerFilter, // below HidBatt: Filters HID Power Device communication
+enum class FilterMode {
+    Upper, // above HidBatt: Filters battery IOCTL communication
+    Lower, // below HidBatt: Filters HID Power Device communication
 };
 
 /** HID-related state for usage by the Lower filter driver instance.

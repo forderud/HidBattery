@@ -29,7 +29,7 @@ _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
-    if (context->Mode == LowerFilter) {
+    if (context->Mode == FilterMode::Lower) {
         // schedule read of HID FEATURE reports
         // cannot call InitializeHidState immediately, since WdfIoTargetOpen of PDO will then fail with 0xc000000e (STATUS_NO_SUCH_DEVICE)
         WDF_TIMER_CONFIG timerCfg = {};
@@ -136,7 +136,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     if (WdfDeviceWdmGetPhysicalDevice(Device) == WdfDeviceWdmGetAttachedDevice(Device)) {
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Lower filter driver below HidBatt\n");
 
-        deviceContext->Mode = LowerFilter;
+        deviceContext->Mode = FilterMode::Lower;
 
         deviceContext->LowState.Initialize(Device);
 
@@ -148,7 +148,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     } else {
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Upper filter driver above HidBatt\n");
 
-        deviceContext->Mode = UpperFilter;
+        deviceContext->Mode = FilterMode::Upper;
 
         NTSTATUS status = deviceContext->Interface.Lookup(Device);
         if (!NT_SUCCESS(status)) {
@@ -168,7 +168,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: PdoName: %wZ\n", deviceContext->PdoName); // outputs "\Device\00000083"
     }
 
-    if (deviceContext->Mode == LowerFilter) {
+    if (deviceContext->Mode == FilterMode::Lower) {
         // create queue for filtering HID Power Device requests
         WDF_IO_QUEUE_CONFIG queueConfig = {};
         WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
@@ -180,7 +180,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoQueueCreate failed 0x%x"), status);
             return status;
         }
-    } else if (deviceContext->Mode == UpperFilter) {
+    } else if (deviceContext->Mode == FilterMode::Upper) {
         // create queue for filtering Battery device requests
         WDF_IO_QUEUE_CONFIG queueConfig = {};
         WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
