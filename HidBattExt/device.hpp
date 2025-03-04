@@ -7,20 +7,21 @@ enum FilterMode {
     LowerFilter, // below HidBatt: Filters HID Power Device communication
 };
 
-/** HID-related state for usage by the Lower filter driver instance. */
+/** HID-related state for usage by the Lower filter driver instance.
+    Members sorted in initialization order. */
 struct HidState {
-    USHORT InputReportByteLength = 0;
-    USHORT FeatureReportByteLength = 0;
-
-    UCHAR TemperatureReportID = 0;
-    UCHAR CycleCountReportID = 0;
-
     WDFMEMORY Preparsed = 0; // preparsed HID report descriptor
 
     void* GetPreparsedData() const {
         NT_ASSERTMSG("WDFMEMORY Preparsed null", Preparsed);
         return WdfMemoryGetBuffer(Preparsed, nullptr);
     }
+
+    USHORT InputReportByteLength = 0;
+    USHORT FeatureReportByteLength = 0;
+
+    UCHAR TemperatureReportID = 0;
+    UCHAR CycleCountReportID = 0;
 };
 
 /** HID Power Device report UsagePage and Usage codes from https://www.usb.org/sites/default/files/pdcv11.pdf */
