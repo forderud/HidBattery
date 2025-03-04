@@ -220,8 +220,10 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
 void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t Length) {
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
-    if (!context->Hid.Initialized)
+    if (!context->Hid.Initialized) {
+        //DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: HidState not yet initialized\n");
         return;
+    }
 
     if (Length != context->Hid.InputReportByteLength) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: EvtIoReadFilter: Incorrect Length"));
