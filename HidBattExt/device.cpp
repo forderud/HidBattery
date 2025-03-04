@@ -43,7 +43,7 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
         WDFTIMER timer = nullptr;
         NTSTATUS status = WdfTimerCreate(&timerCfg, &attr, &timer);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfTimerCreate failed 0x%x"), status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfTimerCreate failed 0x%x"), status);
             return status;
         }
 
