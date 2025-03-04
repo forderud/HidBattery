@@ -11,11 +11,11 @@ VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
     DebugEnter();
 
     WDFDEVICE Device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
-    NT_ASSERTMSG("HidPdFeatureRequest Device NULL\n", Device);
+    NT_ASSERTMSG("InitializeHidState Device NULL\n", Device);
 
-    NTSTATUS status = HidPdFeatureRequest(Device);
+    NTSTATUS status = InitializeHidState(Device);
     if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidPdFeatureRequest failure 0x%x"), status);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: InitializeHidState failure 0x%x"), status);
         return;
     }
 

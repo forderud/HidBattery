@@ -55,7 +55,7 @@ static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, C
 }
 
 
-NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
+NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     DebugEnter();
 
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
