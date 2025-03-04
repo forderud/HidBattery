@@ -102,8 +102,7 @@ struct DEVICE_CONTEXT {
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
 
 
-/** IOCTL buffer object to allow completion routines to access request bufffers.
-    Needed because the "WDF_REQUEST_COMPLETION_PARAMS* Params" argument have been invalidated by WdfRequestFormatRequestUsingCurrentType. */
+/** IOCTL buffer object to allow completion routines to access request information. */
 struct REQUEST_CONTEXT {
     ULONG IoControlCode = 0;
     ULONG InformationLevel = 0; // contains BATTERY_QUERY_INFORMATION::InformationLevel in IOCTL_BATTERY_QUERY_INFORMATION requests
