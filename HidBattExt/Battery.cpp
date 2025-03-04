@@ -59,7 +59,7 @@ void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDF
         return;
     }
 
-    DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: IOCTL_BATTERY_QUERY_INFORMATION (InformationLevel=%u, OutputBufferLength=%u, Information=%u, Status=0x%x)\n", reqCtx->InformationLevel, OutputBufferLength, WdfRequestGetInformation(Request), WdfRequestGetStatus(Request));
+    //DebugPrint(DPFLTR_INFO_LEVEL, "EvtIoDeviceControlBattFilterCompletion: IOCTL_BATTERY_QUERY_INFORMATION (InformationLevel=%u, OutputBufferLength=%u, Information=%u, Status=0x%x)\n", reqCtx->InformationLevel, OutputBufferLength, WdfRequestGetInformation(Request), WdfRequestGetStatus(Request));
 
     if ((reqCtx->InformationLevel == BatteryInformation) && (OutputBufferLength >= sizeof(BATTERY_INFORMATION))) {
         auto* bi = (BATTERY_INFORMATION*)OutputBuffer;
