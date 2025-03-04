@@ -4,8 +4,8 @@
 
 
 enum class FilterMode {
-    Upper, // above HidBatt: Filters battery IOCTL communication
-    Lower, // below HidBatt: Filters HID Power Device communication
+    Upper, // above HidBatt: Filter battery IOCTL communication
+    Lower, // below HidBatt: Filter HID Power Device communication
 };
 
 /** HID-related state for usage by the Lower filter driver instance.
