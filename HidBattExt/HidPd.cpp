@@ -31,7 +31,7 @@ static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, C
         WdfSpinLockRelease(state.Lock);
 
         if (state.CycleCount != CycleCountBefore) {
-            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
         }
     } else if (hid.TemperatureReportID && (reportId == hid.TemperatureReportID)) {
         ULONG value = 0;
@@ -49,7 +49,7 @@ static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, C
         WdfSpinLockRelease(state.Lock);
 
         if (state.Temperature != TempBefore) {
-            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating Temperature before=%u, after=%u\n", TempBefore, state.Temperature);
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID Temperature before=%u, after=%u\n", TempBefore, state.Temperature);
         }
     }
 }
