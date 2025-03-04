@@ -11,7 +11,7 @@ enum class FilterMode {
 /** HID-related state for usage by the Lower filter driver instance.
     Members sorted in initialization order. */
 struct HidState {
-    WDFMEMORY Preparsed = 0; // preparsed HID report descriptor
+    WDFMEMORY Preparsed = 0; // preparsed HID report descriptor (~3kB)
 
     PHIDP_PREPARSED_DATA GetPreparsedData() const {
         NT_ASSERTMSG("WDFMEMORY Preparsed null", Preparsed);
