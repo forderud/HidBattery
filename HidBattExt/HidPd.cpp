@@ -4,21 +4,21 @@
 #include "CppAllocator.hpp"
 
 
-static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, CHAR* report, DEVICE_CONTEXT* context) {
+static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, CHAR* report, const HidState& hid) {
     USHORT reportLen = 0;
     if (reportType == HidP_Input)
-        reportLen = context->Hid.InputReportByteLength;
+        reportLen = hid.InputReportByteLength;
     else if (reportType == HidP_Feature)
-        reportLen = context->Hid.FeatureReportByteLength;
+        reportLen = hid.FeatureReportByteLength;
     else
         NT_ASSERTMSG("UpdateSharedState invalid reportType", false);
 
     CHAR reportId = report[0];
 
     // capture shared state
-    if (context->Hid.CycleCountReportID && (reportId == context->Hid.CycleCountReportID)) {
+    if (hid.CycleCountReportID && (reportId == hid.CycleCountReportID)) {
         ULONG value = 0;
-        NTSTATUS status = HidP_GetUsageValue(reportType, CycleCount_UsagePage, /*default link collection*/0, CycleCount_Usage, &value, (PHIDP_PREPARSED_DATA)context->Hid.GetPreparsedData(), report, reportLen);
+        NTSTATUS status = HidP_GetUsageValue(reportType, CycleCount_UsagePage, /*default link collection*/0, CycleCount_Usage, &value, (PHIDP_PREPARSED_DATA)hid.GetPreparsedData(), report, reportLen);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed 0x%x"), status);
             return;
@@ -33,9 +33,9 @@ static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, C
         if (state.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
         }
-    } else if (context->Hid.TemperatureReportID && (reportId == context->Hid.TemperatureReportID)) {
+    } else if (hid.TemperatureReportID && (reportId == hid.TemperatureReportID)) {
         ULONG value = 0;
-        NTSTATUS status = HidP_GetUsageValue(reportType, Temperature_UsagePage, /*default link collection*/0, Temperature_Usage, &value, (PHIDP_PREPARSED_DATA)context->Hid.GetPreparsedData(), report, reportLen);
+        NTSTATUS status = HidP_GetUsageValue(reportType, Temperature_UsagePage, /*default link collection*/0, Temperature_Usage, &value, (PHIDP_PREPARSED_DATA)hid.GetPreparsedData(), report, reportLen);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed 0x%x"), status);
             return;
@@ -185,7 +185,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        UpdateSharedState(context->LowState, HidP_Feature, report, context);
+        UpdateSharedState(context->LowState, HidP_Feature, report, context->Hid);
     }
     if (context->Hid.CycleCountReportID) {
         // Battery CycleCount query
@@ -206,7 +206,7 @@ NTSTATUS HidPdFeatureRequest(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        UpdateSharedState(context->LowState, HidP_Feature, report, context);
+        UpdateSharedState(context->LowState, HidP_Feature, report, context->Hid);
     }
 
     DebugExit();
@@ -229,7 +229,7 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t L
         return;
     }
 
-    UpdateSharedState(context->LowState, HidP_Input, report, context);
+    UpdateSharedState(context->LowState, HidP_Input, report, context->Hid);
 }
 
 
