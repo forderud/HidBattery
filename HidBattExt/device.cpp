@@ -7,7 +7,7 @@
 _Function_class_(EVT_WDF_TIMER)
 _IRQL_requires_same_
 _IRQL_requires_max_(DISPATCH_LEVEL)
-VOID HidPdFeatureRequestTimer(_In_ WDFTIMER  Timer) {
+VOID InitializeHidStateTimer(_In_ WDFTIMER  Timer) {
     DebugEnter();
 
     WDFDEVICE Device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
@@ -31,9 +31,9 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
 
     if (context->Mode == LowerFilter) {
         // schedule read of HID FEATURE reports
-        // cannot call HidPdFeatureRequestTimer immediately, since WdfIoTargetOpen of PDO will then fail with 0xc000000e (STATUS_NO_SUCH_DEVICE)
+        // cannot call InitializeHidState immediately, since WdfIoTargetOpen of PDO will then fail with 0xc000000e (STATUS_NO_SUCH_DEVICE)
         WDF_TIMER_CONFIG timerCfg = {};
-        WDF_TIMER_CONFIG_INIT(&timerCfg, HidPdFeatureRequestTimer);
+        WDF_TIMER_CONFIG_INIT(&timerCfg, InitializeHidStateTimer);
 
         WDF_OBJECT_ATTRIBUTES attr = {};
         WDF_OBJECT_ATTRIBUTES_INIT(&attr);
