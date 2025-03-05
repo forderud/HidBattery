@@ -1,0 +1,23 @@
+;*** HidBatttExt driver packaging
+;
+; Generic settings from https://learn.microsoft.com/nb-no/windows-hardware/drivers/dashboard/code-signing-attestation
+.OPTION EXPLICIT     ; Generate errors
+.Set CabinetFileCountThreshold=0
+.Set FolderFileCountThreshold=0
+.Set FolderSizeThreshold=0
+.Set MaxCabinetSize=0
+.Set MaxDiskFileCount=0
+.Set MaxDiskSize=0
+.Set CompressionType=MSZIP
+.Set Cabinet=on
+.Set Compress=on
+;
+; Driver name
+.Set CabinetNameTemplate=HidBatttExt_arm64.cab
+;
+; ARM64 driver files
+.Set DestinationDir=ARM64
+..\ARM64\Release\HidBattExt\HidBattExt.inf
+..\ARM64\Release\HidBattExt\HidBattExt.sys
+..\ARM64\Release\HidBattExt\HidBattExt.cat
+..\ARM64\Release\HidBattExt.pdb
