@@ -3,7 +3,7 @@
 /** Driver entry point.
     Initialize the framework and register driver event handlers. */
 NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT  DriverObject, _In_ PUNICODE_STRING RegistryPath ) {
-    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: DriverEntry - WDF version built on %s %s\n", __DATE__, __TIME__);
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: DriverEntry\n");
 
     WDF_DRIVER_CONFIG params = {};
     WDF_DRIVER_CONFIG_INIT(/*out*/&params, EvtDriverDeviceAdd);
