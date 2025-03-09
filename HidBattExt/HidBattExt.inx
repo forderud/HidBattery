@@ -32,15 +32,13 @@ HidBattExt.sys = 1
 
 ; Install Section
 [HidBattExt_Inst.NT]
-Include = HidBatt.inf
-Needs = HidBatt_Inst
+Include = battery.inf
+Needs = Battery_Inst
 CopyFiles = @HidBattExt.sys
 
 [HidBattExt_Inst.NT.HW]
 
 [HidBattExt_Inst.NT.Services]
-Include = HidBatt.inf
-Needs = HidBatt_Inst.Services
 AddService = HidBattExt, %SPSVCINST_ASSOCSERVICE%, HidBattExt_Service_Inst
 
 [HidBattExt_Service_Inst]
