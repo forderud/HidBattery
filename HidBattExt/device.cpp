@@ -27,9 +27,7 @@ _Function_class_(EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT)
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
-    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
-
-    if (context->Mode == FilterMode::Lower) {
+    {
         // schedule read of HID FEATURE reports
         // cannot call InitializeHidState immediately, since WdfIoTargetOpen of PDO will then fail with 0xc000000e (STATUS_NO_SUCH_DEVICE)
         WDF_TIMER_CONFIG timerCfg = {};
@@ -133,29 +131,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     // Driver Framework always zero initializes an objects context memory
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
-    if (WdfDeviceWdmGetPhysicalDevice(Device) == WdfDeviceWdmGetAttachedDevice(Device)) {
-        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Lower filter driver below HidBatt\n");
-
-        deviceContext->Mode = FilterMode::Lower;
-
-        deviceContext->LowState.Initialize(Device);
-
-        NTSTATUS status = deviceContext->Interface.Register(Device, deviceContext->LowState);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfDeviceAddQueryInterface error %x"), status);
-            return status;
-        }
-    } else {
-        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Upper filter driver above HidBatt\n");
-
-        deviceContext->Mode = FilterMode::Upper;
-
-        NTSTATUS status = deviceContext->Interface.Lookup(Device);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfFdoQueryForInterface error %x"), status);
-            return status;
-        }
-    }
+    deviceContext->LowState.Initialize(Device);
 
     {
         // initialize DEVICE_CONTEXT struct with PdoName
@@ -168,23 +144,11 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: PdoName: %wZ\n", deviceContext->PdoName); // outputs "\Device\00000083"
     }
 
-    if (deviceContext->Mode == FilterMode::Lower) {
+    {
         // create queue for filtering HID Power Device requests
         WDF_IO_QUEUE_CONFIG queueConfig = {};
         WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
         queueConfig.EvtIoRead = EvtIoReadHidFilter; // filter read requests
-
-        WDFQUEUE queue = 0; // auto-deleted when "Device" is deleted
-        NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoQueueCreate failed 0x%x"), status);
-            return status;
-        }
-    } else if (deviceContext->Mode == FilterMode::Upper) {
-        // create queue for filtering Battery device requests
-        WDF_IO_QUEUE_CONFIG queueConfig = {};
-        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
-        queueConfig.EvtIoDeviceControl = EvtIoDeviceControlBattFilter; // filter IOCTL requests
 
         WDFQUEUE queue = 0; // auto-deleted when "Device" is deleted
         NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
