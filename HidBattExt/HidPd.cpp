@@ -85,7 +85,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &collectionInfo, sizeof(HID_COLLECTION_INFORMATION));
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
+        // using pdoTarget here leads to 0xc0000010 (STATUS_INVALID_DEVICE_REQUEST)
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(WdfDeviceGetIoTarget(Device), NULL,
             IOCTL_HID_GET_COLLECTION_INFORMATION,
             NULL, // input
             &outputDesc, // output
@@ -114,7 +115,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         WDF_MEMORY_DESCRIPTOR_INIT_HANDLE(&outputDesc, context->Hid.Preparsed, NULL);
 
         // populate "preparsedData"
-        status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
+        // using pdoTarget here leads to 0xc0000010 (STATUS_INVALID_DEVICE_REQUEST)
+        status = WdfIoTargetSendIoctlSynchronously(WdfDeviceGetIoTarget(Device), NULL,
             IOCTL_HID_GET_COLLECTION_DESCRIPTOR, // same as HidD_GetPreparsedData in user-mode
             NULL, // input
             &outputDesc, // output
