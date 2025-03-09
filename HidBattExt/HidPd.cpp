@@ -57,27 +57,6 @@ static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, C
 
 NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
-    WDFIOTARGET_Wrap pdoTarget;
-    {
-        // Use PDO for HID commands instead of local IO target to avoid 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) on IOCTL_HID_SET_FEATURE
-        NTSTATUS status = WdfIoTargetCreate(Device, WDF_NO_OBJECT_ATTRIBUTES, &pdoTarget);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetCreate failed 0x%x"), status);
-            return status;
-        }
-
-        // open in shared read-write mode
-        WDF_IO_TARGET_OPEN_PARAMS openParams = {};
-        WDF_IO_TARGET_OPEN_PARAMS_INIT_OPEN_BY_NAME(&openParams, &context->PdoName, FILE_READ_ACCESS | FILE_WRITE_ACCESS);
-        // We will let the framework to respond automatically to the pnp state changes of the target by closing and opening the handle.
-        openParams.ShareAccess = FILE_SHARE_WRITE | FILE_SHARE_READ;
-
-        status = WdfIoTargetOpen(pdoTarget, &openParams);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetOpen failed 0x%x"), status);
-            return status;
-        }
-    }
 
     HID_COLLECTION_INFORMATION collectionInfo = {};
     {
@@ -85,7 +64,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &collectionInfo, sizeof(HID_COLLECTION_INFORMATION));
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
+        // using pdoTarget here leads to 0xc0000010 (STATUS_INVALID_DEVICE_REQUEST)
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(WdfDeviceGetIoTarget(Device), NULL,
             IOCTL_HID_GET_COLLECTION_INFORMATION,
             NULL, // input
             &outputDesc, // output
@@ -114,7 +94,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         WDF_MEMORY_DESCRIPTOR_INIT_HANDLE(&outputDesc, context->Hid.Preparsed, NULL);
 
         // populate "preparsedData"
-        status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
+        // using pdoTarget here leads to 0xc0000010 (STATUS_INVALID_DEVICE_REQUEST)
+        status = WdfIoTargetSendIoctlSynchronously(WdfDeviceGetIoTarget(Device), NULL,
             IOCTL_HID_GET_COLLECTION_DESCRIPTOR, // same as HidD_GetPreparsedData in user-mode
             NULL, // input
             &outputDesc, // output
@@ -173,7 +154,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, context->Hid.FeatureReportByteLength);
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(WdfDeviceGetIoTarget(Device), NULL,
             IOCTL_HID_GET_FEATURE,
             NULL, // input
             &outputDesc, // output
@@ -193,7 +174,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, context->Hid.FeatureReportByteLength);
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(WdfDeviceGetIoTarget(Device), NULL,
             IOCTL_HID_GET_FEATURE,
             NULL, // input
             &outputDesc, // output
