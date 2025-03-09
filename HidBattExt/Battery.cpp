@@ -1,7 +1,7 @@
 #include "Battery.hpp"
 #include "device.hpp"
 
-
+#if 0
 static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, SharedState& state) {
     auto CycleCountBefore = bi.CycleCount;
 
@@ -120,3 +120,4 @@ VOID EvtIoDeviceControlBattFilter(
         WdfRequestComplete(Request, status);
     }
 }
+#endif
