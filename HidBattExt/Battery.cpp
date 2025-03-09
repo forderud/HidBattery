@@ -2,7 +2,7 @@
 #include "device.hpp"
 #include <Poclass.h> // for IOCTL_BATTERY_QUERY_INFORMATION
 
-
+#if 0
 static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, BatteryState& state) {
     auto CycleCountBefore = bi.CycleCount;
 
@@ -122,3 +122,4 @@ VOID EvtIoDeviceControlBattFilter(
         WdfRequestComplete(Request, status);
     }
 }
+#endif
