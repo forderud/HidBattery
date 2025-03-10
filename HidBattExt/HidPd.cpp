@@ -165,6 +165,11 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             return status;
         }
 
+        WdfRequestFormatRequestUsingCurrentType(request);
+
+        IRP* irp = WdfRequestWdmGetIrp(request);
+        IoGetNextIrpStackLocation(irp)->FileObject = IoGetCurrentIrpStackLocation(irp)->FileObject;
+
         status = WdfIoTargetSendIoctlSynchronously(WdfDeviceGetIoTarget(Device), request,
             IOCTL_HID_GET_FEATURE,
             NULL, // input
