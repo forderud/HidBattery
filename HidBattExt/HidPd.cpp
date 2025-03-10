@@ -173,7 +173,18 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, context->Hid.FeatureReportByteLength);
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
+        WDF_OBJECT_ATTRIBUTES attr{};
+        WDF_OBJECT_ATTRIBUTES_INIT(&attr);
+        attr.ParentObject = pdoTarget;
+
+        WDFREQUEST request = 0;
+        NTSTATUS status = WdfRequestCreate(&attr, pdoTarget, &request);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestCreate failed 0x%x"), status);
+            return status;
+        }
+
+        status = WdfIoTargetSendIoctlSynchronously(pdoTarget, request,
             IOCTL_HID_GET_FEATURE,
             NULL, // input
             &outputDesc, // output
