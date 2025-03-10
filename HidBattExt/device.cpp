@@ -89,6 +89,47 @@ UNICODE_STRING GetTargetPropertyString(WDFIOTARGET target, DEVICE_REGISTRY_PROPE
 }
 
 
+void EvtDeviceFileCreate(_In_ WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ WDFFILEOBJECT FileObject) {
+    UNREFERENCED_PARAMETER(Device);
+
+    IRP* irp = WdfRequestWdmGetIrp(Request);
+
+    WDF_REQUEST_PARAMETERS params = {};
+    WDF_REQUEST_PARAMETERS_INIT(&params);
+    WdfRequestGetParameters(Request, &params);
+
+    IO_SECURITY_CONTEXT* SecurityContext = params.Parameters.Create.SecurityContext; UNREFERENCED_PARAMETER(SecurityContext);
+    ULONG Options = params.Parameters.Create.Options; UNREFERENCED_PARAMETER(Options);
+    USHORT FileAttributes = params.Parameters.Create.FileAttributes; UNREFERENCED_PARAMETER(FileAttributes);
+    USHORT ShareAccess = params.Parameters.Create.ShareAccess; UNREFERENCED_PARAMETER(ShareAccess);
+    ULONG EaLength = params.Parameters.Create.EaLength; UNREFERENCED_PARAMETER(EaLength);
+    
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate: FullCreateOptions=0x%x\n", SecurityContext->FullCreateOptions);
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate: DesiredAccess=0x%x\n", SecurityContext->DesiredAccess);
+
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate: Options=0x%x\n", Options); // 0x'0100'0040 (SYNCHRONIZE | FILE_NON_DIRECTORY_FILE)
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate: FileAttributes=%u\n", FileAttributes); // 0
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate: ShareAccess=%u\n", ShareAccess); // 3 (FILE_SHARE_READ | FILE_SHARE_WRITE)
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate: EaLength=%u\n", EaLength);
+
+    FILE_OBJECT* fo = WdfFileObjectWdmGetFileObject(FileObject);
+    // cannot self-grant read & write access, since the parameters are read-only
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate1: ReadAccess=%u, SharedRead=%u\n", fo->ReadAccess, fo->SharedRead);
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate1: WriteAccess=%u, SharedWrite=%u\n", fo->WriteAccess, fo->SharedWrite);
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate1: FsContext=%u\n", fo->FsContext);
+
+    IO_STACK_LOCATION* ios = IoGetNextIrpStackLocation(irp);
+    UNREFERENCED_PARAMETER(ios);
+#if 0
+    FILE_OBJECT* fo2 = ios->FileObject;
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate2: ReadAccess=%u, SharedRead=%u\n", fo2->ReadAccess, fo2->SharedRead);
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate2: WriteAccess=%u, SharedWrite=%u\n", fo2->WriteAccess, fo2->SharedWrite);
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate2: FsContext=%u\n", fo2->FsContext);
+#endif
+    WdfRequestComplete(Request, STATUS_SUCCESS);
+}
+
+
 NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT DeviceInit) {
     UNREFERENCED_PARAMETER(Driver);
 
@@ -109,6 +150,11 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         WdfDeviceInitSetRequestAttributes(DeviceInit, &attr);
     }
 
+    {
+        WDF_FILEOBJECT_CONFIG config = {};
+        WDF_FILEOBJECT_CONFIG_INIT(&config, EvtDeviceFileCreate, nullptr, nullptr);
+        WdfDeviceInitSetFileObjectConfig(DeviceInit, &config, WDF_NO_OBJECT_ATTRIBUTES);
+    }
 
     WDFDEVICE Device = 0;
     {
