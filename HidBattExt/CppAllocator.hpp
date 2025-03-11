@@ -8,7 +8,7 @@
 template<class T>
 class RamArray {
 public:
-    RamArray(size_t size) {
+    RamArray(ULONG size) : m_size(size) {
         // allocate in non-paged pool (will always reside in RAM)
         m_ptr = (T*)ExAllocatePool2(POOL_FLAG_NON_PAGED, sizeof(T)*size, POOL_TAG);
     }
@@ -24,8 +24,13 @@ public:
         return m_ptr;
     }
 
+    ULONG ByteSize() const {
+        return sizeof(T)*m_size;
+    }
+
 private:
-    T* m_ptr = nullptr;
+    ULONG m_size = 0;
+    T*    m_ptr = nullptr;
 };
 
 #endif // _KERNEL_MODE

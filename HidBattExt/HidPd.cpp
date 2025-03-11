@@ -55,6 +55,18 @@ static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, C
 }
 
 
+/** Blocking IOCTL_HID_GET_FEATURE request with pre-populated report. */
+NTSTATUS GetFeatureReport(WDFIOTARGET target, RamArray<CHAR>& report) {
+    WDF_MEMORY_DESCRIPTOR outputDesc = {};
+    WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, report.ByteSize());
+
+    return WdfIoTargetSendIoctlSynchronously(target, NULL,
+        IOCTL_HID_GET_FEATURE,
+        NULL, // input
+        &outputDesc, // output
+        NULL, NULL);
+}
+
 NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
     WDFIOTARGET_Wrap pdoTarget;
@@ -170,14 +182,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
         report[0] = context->Hid.TemperatureReportID;
 
-        WDF_MEMORY_DESCRIPTOR outputDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, context->Hid.FeatureReportByteLength);
-
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
-            IOCTL_HID_GET_FEATURE,
-            NULL, // input
-            &outputDesc, // output
-            NULL, NULL);
+        NTSTATUS status = GetFeatureReport(pdoTarget, report);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
             return status;
@@ -190,14 +195,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
         report[0] = context->Hid.CycleCountReportID;
 
-        WDF_MEMORY_DESCRIPTOR outputDesc = {};
-        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, context->Hid.FeatureReportByteLength);
-
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
-            IOCTL_HID_GET_FEATURE,
-            NULL, // input
-            &outputDesc, // output
-            NULL, NULL);
+        NTSTATUS status = GetFeatureReport(pdoTarget, report);
         if (!NT_SUCCESS(status)) {
             // IOCTL_HID_SET_FEATURE fails with 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) if using the local IO target (WdfDeviceGetIoTarget)
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
