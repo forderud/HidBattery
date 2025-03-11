@@ -126,7 +126,14 @@ void EvtDeviceFileCreate(_In_ WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ WD
     DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate2: WriteAccess=%u, SharedWrite=%u\n", fo2->WriteAccess, fo2->SharedWrite);
     DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt EvtDeviceFileCreate2: FsContext=%u\n", fo2->FsContext);
 #endif
-    WdfRequestComplete(Request, STATUS_SUCCESS);
+
+    // Forward the request down the driver stack
+    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), WDF_NO_SEND_OPTIONS);
+    if (ret == FALSE) {
+        NTSTATUS status = WdfRequestGetStatus(Request);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestSend failed with status: 0x%x"), status);
+        WdfRequestComplete(Request, status);
+    }
 }
 
 
