@@ -13,19 +13,20 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
     else
         NT_ASSERTMSG("UpdateBatteryState invalid reportType", false);
 
-    CHAR reportId = report[0];
+    const HidCode code = hid.reports[report[0]]; // ReportID lookup
+    if (code == HidCode{ 0, 0 })
+        return;
+
+    ULONG value = 0;
+    NTSTATUS status = HidP_GetUsageValue(reportType, code.UsagePage, /*default link collection*/0, code.Usage, &value, hid.GetPreparsedData(), report, reportLen);
+    if (!NT_SUCCESS(status)) {
+        // fails with HIDP_STATUS_USAGE_NOT_FOUND (0xc0110004) for HID_PD_SERIAL (0x02) report with UsagePage=0x84, Usage=0xff
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed UsagePage=0x%x, Usage=0x%x, (0x%x)"), code.UsagePage, code.Usage, status);
+        return;
+    }
 
     // capture shared state
-    if (hid.CycleCountReportID && (reportId == hid.CycleCountReportID)) {
-        const HidCode code = CycleCount_Code;
-
-        ULONG value = 0;
-        NTSTATUS status = HidP_GetUsageValue(reportType, code.UsagePage, /*default link collection*/0, code.Usage, &value, hid.GetPreparsedData(), report, reportLen);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed UsagePage=0x%x, Usage=0x%x, (0x%x)"), code.UsagePage, code.Usage, status);
-            return;
-        }
-
+    if (code == CycleCount_Code) {
         auto CycleCountBefore = state.BatteryInfo.CycleCount;
 
         WdfSpinLockAcquire(state.Lock);
@@ -35,16 +36,7 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
         if (state.BatteryInfo.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID CycleCount before=%u, after=%u\n", CycleCountBefore, state.BatteryInfo.CycleCount);
         }
-    } else if (hid.TemperatureReportID && (reportId == hid.TemperatureReportID)) {
-        const HidCode code = Temperature_Code;
-
-        ULONG value = 0;
-        NTSTATUS status = HidP_GetUsageValue(reportType, code.UsagePage, /*default link collection*/0, code.Usage, &value, hid.GetPreparsedData(), report, reportLen);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed UsagePage=0x%x, Usage=0x%x, (0x%x)"), code.UsagePage, code.Usage, status);
-            return;
-        }
-
+    } else if (code == Temperature_Code) {
         auto TempBefore = state.Temperature;
 
         WdfSpinLockAcquire(state.Lock);
@@ -158,6 +150,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         }
     }
 
+    UCHAR TemperatureReportID = 0;
+    UCHAR CycleCountReportID = 0;
     {
         // get capabilities
         HIDP_CAPS caps = {};
@@ -184,27 +178,26 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        // identify ReportID codes for Temperature and CycleCount
+        // identify UsagePage & Usage code for all HID reports
         for (USHORT i = 0; i < valueCapsLen; i++) {
-            if ((valueCaps[i].UsagePage == Temperature_Code.UsagePage) && (valueCaps[i].NotRange.Usage == Temperature_Code.Usage)) {
-                context->Hid.TemperatureReportID = valueCaps[i].ReportID;
-                DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Temperature ReportID is 0x%x\n", valueCaps[i].ReportID);
+            HidCode& code = context->Hid.reports[valueCaps[i].ReportID];
+            code.UsagePage = valueCaps[i].UsagePage;
+            code.Usage = valueCaps[i].NotRange.Usage;
 
-            }
-            if ((valueCaps[i].UsagePage == CycleCount_Code.UsagePage) && (valueCaps[i].NotRange.Usage == CycleCount_Code.Usage)) {
-                context->Hid.CycleCountReportID = valueCaps[i].ReportID;
-                DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: CycleCount ReportID is 0x%x\n", valueCaps[i].ReportID);
-            }
+            if (code == Temperature_Code)
+                TemperatureReportID = valueCaps[i].ReportID;
+            else if (code == CycleCount_Code)
+                CycleCountReportID = valueCaps[i].ReportID;
         }
     }
 
     {
         // query FEATURE reports
-        NTSTATUS status = GetFeatureReport(pdoTarget, context->Hid.TemperatureReportID);
+        NTSTATUS status = GetFeatureReport(pdoTarget, TemperatureReportID);
         if (!NT_SUCCESS(status))
             return status;
 
-        status = GetFeatureReport(pdoTarget, context->Hid.CycleCountReportID);
+        status = GetFeatureReport(pdoTarget, CycleCountReportID);
         if (!NT_SUCCESS(status))
             return status;
     }
