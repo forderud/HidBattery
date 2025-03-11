@@ -8,9 +8,9 @@ enum class FilterMode {
     Lower, // below HidBatt: Filter HID Power Device communication
 };
 
-/** HID-related state for usage by the Lower filter driver instance.
+/** HID-related configuration for usage by the Lower filter driver instance.
     Members sorted in initialization order. */
-struct HidState {
+struct HidConfig {
     WDFMEMORY Preparsed = 0; // preparsed HID report descriptor (~3kB)
 
     PHIDP_PREPARSED_DATA GetPreparsedData() const {
@@ -96,7 +96,7 @@ struct HidBattExtIf : public INTERFACE {
 struct DEVICE_CONTEXT {
     FilterMode     Mode;      // upper or lower driver instance
     UNICODE_STRING PdoName;
-    HidState       Hid;       // for lower filter usage
+    HidConfig      Hid;       // for lower filter usage
     SharedState    LowState;  // lower filter instance state (not directly accessible from upper filter)
     HidBattExtIf   Interface; // for communication between driver instances
 };

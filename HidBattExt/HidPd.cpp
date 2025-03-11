@@ -4,7 +4,7 @@
 #include "CppAllocator.hpp"
 
 
-static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, CHAR* report, const HidState& hid) {
+static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, CHAR* report, const HidConfig& hid) {
     USHORT reportLen = 0;
     if (reportType == HidP_Input)
         reportLen = hid.InputReportByteLength;
@@ -205,7 +205,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         UpdateSharedState(context->LowState, HidP_Feature, report, context->Hid);
     }
 
-    // flag HidState struct as initialized
+    // flag HidConfig struct as initialized
     InterlockedIncrement(&context->Hid.Initialized);
 
     return STATUS_SUCCESS;
@@ -216,7 +216,7 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t L
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     if (!context->Hid.Initialized) {
-        //DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: HidState not yet initialized\n");
+        //DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: HidConfig not yet initialized\n");
         return;
     }
 
