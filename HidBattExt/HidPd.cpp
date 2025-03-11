@@ -22,7 +22,7 @@ static void UpdateBatteryState(BatteryState& state, HIDP_REPORT_TYPE reportType,
         ULONG value = 0;
         NTSTATUS status = HidP_GetUsageValue(reportType, code.UsagePage, /*default link collection*/0, code.Usage, &value, hid.GetPreparsedData(), report, reportLen);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed UsagePage=%u, Usage=%u, (0x%x)"), code.UsagePage, code.Usage, status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed UsagePage=0x%x, Usage=0x%x, (0x%x)"), code.UsagePage, code.Usage, status);
             return;
         }
 
@@ -41,7 +41,7 @@ static void UpdateBatteryState(BatteryState& state, HIDP_REPORT_TYPE reportType,
         ULONG value = 0;
         NTSTATUS status = HidP_GetUsageValue(reportType, code.UsagePage, /*default link collection*/0, code.Usage, &value, hid.GetPreparsedData(), report, reportLen);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed UsagePage=%u, Usage=%u, (0x%x)"), code.UsagePage, code.Usage, status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed UsagePage=0x%x, Usage=0x%x, (0x%x)"), code.UsagePage, code.Usage, status);
             return;
         }
 
