@@ -4,14 +4,14 @@
 #include "CppAllocator.hpp"
 
 
-static void UpdateSharedState(BatteryState& state, HIDP_REPORT_TYPE reportType, CHAR* report, const HidConfig& hid) {
+static void UpdateBatteryState(BatteryState& state, HIDP_REPORT_TYPE reportType, CHAR* report, const HidConfig& hid) {
     USHORT reportLen = 0;
     if (reportType == HidP_Input)
         reportLen = hid.InputReportByteLength;
     else if (reportType == HidP_Feature)
         reportLen = hid.FeatureReportByteLength;
     else
-        NT_ASSERTMSG("UpdateSharedState invalid reportType", false);
+        NT_ASSERTMSG("UpdateBatteryState invalid reportType", false);
 
     CHAR reportId = report[0];
 
@@ -188,7 +188,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        UpdateSharedState(context->LowState, HidP_Feature, report, context->Hid);
+        UpdateBatteryState(context->LowState, HidP_Feature, report, context->Hid);
     }
     if (context->Hid.CycleCountReportID) {
         // Battery CycleCount query
@@ -202,7 +202,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             return status;
         }
 
-        UpdateSharedState(context->LowState, HidP_Feature, report, context->Hid);
+        UpdateBatteryState(context->LowState, HidP_Feature, report, context->Hid);
     }
 
     // flag HidConfig struct as initialized
@@ -232,7 +232,7 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t L
         return;
     }
 
-    UpdateSharedState(context->LowState, HidP_Input, report, context->Hid);
+    UpdateBatteryState(context->LowState, HidP_Input, report, context->Hid);
 }
 
 
