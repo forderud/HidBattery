@@ -2,7 +2,7 @@
 #include "device.hpp"
 
 
-static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, SharedState& state) {
+static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, BatteryState& state) {
     auto CycleCountBefore = bi.CycleCount;
 
     WdfSpinLockAcquire(state.Lock);
@@ -12,7 +12,7 @@ static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, SharedState& state
     DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: UpdateBatteryInformation CycleCount before=%u, after=%u\n", CycleCountBefore, bi.CycleCount); CycleCountBefore;
 }
 
-static void UpdateBatteryTemperature(ULONG& temp, SharedState& state) {
+static void UpdateBatteryTemperature(ULONG& temp, BatteryState& state) {
     auto TempBefore = temp;
 
     WdfSpinLockAcquire(state.Lock);

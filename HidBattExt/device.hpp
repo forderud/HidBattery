@@ -34,8 +34,8 @@ static constexpr UCHAR CycleCount_UsagePage = 0x85; // from 4.2 Battery System P
 static constexpr UCHAR CycleCount_Usage = 0x6B;
 
 
-/** State to share between Upper and Lower filter driver instances. */
-class SharedState {
+/** Battery parameters shared between Upper and Lower filter driver instances. */
+class BatteryState {
 public:
     WDFSPINLOCK Lock = 0;  // to protext member access
 
@@ -56,7 +56,7 @@ DEFINE_GUID(GUID_HIDBATTEXT_SHARED_STATE, 0x2f52277a, 0x88f8, 0x44f3, 0x87, 0xec
 
 /** State to share between Upper and Lower filter driver instances. */
 struct HidBattExtIf : public INTERFACE {
-    SharedState* State = nullptr; // non-owning ptr.
+    BatteryState* State = nullptr; // non-owning ptr.
 
     HidBattExtIf() {
         // clear all INTERFACE members
@@ -68,7 +68,7 @@ struct HidBattExtIf : public INTERFACE {
     }
 
     /** Register this object so that it can be looked up by other driver instances. */
-    NTSTATUS Register (WDFDEVICE device, SharedState& state) {
+    NTSTATUS Register (WDFDEVICE device, BatteryState& state) {
         // initialize INTERFACE header
         Size = sizeof(HidBattExtIf);
         Version = 1;
@@ -97,7 +97,7 @@ struct DEVICE_CONTEXT {
     FilterMode     Mode;      // upper or lower driver instance
     UNICODE_STRING PdoName;
     HidConfig      Hid;       // for lower filter usage
-    SharedState    LowState;  // lower filter instance state (not directly accessible from upper filter)
+    BatteryState   LowState;  // lower filter instance state (not directly accessible from upper filter)
     HidBattExtIf   Interface; // for communication between driver instances
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)

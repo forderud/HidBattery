@@ -4,7 +4,7 @@
 #include "CppAllocator.hpp"
 
 
-static void UpdateSharedState(SharedState& state, HIDP_REPORT_TYPE reportType, CHAR* report, const HidConfig& hid) {
+static void UpdateSharedState(BatteryState& state, HIDP_REPORT_TYPE reportType, CHAR* report, const HidConfig& hid) {
     USHORT reportLen = 0;
     if (reportType == HidP_Input)
         reportLen = hid.InputReportByteLength;
