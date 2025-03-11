@@ -30,8 +30,7 @@ struct HidConfig {
     USHORT InputReportByteLength = 0;
     USHORT FeatureReportByteLength = 0;
 
-    UCHAR TemperatureReportID = 0;
-    UCHAR CycleCountReportID = 0;
+    HidCode reports[256] = {}; // ReportID lookup
 
     LONG Initialized = 0;
 };
