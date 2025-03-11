@@ -17,10 +17,12 @@ static void UpdateBatteryState(BatteryState& state, HIDP_REPORT_TYPE reportType,
 
     // capture shared state
     if (hid.CycleCountReportID && (reportId == hid.CycleCountReportID)) {
+        const HidCode code = CycleCount_Code;
+
         ULONG value = 0;
-        NTSTATUS status = HidP_GetUsageValue(reportType, CycleCount_UsagePage, /*default link collection*/0, CycleCount_Usage, &value, hid.GetPreparsedData(), report, reportLen);
+        NTSTATUS status = HidP_GetUsageValue(reportType, code.UsagePage, /*default link collection*/0, code.Usage, &value, hid.GetPreparsedData(), report, reportLen);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed 0x%x"), status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed UsagePage=%u, Usage=%u, (0x%x)"), code.UsagePage, code.Usage, status);
             return;
         }
 
@@ -34,10 +36,12 @@ static void UpdateBatteryState(BatteryState& state, HIDP_REPORT_TYPE reportType,
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
         }
     } else if (hid.TemperatureReportID && (reportId == hid.TemperatureReportID)) {
+        const HidCode code = Temperature_Code;
+
         ULONG value = 0;
-        NTSTATUS status = HidP_GetUsageValue(reportType, Temperature_UsagePage, /*default link collection*/0, Temperature_Usage, &value, hid.GetPreparsedData(), report, reportLen);
+        NTSTATUS status = HidP_GetUsageValue(reportType, code.UsagePage, /*default link collection*/0, code.Usage, &value, hid.GetPreparsedData(), report, reportLen);
         if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed 0x%x"), status);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed UsagePage=%u, Usage=%u, (0x%x)"), code.UsagePage, code.Usage, status);
             return;
         }
 
@@ -165,12 +169,12 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
 
         // identify ReportID codes for Temperature and CycleCount
         for (USHORT i = 0; i < valueCapsLen; i++) {
-            if ((valueCaps[i].UsagePage == Temperature_UsagePage) && (valueCaps[i].NotRange.Usage == Temperature_Usage)) {
+            if ((valueCaps[i].UsagePage == Temperature_Code.UsagePage) && (valueCaps[i].NotRange.Usage == Temperature_Code.Usage)) {
                 context->Hid.TemperatureReportID = valueCaps[i].ReportID;
                 DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Temperature ReportID is 0x%x\n", valueCaps[i].ReportID);
 
             }
-            if ((valueCaps[i].UsagePage == CycleCount_UsagePage) && (valueCaps[i].NotRange.Usage == CycleCount_Usage)) {
+            if ((valueCaps[i].UsagePage == CycleCount_Code.UsagePage) && (valueCaps[i].NotRange.Usage == CycleCount_Code.Usage)) {
                 context->Hid.CycleCountReportID = valueCaps[i].ReportID;
                 DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: CycleCount ReportID is 0x%x\n", valueCaps[i].ReportID);
             }

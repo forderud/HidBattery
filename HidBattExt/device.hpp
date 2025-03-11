@@ -8,6 +8,15 @@ enum class FilterMode {
     Lower, // below HidBatt: Filter HID Power Device communication
 };
 
+struct HidCode {
+    USAGE UsagePage = 0;
+    USAGE Usage = 0;
+
+    bool operator ==(HidCode other) const {
+        return (other.UsagePage == UsagePage) && (other.Usage == Usage);
+    }
+};
+
 /** HID-related configuration for usage by the Lower filter driver instance.
     Members sorted in initialization order. */
 struct HidConfig {
@@ -28,10 +37,8 @@ struct HidConfig {
 };
 
 /** HID Power Device report UsagePage and Usage codes from https://www.usb.org/sites/default/files/pdcv11.pdf */
-static constexpr UCHAR Temperature_UsagePage = 0x84; // from 4.1 Power Device Page (x84) Table 2.
-static constexpr UCHAR Temperature_Usage = 0x36;
-static constexpr UCHAR CycleCount_UsagePage = 0x85; // from 4.2 Battery System Page (x85) Table 3.
-static constexpr UCHAR CycleCount_Usage = 0x6B;
+static constexpr HidCode Temperature_Code = { 0x84, 0x36 }; // from 4.1 Power Device Page (x84) Table 2.
+static constexpr HidCode CycleCount_Code = { 0x85, 0x6B }; // from 4.2 Battery System Page (x85) Table 3.
 
 
 /** Battery parameters shared between Upper and Lower filter driver instances. */
