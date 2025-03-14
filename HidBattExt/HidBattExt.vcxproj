@@ -81,7 +81,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies);$(DDK_LIB_PATH)\hidparse.lib</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies);hidparse.lib</AdditionalDependencies>
       <AdditionalOptions>/brepro %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <DriverSign>
@@ -94,7 +94,7 @@ copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies);$(DDK_LIB_PATH)\hidparse.lib</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies);hidparse.lib</AdditionalDependencies>
       <AdditionalOptions>/brepro %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <DriverSign>
@@ -107,7 +107,7 @@ copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies);$(DDK_LIB_PATH)\hidparse.lib</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies);hidparse.lib</AdditionalDependencies>
       <AdditionalOptions>/brepro %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <DriverSign>
@@ -120,7 +120,7 @@ copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies);$(DDK_LIB_PATH)\hidparse.lib</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies);hidparse.lib</AdditionalDependencies>
       <AdditionalOptions>/brepro %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <DriverSign>
