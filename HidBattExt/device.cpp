@@ -129,6 +129,22 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         PnpPowerCallbacks.EvtDeviceSelfManagedIoCleanup = EvtSelfManagedIoCleanup;
         WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &PnpPowerCallbacks);
     }
+    
+    {
+        // Register WDM preprocess callbacks for IRP_MJ_DEVICE_CONTROL and
+        // IRP_MJ_SYSTEM_CONTROL. The battery class driver needs to handle these IO
+        // requests directly.
+        NTSTATUS status = WdfDeviceInitAssignWdmIrpPreprocessCallback(
+            DeviceInit,
+            BattWdmIrpPreprocessDeviceControl,
+            IRP_MJ_DEVICE_CONTROL,
+            NULL,
+            0);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfDeviceInitAssignWdmIrpPreprocessCallback(IRP_MJ_DEVICE_CONTROL) Failed. 0x%x"), status);
+            return status;
+        }
+    }
 
     {
         // reserve context space for request objects
