@@ -65,7 +65,7 @@ struct DEVICE_CONTEXT {
     // Battery class registration
     void*              ClassHandle;
     WDFWAITLOCK        ClassInitLock;
-    //WMILIB_CONTEXT     WmiLibContext;
+    WMILIB_CONTEXT     WmiLibContext;
 
     // Battery state
     WDFWAITLOCK        StateLock;
