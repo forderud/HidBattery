@@ -163,6 +163,31 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     }
 
     {
+        // initialize battery fields
+        deviceContext->BatteryTag = BATTERY_TAG_INVALID;
+        deviceContext->ClassHandle = NULL;
+
+        WDF_OBJECT_ATTRIBUTES LockAttributes{};
+        WDF_OBJECT_ATTRIBUTES_INIT(&LockAttributes);
+        LockAttributes.ParentObject = Device;
+
+        NTSTATUS status = WdfWaitLockCreate(&LockAttributes, &deviceContext->ClassInitLock);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfWaitLockCreate(ClassInitLock) Failed. Status 0x%x"), status);
+            return status;
+        }
+
+        WDF_OBJECT_ATTRIBUTES_INIT(&LockAttributes);
+        LockAttributes.ParentObject = Device;
+
+        status = WdfWaitLockCreate(&LockAttributes, &deviceContext->StateLock);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfWaitLockCreate(StateLock) Failed. Status 0x%x"), status);
+            return status;
+        }
+    }
+
+    {
         // create queue for filtering HID Power Device requests
         WDF_IO_QUEUE_CONFIG queueConfig = {};
         WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
