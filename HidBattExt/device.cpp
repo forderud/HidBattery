@@ -4,11 +4,26 @@
 #include "HidPd.hpp"
 
 
+_Use_decl_annotations_
+NTSTATUS EvtPrepareHardware(WDFDEVICE Device, WDFCMRESLIST ResourcesRaw, WDFCMRESLIST ResourcesTranslated) {
+    UNREFERENCED_PARAMETER(ResourcesRaw);
+    UNREFERENCED_PARAMETER(ResourcesTranslated);
+
+    InitializeBatteryState(Device);
+    return STATUS_SUCCESS;
+}
+
 _Function_class_(EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT)
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
     UNREFERENCED_PARAMETER(Device);
+    NTSTATUS status = InitializeBattery(Device);
+    if (!NT_SUCCESS(status)) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: InitializeBattery failed 0x%x"), status);
+        return status;
+    }
+
     return STATUS_SUCCESS;
 }
 
@@ -108,6 +123,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         // register PnP callbacks (must be done before WdfDeviceCreate)
         WDF_PNPPOWER_EVENT_CALLBACKS PnpPowerCallbacks;
         WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&PnpPowerCallbacks);
+        PnpPowerCallbacks.EvtDevicePrepareHardware = EvtPrepareHardware;
         PnpPowerCallbacks.EvtDeviceSelfManagedIoInit = EvtSelfManagedIoInit;
         PnpPowerCallbacks.EvtDeviceSelfManagedIoCleanup = EvtSelfManagedIoCleanup;
         WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &PnpPowerCallbacks);
