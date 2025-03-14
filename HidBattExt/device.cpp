@@ -1,6 +1,6 @@
+#include "Battery.hpp"
 #include "device.hpp"
 #include <Hidport.h>
-#include "Battery.hpp"
 #include "HidPd.hpp"
 
 
@@ -22,14 +22,27 @@ VOID InitializeHidStateTimer(_In_ WDFTIMER  Timer) {
     DebugExit();
 }
 
+_Use_decl_annotations_
+NTSTATUS EvtPrepareHardware(WDFDEVICE Device, WDFCMRESLIST ResourcesRaw, WDFCMRESLIST ResourcesTranslated) {
+    UNREFERENCED_PARAMETER(ResourcesRaw);
+    UNREFERENCED_PARAMETER(ResourcesTranslated);
+
+    InitializeBatteryState(Device);
+    return STATUS_SUCCESS;
+}
 
 _Function_class_(EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT)
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
-    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
-    if (context->Mode == FilterMode::Lower) {
+    NTSTATUS status = InitializeBatteryClass(Device);
+    if (!NT_SUCCESS(status)) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: InitializeBattery failed 0x%x"), status);
+        return status;
+    }
+
+    {
         // schedule read of HID FEATURE reports
         // cannot call InitializeHidState immediately, since WdfIoTargetOpen of PDO will then fail with 0xc000000e (STATUS_NO_SUCH_DEVICE)
         WDF_TIMER_CONFIG timerCfg = {};
@@ -41,7 +54,7 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
         attr.ExecutionLevel = WdfExecutionLevelPassive; // required to access HID functions
 
         WDFTIMER timer = nullptr;
-        NTSTATUS status = WdfTimerCreate(&timerCfg, &attr, &timer);
+        status = WdfTimerCreate(&timerCfg, &attr, &timer);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfTimerCreate failed 0x%x"), status);
             return status;
@@ -63,6 +76,8 @@ void EvtSelfManagedIoCleanup(WDFDEVICE Device) {
     UNREFERENCED_PARAMETER(Device);
 
     DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Device removed FDO(0x%p)\n", WdfDeviceWdmGetDeviceObject(Device));
+
+    UnloadBatteryClass(Device);
 }
 
 
@@ -101,9 +116,26 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         // register PnP callbacks (must be done before WdfDeviceCreate)
         WDF_PNPPOWER_EVENT_CALLBACKS PnpPowerCallbacks;
         WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&PnpPowerCallbacks);
+        PnpPowerCallbacks.EvtDevicePrepareHardware = EvtPrepareHardware;
         PnpPowerCallbacks.EvtDeviceSelfManagedIoInit = EvtSelfManagedIoInit;
         PnpPowerCallbacks.EvtDeviceSelfManagedIoCleanup = EvtSelfManagedIoCleanup;
         WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &PnpPowerCallbacks);
+    }
+    
+    {
+        // Register WDM preprocess callbacks for IRP_MJ_DEVICE_CONTROL and
+        // IRP_MJ_SYSTEM_CONTROL. The battery class driver needs to handle these IO
+        // requests directly.
+        NTSTATUS status = WdfDeviceInitAssignWdmIrpPreprocessCallback(
+            DeviceInit,
+            BattWdmIrpPreprocessDeviceControl,
+            IRP_MJ_DEVICE_CONTROL,
+            NULL,
+            0);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfDeviceInitAssignWdmIrpPreprocessCallback(IRP_MJ_DEVICE_CONTROL) Failed. 0x%x"), status);
+            return status;
+        }
     }
 
     {
@@ -133,29 +165,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     // Driver Framework always zero initializes an objects context memory
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
-    if (WdfDeviceWdmGetPhysicalDevice(Device) == WdfDeviceWdmGetAttachedDevice(Device)) {
-        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Lower filter driver below HidBatt\n");
-
-        deviceContext->Mode = FilterMode::Lower;
-
-        deviceContext->LowState.Initialize(Device);
-
-        NTSTATUS status = deviceContext->Interface.Register(Device, deviceContext->LowState);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfDeviceAddQueryInterface error %x"), status);
-            return status;
-        }
-    } else {
-        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Upper filter driver above HidBatt\n");
-
-        deviceContext->Mode = FilterMode::Upper;
-
-        NTSTATUS status = deviceContext->Interface.Lookup(Device);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfFdoQueryForInterface error %x"), status);
-            return status;
-        }
-    }
+    deviceContext->LowState.Initialize(Device);
 
     {
         // initialize DEVICE_CONTEXT struct with PdoName
@@ -168,23 +178,36 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: PdoName: %wZ\n", deviceContext->PdoName); // outputs "\Device\00000083"
     }
 
-    if (deviceContext->Mode == FilterMode::Lower) {
+    {
+        // initialize battery fields
+        deviceContext->BatteryTag = BATTERY_TAG_INVALID;
+        deviceContext->ClassHandle = NULL;
+
+        WDF_OBJECT_ATTRIBUTES LockAttributes{};
+        WDF_OBJECT_ATTRIBUTES_INIT(&LockAttributes);
+        LockAttributes.ParentObject = Device;
+
+        NTSTATUS status = WdfWaitLockCreate(&LockAttributes, &deviceContext->ClassInitLock);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfWaitLockCreate(ClassInitLock) Failed. Status 0x%x"), status);
+            return status;
+        }
+
+        WDF_OBJECT_ATTRIBUTES_INIT(&LockAttributes);
+        LockAttributes.ParentObject = Device;
+
+        status = WdfWaitLockCreate(&LockAttributes, &deviceContext->StateLock);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfWaitLockCreate(StateLock) Failed. Status 0x%x"), status);
+            return status;
+        }
+    }
+
+    {
         // create queue for filtering HID Power Device requests
         WDF_IO_QUEUE_CONFIG queueConfig = {};
         WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
         queueConfig.EvtIoRead = EvtIoReadHidFilter; // filter read requests
-
-        WDFQUEUE queue = 0; // auto-deleted when "Device" is deleted
-        NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoQueueCreate failed 0x%x"), status);
-            return status;
-        }
-    } else if (deviceContext->Mode == FilterMode::Upper) {
-        // create queue for filtering Battery device requests
-        WDF_IO_QUEUE_CONFIG queueConfig = {};
-        WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
-        queueConfig.EvtIoDeviceControl = EvtIoDeviceControlBattFilter; // filter IOCTL requests
 
         WDFQUEUE queue = 0; // auto-deleted when "Device" is deleted
         NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
