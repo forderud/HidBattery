@@ -1,11 +1,10 @@
 #pragma once
 #include <ntddk.h>
 #include <wdf.h>
+#include <Wmilib.h>
 extern "C" {
 #include <Batclass.h>
 }
-#include <Wmilib.h>
-#include "device.hpp"
 
 
 struct BATT_STATE {
