@@ -1,6 +1,7 @@
 #pragma once
 #include "driver.hpp"
 #include <hidpddi.h> // for PHIDP_PREPARSED_DATA
+#include "Battery.hpp"
 
 
 struct HidCode {
@@ -60,6 +61,16 @@ struct DEVICE_CONTEXT {
     HidConfig      Hid;       // for lower filter usage
     BatteryState   LowState;  // lower filter instance state (not directly accessible from upper filter)
     void*          NotificationHandle; // opaque value to identify PnP notification registration
+
+    // Battery class registration
+    void*              ClassHandle;
+    WDFWAITLOCK        ClassInitLock;
+    //WMILIB_CONTEXT     WmiLibContext;
+
+    // Battery state
+    WDFWAITLOCK        StateLock;
+    ULONG              BatteryTag;
+    BATT_STATE         State;
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
 
