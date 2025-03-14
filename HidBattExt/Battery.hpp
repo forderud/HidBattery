@@ -22,7 +22,8 @@ struct BATT_STATE {
 };
 
 
-NTSTATUS InitializeBattery(_In_ WDFDEVICE Device);
+NTSTATUS InitializeBatteryClass(_In_ WDFDEVICE Device);
+NTSTATUS UnloadBatteryClass(_In_ WDFDEVICE Device);
 
 _IRQL_requires_same_
 void InitializeBatteryState(_In_ WDFDEVICE Device);

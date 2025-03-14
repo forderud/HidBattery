@@ -17,8 +17,7 @@ _Function_class_(EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT)
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
-    UNREFERENCED_PARAMETER(Device);
-    NTSTATUS status = InitializeBattery(Device);
+    NTSTATUS status = InitializeBatteryClass(Device);
     if (!NT_SUCCESS(status)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: InitializeBattery failed 0x%x"), status);
         return status;
@@ -35,6 +34,8 @@ void EvtSelfManagedIoCleanup(WDFDEVICE Device) {
     UNREFERENCED_PARAMETER(Device);
 
     DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Device removed FDO(0x%p)\n", WdfDeviceWdmGetDeviceObject(Device));
+
+    UnloadBatteryClass(Device);
 }
 
 
