@@ -4,6 +4,7 @@
 --*/
 
 #include "battery.hpp"
+#include "device.hpp"
 //#include "simbattdriverif.h"
 
 //------------------------------------------------------------------- Prototypes
