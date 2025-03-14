@@ -233,22 +233,7 @@ Return Value:
         break;
 
     case BatteryEstimatedTime:
-        if (DevExt->State.EstimatedTime == SIMBATT_RATE_CALCULATE) {
-            if (AtRate == 0) {
-                AtRate = DevExt->State.BatteryStatus.Rate;
-            }
-
-            if (AtRate < 0) {
-                ResultValue = (3600 * DevExt->State.BatteryStatus.Capacity) /
-                                (-AtRate);
-
-            } else {
-                ResultValue = BATTERY_UNKNOWN_TIME;
-            }
-
-        } else {
-            ResultValue = DevExt->State.EstimatedTime;
-        }
+        ResultValue = DevExt->State.EstimatedTime;
 
         ReturnBuffer = &ResultValue;
         ReturnBufferLength = sizeof(ResultValue);
@@ -500,77 +485,6 @@ SetInformationEnd:
     WdfWaitLockRelease(DevExt->StateLock);
     DebugExitStatus(Status);
     return Status;
-}
-
-//------------------------------------------------- Battery Simulation Interface
-//
-// The following IO control handler and associated SimBattSetXxx routines
-// implement the control side of the simulated battery. A real battery would
-// not implement this interface, and instead read battery data from hardware/
-// firmware interfaces.
-void BattIoDeviceControl (
-    WDFQUEUE Queue,
-    WDFREQUEST Request,
-    size_t OutputBufferLength,
-    size_t InputBufferLength,
-    ULONG IoControlCode)
-/*++
-Routine Description:
-    Handle changes to the simulated battery state.
-
-Arguments:
-    Queue - Supplies a handle to the framework queue object that is associated
-        with the I/O request.
-
-    Request - Supplies a handle to a framework request object. This one
-        represents the IRP_MJ_DEVICE_CONTROL IRP received by the framework.
-
-    OutputBufferLength - Supplies the length, in bytes, of the request's output
-        buffer, if an output buffer is available.
-
-    InputBufferLength - Supplies the length, in bytes, of the request's input
-        buffer, if an input buffer is available.
-
-    IoControlCode - Supplies the Driver-defined or system-defined I/O control
-        code (IOCTL) that is associated with the request.
---*/
-{
-    BATTERY_INFORMATION* BatteryInformation;
-    BATTERY_STATUS* BatteryStatus;
-    size_t Length;
-    NTSTATUS TempStatus;
-
-    UNREFERENCED_PARAMETER(OutputBufferLength);
-    UNREFERENCED_PARAMETER(InputBufferLength);
-
-    ULONG BytesReturned = 0;
-    WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
-    DebugPrint(DPFLTR_INFO_LEVEL, "BattIoDeviceControl: 0x%p\n", Device);
-    NTSTATUS Status = STATUS_INVALID_PARAMETER;
-    switch (IoControlCode) {
-    case IOCTL_SIMBATT_SET_STATUS:
-        TempStatus = WdfRequestRetrieveInputBuffer(Request, sizeof(BATTERY_STATUS), (void**)&BatteryStatus, &Length);
-
-        if (NT_SUCCESS(TempStatus) && (Length == sizeof(BATTERY_STATUS))) {
-            Status = SetBatteryStatus(Device, BatteryStatus);
-        }
-
-        break;
-
-    case IOCTL_SIMBATT_SET_INFORMATION:
-        TempStatus = WdfRequestRetrieveInputBuffer(Request, sizeof(BATTERY_INFORMATION), (void**)&BatteryInformation, &Length);
-
-        if (NT_SUCCESS(TempStatus) && (Length == sizeof(BATTERY_INFORMATION))) {
-            Status = SetBatteryInformation(Device, BatteryInformation);
-        }
-
-        break;
-
-    default:
-        break;
-    }
-
-    WdfRequestCompleteWithInformation(Request, Status, BytesReturned);
 }
 
 _Use_decl_annotations_
