@@ -1,5 +1,6 @@
 #pragma once
 #include "driver.hpp"
+#include <hidpddi.h> // for PHIDP_PREPARSED_DATA
 #include "HidPd.hpp"
 
 

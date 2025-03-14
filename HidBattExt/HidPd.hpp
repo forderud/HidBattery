@@ -1,5 +1,4 @@
 #pragma once
-#include <hidpddi.h> // for PHIDP_PREPARSED_DATA
 
 
 /** RAII wrapper of WDFIOTARGET. */
