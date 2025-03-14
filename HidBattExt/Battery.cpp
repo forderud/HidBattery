@@ -1,5 +1,6 @@
 #include "Battery.hpp"
 #include "device.hpp"
+#include <Poclass.h> // for IOCTL_BATTERY_QUERY_INFORMATION
 
 
 static void UpdateBatteryInformation(BATTERY_INFORMATION& bi, BatteryState& state) {
