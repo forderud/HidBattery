@@ -109,7 +109,7 @@ Arguments:
         DevExt->State.BatteryInfo.DefaultAlert1 = 0;
         DevExt->State.BatteryInfo.DefaultAlert2 = 0;
         DevExt->State.BatteryInfo.CriticalBias = 0;
-        DevExt->State.BatteryInfo.CycleCount = 100;
+        DevExt->State.BatteryInfo.CycleCount = 0;
 
         DevExt->State.BatteryStatus.PowerState = BATTERY_POWER_ON_LINE;
         DevExt->State.BatteryStatus.Capacity = 90;
@@ -124,7 +124,7 @@ Arguments:
 
         DevExt->State.EstimatedTime = BATTERY_UNKNOWN_TIME; // battery run time, in seconds
 
-        DevExt->State.Temperature = 2981; // 25 degree Celsius [10ths of a degree Kelvin]
+        DevExt->State.Temperature = 0; // [10ths of a degree Kelvin]
 
         RtlStringCchCopyW(DevExt->State.DeviceName, MAX_BATTERY_STRING_SIZE, L"SimulatedBattery");
 
