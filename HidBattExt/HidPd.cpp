@@ -51,7 +51,7 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
         auto CapBefore = state.BatteryStatus.Capacity;
 
         WdfSpinLockAcquire(state.Lock);
-        state.BatteryStatus.Capacity = value;
+        state.BatteryStatus.Capacity = value; // TODO: AmpSec to mWh conversion
         WdfSpinLockRelease(state.Lock);
 
         if (state.BatteryStatus.Capacity != CapBefore) {
@@ -61,7 +61,7 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
         auto DesignCapBefore = state.BatteryInfo.DesignedCapacity;
 
         WdfSpinLockAcquire(state.Lock);
-        state.BatteryInfo.DesignedCapacity = value;
+        state.BatteryInfo.DesignedCapacity = value; // TODO: AmpSec to mWh conversion
         WdfSpinLockRelease(state.Lock);
 
         if (state.BatteryInfo.DesignedCapacity != DesignCapBefore) {
@@ -71,7 +71,7 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
         auto FullCapBefore = state.BatteryInfo.FullChargedCapacity;
 
         WdfSpinLockAcquire(state.Lock);
-        state.BatteryInfo.FullChargedCapacity = value;
+        state.BatteryInfo.FullChargedCapacity = value; // TODO: AmpSec to mWh conversion
         WdfSpinLockRelease(state.Lock);
 
         if (state.BatteryInfo.FullChargedCapacity != FullCapBefore) {
