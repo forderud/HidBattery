@@ -50,4 +50,4 @@ private:
 };
 
 // max number of batteries supported by the HW
-#define MAX_BATTERIES (USB_ENDPOINTS - CDC_FIRST_ENDPOINT - CDC_ENPOINT_COUNT) // 3 by default; 6 if defining CDC_DISABLED in %LOCALAPPDATA%\Arduino15\packages\arduino\hardware\avr\<version>\cores\arduino\USBDesc.h
+#define MAX_BATTERIES 1
