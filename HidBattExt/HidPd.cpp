@@ -216,11 +216,19 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
 }
 
 
-void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t Length) {
+void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request) {
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     if (!context->Hid.Initialized) {
         //DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: HidConfig not yet initialized\n");
+        return;
+    }
+
+    CHAR* report = nullptr;
+    size_t Length = 0;
+    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, 0, (void**)&report, &Length);
+    if (!NT_SUCCESS(status) || !report) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestRetrieveOutputBuffer failed 0x%x, report=0x%p"), status, report);
         return;
     }
 
@@ -229,14 +237,24 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request, _In_ size_t L
         return;
     }
 
-    CHAR* report = nullptr;
-    NTSTATUS status = WdfRequestRetrieveOutputBuffer(Request, Length, (void**)&report, NULL);
-    if (!NT_SUCCESS(status) || !report) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestRetrieveOutputBuffer failed 0x%x, report=0x%p"), status, report);
+    UpdateBatteryState(context->LowState, HidP_Input, report, context->Hid);
+}
+
+
+void EvtIoReadHidFilterCompletion(_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  WDF_REQUEST_COMPLETION_PARAMS* Params, _In_  WDFCONTEXT Context) {
+    UNREFERENCED_PARAMETER(Params); // invalidated by WdfRequestFormatRequestUsingCurrentType
+    UNREFERENCED_PARAMETER(Context);
+
+    if (!NT_SUCCESS(WdfRequestGetStatus(Request))) {
+        //DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: EvtIoReadHidFilterCompletion status=0x%x"), WdfRequestGetStatus(Request));
+        WdfRequestComplete(Request, WdfRequestGetStatus(Request));
         return;
     }
 
-    UpdateBatteryState(context->LowState, HidP_Input, report, context->Hid);
+    WDFDEVICE device = WdfIoTargetGetDevice(Target);
+    ParseReadHidBuffer(device, Request);
+
+    WdfRequestComplete(Request, STATUS_SUCCESS);
 }
 
 
@@ -244,17 +262,17 @@ _Function_class_(EVT_WDF_IO_QUEUE_IO_READ)
 _IRQL_requires_same_
 _IRQL_requires_max_(DISPATCH_LEVEL)
 VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_t Length) {
+    UNREFERENCED_PARAMETER(Length);
     //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoReadFilter (Length=%Iu)\n", Length);
 
     WDFDEVICE device = WdfIoQueueGetDevice(Queue);
 
-    ParseReadHidBuffer(device, Request, Length);
+    // Formating required if specifying a completion routine
+    WdfRequestFormatRequestUsingCurrentType(Request);
+    // set completion callback
+    WdfRequestSetCompletionRoutine(Request, EvtIoReadHidFilterCompletion, nullptr);
 
-    // Forward the request down the driver stack
-    WDF_REQUEST_SEND_OPTIONS options = {};
-    WDF_REQUEST_SEND_OPTIONS_INIT(&options, WDF_REQUEST_SEND_OPTION_SEND_AND_FORGET);
-
-    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(device), &options);
+    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(device), WDF_NO_SEND_OPTIONS);
     if (ret == FALSE) {
         NTSTATUS status = WdfRequestGetStatus(Request);
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestSend failed with status: 0x%x"), status);
