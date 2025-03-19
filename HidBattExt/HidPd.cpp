@@ -77,6 +77,16 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
         if (state.BatteryInfo.FullChargedCapacity != FullCapBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID FullChargedCapacity before=%u, after=%u\n", FullCapBefore, state.BatteryInfo.FullChargedCapacity);
         }
+    } else if (code == Voltage_Code) {
+        auto VoltageBefore = state.BatteryStatus.Voltage;
+
+        WdfSpinLockAcquire(state.Lock);
+        state.BatteryStatus.Voltage = 10*value; // centiVolt to millivolts 
+        WdfSpinLockRelease(state.Lock);
+
+        if (state.BatteryStatus.Voltage != VoltageBefore) {
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID Voltage before=%u, after=%u\n", VoltageBefore, state.BatteryStatus.Voltage);
+        }
     }
 }
 
@@ -185,6 +195,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     UCHAR RemainingCapacityID = 0;
     UCHAR DesignCapacityID = 0;
     UCHAR FullCapacityID = 0;
+    UCHAR VoltageID = 0;
     {
         // get capabilities
         HIDP_CAPS caps = {};
@@ -227,6 +238,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
                 DesignCapacityID = valueCaps[i].ReportID;
             else if (code == FullCapacity_Code)
                 FullCapacityID = valueCaps[i].ReportID;
+            else if (code == Voltage_Code)
+                VoltageID = valueCaps[i].ReportID;;
         }
     }
 
