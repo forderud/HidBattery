@@ -47,6 +47,16 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
         if (state.Temperature != TempBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID Temperature before=%u, after=%u\n", TempBefore, state.Temperature);
         }
+    } else if (code == RemainingCapacity_Code) {
+        auto CapBefore = state.BatteryStatus.Capacity;
+
+        WdfSpinLockAcquire(state.Lock);
+        state.BatteryStatus.Capacity = value;
+        WdfSpinLockRelease(state.Lock);
+
+        if (state.BatteryStatus.Capacity != CapBefore) {
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID RemainingCapacity before=%u, after=%u\n", CapBefore, state.BatteryStatus.Capacity);
+        }
     }
 }
 
@@ -135,6 +145,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
 
     UCHAR TemperatureReportID = 0;
     UCHAR CycleCountReportID = 0;
+    UCHAR RemainingCapacityID = 0;
     {
         // get capabilities
         HIDP_CAPS caps = {};
@@ -171,6 +182,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
                 TemperatureReportID = valueCaps[i].ReportID;
             else if (code == CycleCount_Code)
                 CycleCountReportID = valueCaps[i].ReportID;
+            else if (code == RemainingCapacity_Code)
+                RemainingCapacityID = valueCaps[i].ReportID;
         }
     }
 
@@ -191,6 +204,20 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         // Battery CycleCount query
         RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
         report[0] = CycleCountReportID;
+
+        NTSTATUS status = GetFeatureReport(pdoTarget, report);
+        if (!NT_SUCCESS(status)) {
+            // IOCTL_HID_SET_FEATURE fails with 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) if using the local IO target (WdfDeviceGetIoTarget)
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
+            return status;
+        }
+
+        UpdateBatteryState(context->State, HidP_Feature, report, context->Hid);
+    }
+    if (RemainingCapacityID) {
+        // Battery CycleCount query
+        RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
+        report[0] = RemainingCapacityID;
 
         NTSTATUS status = GetFeatureReport(pdoTarget, report);
         if (!NT_SUCCESS(status)) {

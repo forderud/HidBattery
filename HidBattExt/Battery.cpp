@@ -112,7 +112,7 @@ Arguments:
         DevExt->State.BatteryInfo.CycleCount = 0;
 
         DevExt->State.BatteryStatus.PowerState = BATTERY_POWER_ON_LINE;
-        DevExt->State.BatteryStatus.Capacity = 90;
+        DevExt->State.BatteryStatus.Capacity = 0;
         DevExt->State.BatteryStatus.Voltage = BATTERY_UNKNOWN_VOLTAGE;
         DevExt->State.BatteryStatus.Rate = 0;
 
