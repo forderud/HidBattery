@@ -196,7 +196,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         WDF_OBJECT_ATTRIBUTES_INIT(&LockAttributes);
         LockAttributes.ParentObject = Device;
 
-        status = WdfWaitLockCreate(&LockAttributes, &deviceContext->StateLock);
+        status = WdfWaitLockCreate(&LockAttributes, &deviceContext->State.Lock);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfWaitLockCreate(StateLock) Failed. Status 0x%x"), status);
             return status;
