@@ -4,7 +4,7 @@
 #include "CppAllocator.hpp"
 
 
-static void UpdateBatteryState(BatteryState& state, HIDP_REPORT_TYPE reportType, CHAR* report, const HidConfig& hid) {
+static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, CHAR* report, const HidConfig& hid) {
     USHORT reportLen = 0;
     if (reportType == HidP_Input)
         reportLen = hid.InputReportByteLength;
@@ -26,14 +26,14 @@ static void UpdateBatteryState(BatteryState& state, HIDP_REPORT_TYPE reportType,
             return;
         }
 
-        auto CycleCountBefore = state.CycleCount;
+        auto CycleCountBefore = state.BatteryInfo.CycleCount;
 
-        WdfSpinLockAcquire(state.Lock);
-        state.CycleCount = value;
-        WdfSpinLockRelease(state.Lock);
+        WdfWaitLockAcquire(state.Lock, nullptr);
+        state.BatteryInfo.CycleCount = value;
+        WdfWaitLockRelease(state.Lock);
 
-        if (state.CycleCount != CycleCountBefore) {
-            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID CycleCount before=%u, after=%u\n", CycleCountBefore, state.CycleCount);
+        if (state.BatteryInfo.CycleCount != CycleCountBefore) {
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID CycleCount before=%u, after=%u\n", CycleCountBefore, state.BatteryInfo.CycleCount);
         }
     } else if (hid.TemperatureReportID && (reportId == hid.TemperatureReportID)) {
         const HidCode code = Temperature_Code;
@@ -47,10 +47,10 @@ static void UpdateBatteryState(BatteryState& state, HIDP_REPORT_TYPE reportType,
 
         auto TempBefore = state.Temperature;
 
-        WdfSpinLockAcquire(state.Lock);
+        WdfWaitLockAcquire(state.Lock, nullptr);
         // convert HID PD unit from (Kelvin) to BATTERY_QUERY_INFORMATION unit (10ths of a degree Kelvin)
         state.Temperature = 10*value;
-        WdfSpinLockRelease(state.Lock);
+        WdfWaitLockRelease(state.Lock);
 
         if (state.Temperature != TempBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID Temperature before=%u, after=%u\n", TempBefore, state.Temperature);
@@ -84,7 +84,7 @@ NTSTATUS GetFeatureReport(WDFIOTARGET target, UCHAR reportId) {
         return status;
     }
 
-    UpdateBatteryState(context->LowState, HidP_Feature, report, context->Hid);
+    UpdateBatteryState(context->State, HidP_Feature, report, context->Hid);
     return status;
 }
 
@@ -237,7 +237,7 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request) {
         return;
     }
 
-    UpdateBatteryState(context->LowState, HidP_Input, report, context->Hid);
+    UpdateBatteryState(context->State, HidP_Input, report, context->Hid);
 }
 
 
