@@ -57,6 +57,26 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
         if (state.BatteryStatus.Capacity != CapBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID RemainingCapacity before=%u, after=%u\n", CapBefore, state.BatteryStatus.Capacity);
         }
+    } else if (code == DesignCapacity_Code) {
+        auto DesignCapBefore = state.BatteryInfo.DesignedCapacity;
+
+        WdfSpinLockAcquire(state.Lock);
+        state.BatteryInfo.DesignedCapacity = value;
+        WdfSpinLockRelease(state.Lock);
+
+        if (state.BatteryInfo.DesignedCapacity != DesignCapBefore) {
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID DesignedCapacity before=%u, after=%u\n", DesignCapBefore, state.BatteryInfo.DesignedCapacity);
+        }
+    } else if (code == FullCapacity_Code) {
+        auto FullCapBefore = state.BatteryInfo.FullChargedCapacity;
+
+        WdfSpinLockAcquire(state.Lock);
+        state.BatteryInfo.FullChargedCapacity = value;
+        WdfSpinLockRelease(state.Lock);
+
+        if (state.BatteryInfo.FullChargedCapacity != FullCapBefore) {
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID FullChargedCapacity before=%u, after=%u\n", FullCapBefore, state.BatteryInfo.FullChargedCapacity);
+        }
     }
 }
 
@@ -146,6 +166,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     UCHAR TemperatureReportID = 0;
     UCHAR CycleCountReportID = 0;
     UCHAR RemainingCapacityID = 0;
+    UCHAR DesignCapacityID = 0;
+    UCHAR FullCapacityID = 0;
     {
         // get capabilities
         HIDP_CAPS caps = {};
@@ -184,6 +206,10 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
                 CycleCountReportID = valueCaps[i].ReportID;
             else if (code == RemainingCapacity_Code)
                 RemainingCapacityID = valueCaps[i].ReportID;
+            else if (code == DesignCapacity_Code)
+                DesignCapacityID = valueCaps[i].ReportID;
+            else if (code == FullCapacity_Code)
+                FullCapacityID = valueCaps[i].ReportID;
         }
     }
 
@@ -218,6 +244,34 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         // Battery CycleCount query
         RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
         report[0] = RemainingCapacityID;
+
+        NTSTATUS status = GetFeatureReport(pdoTarget, report);
+        if (!NT_SUCCESS(status)) {
+            // IOCTL_HID_SET_FEATURE fails with 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) if using the local IO target (WdfDeviceGetIoTarget)
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
+            return status;
+        }
+
+        UpdateBatteryState(context->State, HidP_Feature, report, context->Hid);
+    }
+    if (DesignCapacityID) {
+        // Battery CycleCount query
+        RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
+        report[0] = DesignCapacityID;
+
+        NTSTATUS status = GetFeatureReport(pdoTarget, report);
+        if (!NT_SUCCESS(status)) {
+            // IOCTL_HID_SET_FEATURE fails with 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) if using the local IO target (WdfDeviceGetIoTarget)
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
+            return status;
+        }
+
+        UpdateBatteryState(context->State, HidP_Feature, report, context->Hid);
+    }
+    if (FullCapacityID) {
+        // Battery CycleCount query
+        RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
+        report[0] = FullCapacityID;
 
         NTSTATUS status = GetFeatureReport(pdoTarget, report);
         if (!NT_SUCCESS(status)) {

@@ -104,8 +104,8 @@ Arguments:
         DevExt->State.BatteryInfo.Chemistry[1] = 'a';
         DevExt->State.BatteryInfo.Chemistry[2] = 'k';
         DevExt->State.BatteryInfo.Chemistry[3] = 'e';
-        DevExt->State.BatteryInfo.DesignedCapacity = 110;
-        DevExt->State.BatteryInfo.FullChargedCapacity = 100;
+        DevExt->State.BatteryInfo.DesignedCapacity = 0;
+        DevExt->State.BatteryInfo.FullChargedCapacity = 0;
         DevExt->State.BatteryInfo.DefaultAlert1 = 0;
         DevExt->State.BatteryInfo.DefaultAlert2 = 0;
         DevExt->State.BatteryInfo.CriticalBias = 0;
