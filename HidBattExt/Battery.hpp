@@ -8,7 +8,7 @@ extern "C" {
 
 
 struct BATT_STATE {
-    WDFWAITLOCK              Lock; // protects state changes
+    WDFSPINLOCK              Lock; // protects state changes
 
     BATTERY_MANUFACTURE_DATE ManufactureDate;
     BATTERY_INFORMATION      BatteryInfo;
