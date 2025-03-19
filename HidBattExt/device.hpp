@@ -68,7 +68,6 @@ struct DEVICE_CONTEXT {
     WMILIB_CONTEXT     WmiLibContext;
 
     // Battery state
-    WDFWAITLOCK        StateLock;
     ULONG              BatteryTag;
     BATT_STATE         State;
 };

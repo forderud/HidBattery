@@ -90,7 +90,7 @@ Arguments:
 
     // Get this battery's state - use defaults.
     {
-        WdfWaitLockAcquire(DevExt->StateLock, NULL);
+        WdfWaitLockAcquire(DevExt->State.Lock, NULL);
         UpdateTag(DevExt);
 
         // manufactured on 8th September 2024
@@ -134,7 +134,7 @@ Arguments:
 
         RtlStringCchCopyW(DevExt->State.UniqueId, MAX_BATTERY_STRING_SIZE, L"SimulatedBattery007");
 
-        WdfWaitLockRelease(DevExt->StateLock);
+        WdfWaitLockRelease(DevExt->State.Lock);
     }
 }
 
@@ -168,9 +168,9 @@ Arguments:
     DebugEnter();
 
     DEVICE_CONTEXT* DevExt = (DEVICE_CONTEXT*)Context;
-    WdfWaitLockAcquire(DevExt->StateLock, NULL);
+    WdfWaitLockAcquire(DevExt->State.Lock, NULL);
     *BatteryTag = DevExt->BatteryTag;
-    WdfWaitLockRelease(DevExt->StateLock);
+    WdfWaitLockRelease(DevExt->State.Lock);
     if (*BatteryTag == BATTERY_TAG_INVALID) {
         Status = STATUS_NO_SUCH_DEVICE;
     } else {
@@ -227,7 +227,7 @@ Return Value:
     DebugEnter();
 
     DEVICE_CONTEXT* DevExt = (DEVICE_CONTEXT*)Context;
-    WdfWaitLockAcquire(DevExt->StateLock, NULL);
+    WdfWaitLockAcquire(DevExt->State.Lock, NULL);
     if (BatteryTag != DevExt->BatteryTag) {
         Status = STATUS_NO_SUCH_DEVICE;
         goto QueryInformationEnd;
@@ -341,7 +341,7 @@ Return Value:
     }
 
 QueryInformationEnd:
-    WdfWaitLockRelease(DevExt->StateLock);
+    WdfWaitLockRelease(DevExt->State.Lock);
     DebugExitStatus(Status);
     return Status;
 }
@@ -372,7 +372,7 @@ Return Value:
     DebugEnter();
 
     DEVICE_CONTEXT* DevExt = (DEVICE_CONTEXT*)Context;
-    WdfWaitLockAcquire(DevExt->StateLock, NULL);
+    WdfWaitLockAcquire(DevExt->State.Lock, NULL);
     if (BatteryTag != DevExt->BatteryTag) {
         Status = STATUS_NO_SUCH_DEVICE;
         goto QueryStatusEnd;
@@ -385,7 +385,7 @@ Return Value:
     Status = STATUS_SUCCESS;
 
 QueryStatusEnd:
-    WdfWaitLockRelease(DevExt->StateLock);
+    WdfWaitLockRelease(DevExt->State.Lock);
     DebugExitStatus(Status);
     return Status;
 }
@@ -419,7 +419,7 @@ Return Value:
     DebugEnter();
 
     DEVICE_CONTEXT* DevExt = (DEVICE_CONTEXT*)Context;
-    WdfWaitLockAcquire(DevExt->StateLock, NULL);
+    WdfWaitLockAcquire(DevExt->State.Lock, NULL);
     if (BatteryTag != DevExt->BatteryTag) {
         Status = STATUS_NO_SUCH_DEVICE;
         goto SetStatusNotifyEnd;
@@ -428,7 +428,7 @@ Return Value:
     Status = STATUS_NOT_SUPPORTED;
 
 SetStatusNotifyEnd:
-    WdfWaitLockRelease(DevExt->StateLock);
+    WdfWaitLockRelease(DevExt->State.Lock);
     DebugExitStatus(Status);
     return Status;
 }
@@ -485,7 +485,7 @@ Arguments:
     DebugEnter();
 
     DEVICE_CONTEXT* DevExt = (DEVICE_CONTEXT*)Context;
-    WdfWaitLockAcquire(DevExt->StateLock, NULL);
+    WdfWaitLockAcquire(DevExt->State.Lock, NULL);
     if (BatteryTag != DevExt->BatteryTag) {
         Status = STATUS_NO_SUCH_DEVICE;
         goto SetInformationEnd;
@@ -498,7 +498,7 @@ Arguments:
     }
 
 SetInformationEnd:
-    WdfWaitLockRelease(DevExt->StateLock);
+    WdfWaitLockRelease(DevExt->State.Lock);
     DebugExitStatus(Status);
     return Status;
 }
@@ -526,10 +526,10 @@ Arguments:
         goto SetBatteryStatusEnd;
     }
 
-    WdfWaitLockAcquire(DevExt->StateLock, NULL);
+    WdfWaitLockAcquire(DevExt->State.Lock, NULL);
     static_assert(sizeof(DevExt->State.BatteryStatus) == sizeof(*BatteryStatus));
     RtlCopyMemory(&DevExt->State.BatteryStatus, BatteryStatus, sizeof(BATTERY_STATUS));
-    WdfWaitLockRelease(DevExt->StateLock);
+    WdfWaitLockRelease(DevExt->State.Lock);
 
     BatteryClassStatusNotify(DevExt->ClassHandle);
     Status = STATUS_SUCCESS;
@@ -564,7 +564,7 @@ Arguments:
         goto SetBatteryInformationEnd;
     }
 
-    WdfWaitLockAcquire(DevExt->StateLock, NULL);
+    WdfWaitLockAcquire(DevExt->State.Lock, NULL);
     static_assert(sizeof(DevExt->State.BatteryInfo) == sizeof(*BatteryInformation));
     RtlCopyMemory(&DevExt->State.BatteryInfo, BatteryInformation, sizeof(BATTERY_INFORMATION));
 
@@ -573,7 +573,7 @@ Arguments:
     // status query will fail due to a different battery tag, causing the class
     // driver to query for the new tag and new information.
     UpdateTag(DevExt);
-    WdfWaitLockRelease(DevExt->StateLock);
+    WdfWaitLockRelease(DevExt->State.Lock);
     BatteryClassStatusNotify(DevExt->ClassHandle);
     Status = STATUS_SUCCESS;
 
