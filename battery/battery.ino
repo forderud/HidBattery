@@ -21,7 +21,7 @@ uint16_t Voltage =1499; // centiVolt
 uint16_t RunTimeToEmpty = 0; // maps to BatteryEstimatedTime on Windows
 uint16_t ManufacturerDate = 0; // initialized in setup function
 int16_t  CycleCount = 41;
-uint16_t Temperature = 300; // degrees Kelvin
+uint16_t Temperature = 999; // degrees Kelvin
 
 // Parameters for ACPI compliancy
 const uint16_t DesignCapacity = 58003*360/Voltage; // AmpSec=mWh*360/centiVolt (1 mAh = 3.6 As)
@@ -133,6 +133,8 @@ void loop() {
   } else {
     PresentStatus.ShutdownImminent = 0;
   }
+
+  PresentStatus.ShutdownImminent = true;
 
   //************ Delay ****************************************
   delay(1000);
