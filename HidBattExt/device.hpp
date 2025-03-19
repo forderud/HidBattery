@@ -37,29 +37,10 @@ static constexpr HidCode Temperature_Code = { 0x84, 0x36 }; // from 4.1 Power De
 static constexpr HidCode CycleCount_Code = { 0x85, 0x6B }; // from 4.2 Battery System Page (x85) Table 3.
 
 
-/** Battery parameters shared between Upper and Lower filter driver instances. */
-class BatteryState {
-public:
-    WDFSPINLOCK Lock = 0;  // to protext member access
-
-    ULONG CycleCount = 0;  // BATTERY_INFORMATION::CycleCount value
-    ULONG Temperature = 0; // IOCTL_BATTERY_QUERY_INFORMATION BatteryTemperature value
-
-    void Initialize(WDFDEVICE device) {
-        WDF_OBJECT_ATTRIBUTES attr{};
-        WDF_OBJECT_ATTRIBUTES_INIT(&attr);
-        attr.ParentObject = device; // auto-deleted when "device" is deleted
-
-        NTSTATUS status = WdfSpinLockCreate(&attr, &Lock);
-        NT_ASSERTMSG("WdfSpinLockCreate failed.\n", status == STATUS_SUCCESS); status;
-    }
-};
-
 /** Driver-specific struct for storing instance-specific data. */
 struct DEVICE_CONTEXT {
     UNICODE_STRING PdoName;
     HidConfig      Hid;       // for lower filter usage
-    BatteryState   LowState;  // lower filter instance state (not directly accessible from upper filter)
     void*          NotificationHandle; // opaque value to identify PnP notification registration
 
     // Battery class registration

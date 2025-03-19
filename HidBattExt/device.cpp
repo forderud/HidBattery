@@ -173,8 +173,6 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     // Driver Framework always zero initializes an objects context memory
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
-    deviceContext->LowState.Initialize(Device);
-
     {
         // initialize DEVICE_CONTEXT struct with PdoName
         deviceContext->PdoName = GetTargetPropertyString(WdfDeviceGetIoTarget(Device), DevicePropertyPhysicalDeviceObjectName);
