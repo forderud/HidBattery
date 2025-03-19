@@ -150,7 +150,7 @@ void loop() {
       res = PowerDevice[i].SendReport(HID_PD_RUNTIMETOEMPTY, &RunTimeToEmpty, sizeof(RunTimeToEmpty));
 
     if (res >= 0)
-      PowerDevice[i].SetFeature(HID_PD_TEMPERATURE, &Temperature, sizeof(Temperature));
+      PowerDevice[i].SendReport(HID_PD_TEMPERATURE, &Temperature, sizeof(Temperature));
 
     if (res >= 0)
       res = PowerDevice[i].SendReport(HID_PD_PRESENTSTATUS, &PresentStatus, sizeof(PresentStatus));
