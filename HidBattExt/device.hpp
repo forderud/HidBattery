@@ -34,7 +34,9 @@ struct HidConfig {
 /** HID Power Device report UsagePage and Usage codes from https://www.usb.org/sites/default/files/pdcv11.pdf */
 static constexpr HidCode Temperature_Code = { 0x84, 0x36 }; // from 4.1 Power Device Page (x84) Table 2.
 static constexpr HidCode CycleCount_Code = { 0x85, 0x6B }; // from 4.2 Battery System Page (x85) Table 3.
-
+static constexpr HidCode RemainingCapacity_Code = { 0x85, 0x66 };
+static constexpr HidCode DesignCapacity_Code = { 0x85, 0x83 };
+static constexpr HidCode FullCapacity_Code = { 0x85, 0x67 };
 
 /** Driver-specific struct for storing instance-specific data. */
 struct DEVICE_CONTEXT {
