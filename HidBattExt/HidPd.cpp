@@ -237,6 +237,16 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request) {
         return;
     }
 
+    // inspect & modify buffer from the battery HW
+    if (report[0] == 0x0A) { // temperature ReportID
+        // clamp unrealisticaly high temperatures
+        auto* temperature = (USHORT*)(report + 1);
+        if (*temperature > 400) {
+            *temperature = 400; // [kelvin]
+            DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: Clamping Temperature to %u kelvin\n", *temperature);
+        }
+    }
+
     UpdateBatteryState(context->LowState, HidP_Input, report, context->Hid);
 }
 
