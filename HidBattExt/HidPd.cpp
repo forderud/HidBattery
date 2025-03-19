@@ -60,15 +60,32 @@ static void UpdateBatteryState(BatteryState& state, HIDP_REPORT_TYPE reportType,
 
 
 /** Blocking IOCTL_HID_GET_FEATURE request with pre-populated report. */
-NTSTATUS GetFeatureReport(WDFIOTARGET target, RamArray<CHAR>& report) {
+NTSTATUS GetFeatureReport(WDFIOTARGET target, UCHAR reportId) {
+    if (!reportId)
+        return STATUS_SUCCESS;
+
+    WDFDEVICE device = WdfIoTargetGetDevice(target);
+    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(device);
+
+    // Battery Temperature query
+    RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
+    report[0] = reportId;
+
     WDF_MEMORY_DESCRIPTOR outputDesc = {};
     WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, report.ByteSize());
 
-    return WdfIoTargetSendIoctlSynchronously(target, NULL,
+    NTSTATUS status = WdfIoTargetSendIoctlSynchronously(target, NULL,
         IOCTL_HID_GET_FEATURE,
         NULL, // input
         &outputDesc, // output
         NULL, NULL);
+    if (!NT_SUCCESS(status)) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
+        return status;
+    }
+
+    UpdateBatteryState(context->LowState, HidP_Feature, report, context->Hid);
+    return status;
 }
 
 NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
@@ -181,32 +198,15 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         }
     }
 
-    if (context->Hid.TemperatureReportID) {
-        // Battery Temperature query
-        RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
-        report[0] = context->Hid.TemperatureReportID;
-
-        NTSTATUS status = GetFeatureReport(pdoTarget, report);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
+    {
+        // query FEATURE reports
+        NTSTATUS status = GetFeatureReport(pdoTarget, context->Hid.TemperatureReportID);
+        if (!NT_SUCCESS(status))
             return status;
-        }
 
-        UpdateBatteryState(context->LowState, HidP_Feature, report, context->Hid);
-    }
-    if (context->Hid.CycleCountReportID) {
-        // Battery CycleCount query
-        RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
-        report[0] = context->Hid.CycleCountReportID;
-
-        NTSTATUS status = GetFeatureReport(pdoTarget, report);
-        if (!NT_SUCCESS(status)) {
-            // IOCTL_HID_SET_FEATURE fails with 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) if using the local IO target (WdfDeviceGetIoTarget)
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
+        status = GetFeatureReport(pdoTarget, context->Hid.CycleCountReportID);
+        if (!NT_SUCCESS(status))
             return status;
-        }
-
-        UpdateBatteryState(context->LowState, HidP_Feature, report, context->Hid);
     }
 
     // flag HidConfig struct as initialized
