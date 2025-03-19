@@ -4,6 +4,11 @@
 #include "CppAllocator.hpp"
 
 
+/** AmpSec=mWh*360/centiVolt */
+ULONG Compute_mWh(ULONG ampereSec, ULONG mV) {
+    return (ampereSec * mV)/3600;
+}
+
 static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, CHAR* report, const HidConfig& hid) {
     USHORT reportLen = 0;
     if (reportType == HidP_Input)
@@ -46,6 +51,36 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
 
         if (state.BatteryInfo.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID CycleCount before=%u, after=%u\n", CycleCountBefore, state.BatteryInfo.CycleCount);
+        }
+    } else if (code == RemainingCapacity_Code) {
+        auto CapBefore = state.BatteryStatus.Capacity;
+
+        WdfSpinLockAcquire(state.Lock);
+        state.BatteryStatus.Capacity = Compute_mWh(value, state.BatteryStatus.Voltage); // AmpSec to mWh conversion
+        WdfSpinLockRelease(state.Lock);
+
+        if (state.BatteryStatus.Capacity != CapBefore) {
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID RemainingCapacity before=%u, after=%u\n", CapBefore, state.BatteryStatus.Capacity);
+        }
+    } else if (code == DesignCapacity_Code) {
+        auto DesignCapBefore = state.BatteryInfo.DesignedCapacity;
+
+        WdfSpinLockAcquire(state.Lock);
+        state.BatteryInfo.DesignedCapacity = Compute_mWh(value, state.BatteryStatus.Voltage); // AmpSec to mWh conversion
+        WdfSpinLockRelease(state.Lock);
+
+        if (state.BatteryInfo.DesignedCapacity != DesignCapBefore) {
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID DesignedCapacity before=%u, after=%u\n", DesignCapBefore, state.BatteryInfo.DesignedCapacity);
+        }
+    } else if (code == FullCapacity_Code) {
+        auto FullCapBefore = state.BatteryInfo.FullChargedCapacity;
+
+        WdfSpinLockAcquire(state.Lock);
+        state.BatteryInfo.FullChargedCapacity = Compute_mWh(value, state.BatteryStatus.Voltage); // AmpSec to mWh conversion
+        WdfSpinLockRelease(state.Lock);
+
+        if (state.BatteryInfo.FullChargedCapacity != FullCapBefore) {
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID FullChargedCapacity before=%u, after=%u\n", FullCapBefore, state.BatteryInfo.FullChargedCapacity);
         }
     }
 }
@@ -152,6 +187,9 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
 
     UCHAR TemperatureReportID = 0;
     UCHAR CycleCountReportID = 0;
+    UCHAR RemainingCapacityID = 0;
+    UCHAR DesignCapacityID = 0;
+    UCHAR FullCapacityID = 0;
     {
         // get capabilities
         HIDP_CAPS caps = {};
@@ -188,6 +226,12 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
                 TemperatureReportID = valueCaps[i].ReportID;
             else if (code == CycleCount_Code)
                 CycleCountReportID = valueCaps[i].ReportID;
+            else if (code == RemainingCapacity_Code)
+                RemainingCapacityID = valueCaps[i].ReportID;
+            else if (code == DesignCapacity_Code)
+                DesignCapacityID = valueCaps[i].ReportID;
+            else if (code == FullCapacity_Code)
+                FullCapacityID = valueCaps[i].ReportID;
         }
     }
 
@@ -198,6 +242,18 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             return status;
 
         status = GetFeatureReport(pdoTarget, CycleCountReportID);
+        if (!NT_SUCCESS(status))
+            return status;
+
+        status = GetFeatureReport(pdoTarget, RemainingCapacityID);
+        if (!NT_SUCCESS(status))
+            return status;
+
+        status = GetFeatureReport(pdoTarget, DesignCapacityID);
+        if (!NT_SUCCESS(status))
+            return status;
+
+        status = GetFeatureReport(pdoTarget, FullCapacityID);
         if (!NT_SUCCESS(status))
             return status;
     }
