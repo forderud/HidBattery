@@ -52,6 +52,16 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
         if (state.BatteryInfo.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID CycleCount before=%u, after=%u\n", CycleCountBefore, state.BatteryInfo.CycleCount);
         }
+    } else if (code == Voltage_Code) {
+        auto VoltageBefore = state.BatteryStatus.Voltage;
+
+        WdfSpinLockAcquire(state.Lock);
+        state.BatteryStatus.Voltage = 10*value; // centiVolt to millivolts 
+        WdfSpinLockRelease(state.Lock);
+
+        if (state.BatteryStatus.Voltage != VoltageBefore) {
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID Voltage before=%u, after=%u\n", VoltageBefore, state.BatteryStatus.Voltage);
+        }
     } else if (code == RemainingCapacity_Code) {
         auto CapBefore = state.BatteryStatus.Capacity;
 
@@ -187,6 +197,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
 
     UCHAR TemperatureReportID = 0;
     UCHAR CycleCountReportID = 0;
+    UCHAR VoltageID = 0;
     UCHAR RemainingCapacityID = 0;
     UCHAR DesignCapacityID = 0;
     UCHAR FullCapacityID = 0;
@@ -226,6 +237,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
                 TemperatureReportID = valueCaps[i].ReportID;
             else if (code == CycleCount_Code)
                 CycleCountReportID = valueCaps[i].ReportID;
+            else if (code == Voltage_Code)
+                VoltageID = valueCaps[i].ReportID;
             else if (code == RemainingCapacity_Code)
                 RemainingCapacityID = valueCaps[i].ReportID;
             else if (code == DesignCapacity_Code)
@@ -242,6 +255,10 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             return status;
 
         status = GetFeatureReport(pdoTarget, CycleCountReportID);
+        if (!NT_SUCCESS(status))
+            return status;
+
+        status = GetFeatureReport(pdoTarget, VoltageID); // voltage must be retrieved BEFORE capacity reports
         if (!NT_SUCCESS(status))
             return status;
 
