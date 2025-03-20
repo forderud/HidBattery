@@ -28,3 +28,4 @@ private:
 NTSTATUS InitializeHidState(_In_ WDFDEVICE Device);
 
 EVT_WDF_IO_QUEUE_IO_READ           EvtIoReadHidFilter;
+EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL EvtIoctlHidFilter;

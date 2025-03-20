@@ -279,3 +279,57 @@ VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_
         WdfRequestComplete(Request, status);
     }
 }
+
+
+void EvtIoctlHidGetFeatureCompletion(_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  WDF_REQUEST_COMPLETION_PARAMS* Params, _In_  WDFCONTEXT Context) {
+    UNREFERENCED_PARAMETER(Params); // invalidated by WdfRequestFormatRequestUsingCurrentType
+    UNREFERENCED_PARAMETER(Context);
+
+    if (!NT_SUCCESS(WdfRequestGetStatus(Request))) {
+        //DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: EvtIoReadHidFilterCompletion status=0x%x"), WdfRequestGetStatus(Request));
+        WdfRequestComplete(Request, WdfRequestGetStatus(Request));
+        return;
+    }
+
+    WDFDEVICE device = WdfIoTargetGetDevice(Target);
+    ParseReadHidBuffer(device, Request);
+
+    WdfRequestComplete(Request, STATUS_SUCCESS);
+}
+
+
+_Function_class_(EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL)
+_IRQL_requires_same_
+_IRQL_requires_max_(DISPATCH_LEVEL)
+VOID EvtIoctlHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_t OutputBufferLength, _In_ size_t InputBufferLength, _In_ ULONG IoControlCode) {
+    UNREFERENCED_PARAMETER(OutputBufferLength);
+    UNREFERENCED_PARAMETER(InputBufferLength);
+
+    WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
+
+    if (IoControlCode == IOCTL_HID_GET_FEATURE) {
+        // Formating required if specifying a completion routine
+        WdfRequestFormatRequestUsingCurrentType(Request);
+        // set completion callback
+        WdfRequestSetCompletionRoutine(Request, EvtIoctlHidGetFeatureCompletion, nullptr);
+
+        // Forward the request down the driver stack
+        BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), WDF_NO_SEND_OPTIONS);
+        if (ret == FALSE) {
+            NTSTATUS status = WdfRequestGetStatus(Request);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestSend failed with status: 0x%x"), status);
+            WdfRequestComplete(Request, status);
+        }
+    } else {
+        // Forward the request down the driver stack without completion routine
+        WDF_REQUEST_SEND_OPTIONS options = {};
+        WDF_REQUEST_SEND_OPTIONS_INIT(&options, WDF_REQUEST_SEND_OPTION_SEND_AND_FORGET);
+
+        BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), &options);
+        if (ret == FALSE) {
+            NTSTATUS status = WdfRequestGetStatus(Request);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestSend failed with status: 0x%x"), status);
+            WdfRequestComplete(Request, status);
+        }
+    }
+}
