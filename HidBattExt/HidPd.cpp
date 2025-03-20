@@ -232,8 +232,8 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request) {
         return;
     }
 
-    if (Length != context->Hid.InputReportByteLength) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: EvtIoReadFilter: Incorrect Length"));
+    if (Length < context->Hid.InputReportByteLength) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: EvtIoReadFilter: Too small output buffer"));
         return;
     }
 
