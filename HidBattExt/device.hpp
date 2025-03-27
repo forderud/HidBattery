@@ -4,8 +4,8 @@
 
 
 enum class FilterMode {
-    Upper, // above HidBatt: Filter battery IOCTL communication
-    Lower, // below HidBatt: Filter HID Power Device communication
+    Upper, // Running above HidBatt. Filters (modifies) battery IOCTL communication.
+    Lower, // Running below HidBatt. Filters (parses) HID Power Device communication.
 };
 
 struct HidCode {
