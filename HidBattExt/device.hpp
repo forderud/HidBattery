@@ -33,7 +33,7 @@ struct HidConfig {
     UCHAR TemperatureReportID = 0;
     UCHAR CycleCountReportID = 0;
 
-    LONG Initialized = 0;
+    LONG Initialized = 0; // struct initialized (atomic value)
 };
 
 /** HID Power Device report UsagePage and Usage codes from https://www.usb.org/sites/default/files/pdcv11.pdf */
