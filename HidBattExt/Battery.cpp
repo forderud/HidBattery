@@ -25,6 +25,7 @@ static void UpdateBatteryTemperature(ULONG& temp, BatteryState& state) {
 }
 
 
+/** IOCTL request completion routine for modifying the output buffer written by the driver beneath. */
 void EvtIoDeviceControlBattFilterCompletion (_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  WDF_REQUEST_COMPLETION_PARAMS* Params, _In_  WDFCONTEXT Context) {
     UNREFERENCED_PARAMETER(Params); // invalidated by WdfRequestFormatRequestUsingCurrentType
     UNREFERENCED_PARAMETER(Context);

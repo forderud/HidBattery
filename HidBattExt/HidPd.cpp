@@ -241,6 +241,7 @@ void ParseReadHidBuffer(WDFDEVICE Device, _In_ WDFREQUEST Request) {
 }
 
 
+/** Read request completion routine for parsing the output buffer written by the HW. */
 void EvtIoReadHidFilterCompletion(_In_  WDFREQUEST Request, _In_  WDFIOTARGET Target, _In_  WDF_REQUEST_COMPLETION_PARAMS* Params, _In_  WDFCONTEXT Context) {
     UNREFERENCED_PARAMETER(Params); // invalidated by WdfRequestFormatRequestUsingCurrentType
     UNREFERENCED_PARAMETER(Context);
