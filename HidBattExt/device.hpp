@@ -41,6 +41,8 @@ static constexpr HidCode Voltage_Code = { 0x84, 0x30 };
 static constexpr HidCode RunTimeToEmpty_Code = { 0x85, 0x68 };
 static constexpr HidCode ManufacturerDate_Code = {0x85, 0x85};
 static constexpr HidCode Chemistry_Code = { 0x85, 0x89 };
+static constexpr HidCode Manufacturer_Code = { 0x84, 0xFD };
+static constexpr HidCode SerialNumber_Code = { 0x84, 0xFF };
 
 /** Driver-specific struct for storing instance-specific data. */
 struct DEVICE_CONTEXT {
