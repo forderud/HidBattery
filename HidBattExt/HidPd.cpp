@@ -26,7 +26,18 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
     }
 
     // capture shared state
-    if (code == CycleCount_Code) {
+    if (code == Temperature_Code) {
+         auto TempBefore = state.Temperature;
+
+         WdfSpinLockAcquire(state.Lock);
+         // convert HID PD unit from (Kelvin) to BATTERY_QUERY_INFORMATION unit (10ths of a degree Kelvin)
+         state.Temperature = 10 * value;
+         WdfSpinLockRelease(state.Lock);
+
+         if (state.Temperature != TempBefore) {
+             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID Temperature before=%u, after=%u\n", TempBefore, state.Temperature);
+         }
+     } else if (code == CycleCount_Code) {
         auto CycleCountBefore = state.BatteryInfo.CycleCount;
 
         WdfSpinLockAcquire(state.Lock);
@@ -35,17 +46,6 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
 
         if (state.BatteryInfo.CycleCount != CycleCountBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID CycleCount before=%u, after=%u\n", CycleCountBefore, state.BatteryInfo.CycleCount);
-        }
-    } else if (code == Temperature_Code) {
-        auto TempBefore = state.Temperature;
-
-        WdfSpinLockAcquire(state.Lock);
-        // convert HID PD unit from (Kelvin) to BATTERY_QUERY_INFORMATION unit (10ths of a degree Kelvin)
-        state.Temperature = 10*value;
-        WdfSpinLockRelease(state.Lock);
-
-        if (state.Temperature != TempBefore) {
-            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID Temperature before=%u, after=%u\n", TempBefore, state.Temperature);
         }
     }
 }
