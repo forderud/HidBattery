@@ -92,6 +92,16 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
         if (state.BatteryInfo.FullChargedCapacity != FullCapBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID FullChargedCapacity before=%u, after=%u\n", FullCapBefore, state.BatteryInfo.FullChargedCapacity);
         }
+    } else if (code == RunTimeToEmpty_Code) {
+        auto timeBefore = state.EstimatedTime;
+
+        WdfSpinLockAcquire(state.Lock);
+        state.EstimatedTime = value;
+        WdfSpinLockRelease(state.Lock);
+
+        if (state.EstimatedTime != timeBefore) {
+            DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID RunTimeToEmpty before=%u, after=%u\n", timeBefore, state.EstimatedTime);
+        }
     }
 }
 
@@ -201,6 +211,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     UCHAR RemainingCapacityID = 0;
     UCHAR DesignCapacityID = 0;
     UCHAR FullCapacityID = 0;
+    UCHAR RunTimeToEmptyID = 0;
     {
         // get capabilities
         HIDP_CAPS caps = {};
@@ -245,6 +256,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
                 DesignCapacityID = valueCaps[i].ReportID;
             else if (code == FullCapacity_Code)
                 FullCapacityID = valueCaps[i].ReportID;
+            else if (code == RunTimeToEmpty_Code)
+                RunTimeToEmptyID = valueCaps[i].ReportID;
         }
     }
 
@@ -271,6 +284,10 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             return status;
 
         status = GetFeatureReport(pdoTarget, FullCapacityID);
+        if (!NT_SUCCESS(status))
+            return status;
+
+        status = GetFeatureReport(pdoTarget, RunTimeToEmptyID);
         if (!NT_SUCCESS(status))
             return status;
     }
