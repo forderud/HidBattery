@@ -57,16 +57,3 @@ struct DEVICE_CONTEXT {
     BATT_STATE         State;
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
-
-
-/** IOCTL buffer object to allow completion routines to access request information. */
-struct REQUEST_CONTEXT {
-    ULONG IoControlCode = 0;
-    ULONG InformationLevel = 0; // contains BATTERY_QUERY_INFORMATION::InformationLevel in IOCTL_BATTERY_QUERY_INFORMATION requests
-
-    void Set(ULONG ioctl, ULONG infoLevel) {
-        IoControlCode = ioctl;
-        InformationLevel = infoLevel;
-    }
-};
-WDF_DECLARE_CONTEXT_TYPE(REQUEST_CONTEXT)
