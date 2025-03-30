@@ -144,6 +144,57 @@ NTSTATUS GetFeatureReport(WDFIOTARGET target, UCHAR reportId) {
     return status;
 }
 
+template <size_t BUF_SIZE>
+NTSTATUS GetStringFromReport(WDFIOTARGET target, UCHAR reportId, wchar_t (&buffer)[BUF_SIZE]) {
+    if (!reportId)
+        return STATUS_SUCCESS;
+
+    WDFDEVICE device = WdfIoTargetGetDevice(target);
+    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(device);
+
+    ULONG strIdx = 0;
+    {
+        // string index query
+        RamArray<CHAR> report(context->Hid.FeatureReportByteLength);
+        report[0] = reportId;
+
+        WDF_MEMORY_DESCRIPTOR outputDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, report, report.ByteSize());
+
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(target, NULL,
+            IOCTL_HID_GET_FEATURE,
+            NULL, // input
+            &outputDesc, // output
+            NULL, NULL);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_FEATURE failed 0x%x"), status);
+            return status;
+        }
+        // string report index
+        strIdx = report[1];
+    }
+    {
+        // battery chemistry query
+        WDF_MEMORY_DESCRIPTOR inputDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&inputDesc, &strIdx, sizeof(strIdx));
+
+        WDF_MEMORY_DESCRIPTOR outputDesc = {};
+        WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, buffer, sizeof(buffer));
+
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(target, NULL,
+            IOCTL_HID_GET_INDEXED_STRING,
+            &inputDesc, // input
+            &outputDesc, // output
+            NULL, NULL);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL_HID_GET_INDEXED_STRING failed 0x%x"), status);
+            return status;
+        }
+    }
+
+    return STATUS_SUCCESS;
+}
+
 NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
     WDFIOTARGET_Wrap pdoTarget;
@@ -222,6 +273,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     UCHAR FullCapacityID = 0;
     UCHAR RunTimeToEmptyID = 0;
     UCHAR ManufacturerDateID = 0;
+    UCHAR ChemistryID = 0;
     {
         // get capabilities
         HIDP_CAPS caps = {};
@@ -270,6 +322,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
                 RunTimeToEmptyID = valueCaps[i].ReportID;
             else if (code == ManufacturerDate_Code)
                 ManufacturerDateID = valueCaps[i].ReportID;
+            else if (code == Chemistry_Code)
+                ChemistryID = valueCaps[i].ReportID;
         }
     }
 
@@ -306,6 +360,20 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         status = GetFeatureReport(pdoTarget, ManufacturerDateID);
         if (!NT_SUCCESS(status))
             return status;
+
+        {
+            // query battery chemistry
+            wchar_t strBuf[128] = {}; // max USB length is 126 wchar's
+            status = GetStringFromReport(pdoTarget, ChemistryID, strBuf);
+            if (!NT_SUCCESS(status))
+                return status;
+
+            // convert wchar_t string to fixed-length ASCII
+            context->State.BatteryInfo.Chemistry[0] = (UCHAR)strBuf[0];
+            context->State.BatteryInfo.Chemistry[1] = (UCHAR)strBuf[1];
+            context->State.BatteryInfo.Chemistry[2] = (UCHAR)strBuf[2];
+            context->State.BatteryInfo.Chemistry[3] = (UCHAR)strBuf[3];
+        }
     }
 
     // flag HidConfig struct as initialized
