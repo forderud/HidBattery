@@ -99,10 +99,10 @@ Arguments:
 
         DevExt->State.BatteryInfo.Capabilities = BATTERY_SYSTEM_BATTERY;
         DevExt->State.BatteryInfo.Technology = 1;
-        DevExt->State.BatteryInfo.Chemistry[0] = 'F';
-        DevExt->State.BatteryInfo.Chemistry[1] = 'a';
-        DevExt->State.BatteryInfo.Chemistry[2] = 'k';
-        DevExt->State.BatteryInfo.Chemistry[3] = 'e';
+
+        for (size_t i = 0; i < 4; i++)
+            DevExt->State.BatteryInfo.Chemistry[i] = 0;
+
         DevExt->State.BatteryInfo.DesignedCapacity = 0;
         DevExt->State.BatteryInfo.FullChargedCapacity = 0;
         DevExt->State.BatteryInfo.DefaultAlert1 = 0;
