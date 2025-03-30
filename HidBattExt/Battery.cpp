@@ -125,13 +125,13 @@ Arguments:
 
         DevExt->State.Temperature = 0; // [10ths of a degree Kelvin]
 
-        RtlStringCchCopyW(DevExt->State.DeviceName, MAX_BATTERY_STRING_SIZE, L"SimulatedBattery");
+        memset(DevExt->State.DeviceName, 0, sizeof(WCHAR)*MAX_BATTERY_STRING_SIZE);
 
-        RtlStringCchCopyW(DevExt->State.ManufacturerName, MAX_BATTERY_STRING_SIZE, L"OpenSource");
+        memset(DevExt->State.ManufacturerName, 0, sizeof(WCHAR)*MAX_BATTERY_STRING_SIZE);
 
-        RtlStringCchCopyW(DevExt->State.SerialNumber, MAX_BATTERY_STRING_SIZE, L"1234");
+        memset(DevExt->State.SerialNumber, 0, sizeof(WCHAR)*MAX_BATTERY_STRING_SIZE);
 
-        RtlStringCchCopyW(DevExt->State.UniqueId, MAX_BATTERY_STRING_SIZE, L"SimulatedBattery007");
+        memset(DevExt->State.UniqueId, 0, sizeof(WCHAR)*MAX_BATTERY_STRING_SIZE);
 
         WdfSpinLockRelease(DevExt->State.Lock);
     }

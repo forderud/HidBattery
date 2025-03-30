@@ -195,6 +195,24 @@ NTSTATUS GetStringFromReport(WDFIOTARGET target, UCHAR reportId, wchar_t (&buffe
     return STATUS_SUCCESS;
 }
 
+template <size_t BUF_SIZE>
+NTSTATUS GetStandardStringReport(WDFIOTARGET target, ULONG ioctl, wchar_t (&buffer)[BUF_SIZE]) {
+    WDF_MEMORY_DESCRIPTOR outputDesc = {};
+    WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, buffer, sizeof(buffer));
+
+    NTSTATUS status = WdfIoTargetSendIoctlSynchronously(target, NULL,
+        ioctl,
+        NULL, // input
+        &outputDesc, // output
+        NULL, NULL);
+    if (!NT_SUCCESS(status)) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IOCTL=0x%x failed 0x%x"), ioctl, status);
+        return status;
+    }
+
+    return STATUS_SUCCESS;
+}
+
 NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
     WDFIOTARGET_Wrap pdoTarget;
@@ -274,6 +292,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     UCHAR RunTimeToEmptyID = 0;
     UCHAR ManufacturerDateID = 0;
     UCHAR ChemistryID = 0;
+    UCHAR ManufacturerID = 0;
+    UCHAR SerialNumberID = 0;
     {
         // get capabilities
         HIDP_CAPS caps = {};
@@ -324,6 +344,10 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
                 ManufacturerDateID = valueCaps[i].ReportID;
             else if (code == Chemistry_Code)
                 ChemistryID = valueCaps[i].ReportID;
+            else if (code == Manufacturer_Code)
+                ManufacturerID  = valueCaps[i].ReportID;
+            else if (code == SerialNumber_Code)
+                SerialNumberID = valueCaps[i].ReportID;
         }
     }
 
@@ -373,6 +397,32 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             context->State.BatteryInfo.Chemistry[1] = (UCHAR)strBuf[1];
             context->State.BatteryInfo.Chemistry[2] = (UCHAR)strBuf[2];
             context->State.BatteryInfo.Chemistry[3] = (UCHAR)strBuf[3];
+        }
+        {
+            // query device name
+            status = GetStandardStringReport(pdoTarget, IOCTL_HID_GET_PRODUCT_STRING, context->State.DeviceName);
+            if (!NT_SUCCESS(status))
+                return status;
+        }
+        {
+            // query manufacturer
+            status = GetStringFromReport(pdoTarget, ManufacturerID, context->State.ManufacturerName);
+            if (!NT_SUCCESS(status))
+                return status;
+        }
+        {
+            // query serial number
+            // IOCTL_HID_GET_SERIALNUMBER_STRING cannot be used since it only returns "HIDAP"
+            status = GetStringFromReport(pdoTarget, SerialNumberID, context->State.SerialNumber);
+            if (!NT_SUCCESS(status))
+                return status;
+        }
+        {
+            // TODO: query unique ID
+            // IOCTL_HID_GET_MANUFACTURER_STRING returns "Arduino LLC"
+            status = GetStandardStringReport(pdoTarget, IOCTL_HID_GET_MANUFACTURER_STRING, context->State.UniqueId);
+            if (!NT_SUCCESS(status))
+                return status;
         }
     }
 
