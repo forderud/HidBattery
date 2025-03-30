@@ -102,6 +102,15 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
         if (state.EstimatedTime != timeBefore) {
             DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID RunTimeToEmpty before=%u, after=%u\n", timeBefore, state.EstimatedTime);
         }
+    } else if (code == ManufacturerDate_Code) {
+        WdfSpinLockAcquire(state.Lock);
+        // value = (year - 1980) * 512 + month * 32 + day; // from 4.2.6 Battery Settings in "Universal Serial Bus Usage Tables for HID Power Devices"
+        state.ManufactureDate.Day = value % 32;
+        state.ManufactureDate.Month = (value >> 5) % 16;
+        state.ManufactureDate.Year = (USHORT)(1980 + (value >> 9));
+        WdfSpinLockRelease(state.Lock);
+
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Updating HID ManufactureDate\n");
     }
 }
 
@@ -212,6 +221,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     UCHAR DesignCapacityID = 0;
     UCHAR FullCapacityID = 0;
     UCHAR RunTimeToEmptyID = 0;
+    UCHAR ManufacturerDateID = 0;
     {
         // get capabilities
         HIDP_CAPS caps = {};
@@ -258,6 +268,8 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
                 FullCapacityID = valueCaps[i].ReportID;
             else if (code == RunTimeToEmpty_Code)
                 RunTimeToEmptyID = valueCaps[i].ReportID;
+            else if (code == ManufacturerDate_Code)
+                ManufacturerDateID = valueCaps[i].ReportID;
         }
     }
 
@@ -288,6 +300,10 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             return status;
 
         status = GetFeatureReport(pdoTarget, RunTimeToEmptyID);
+        if (!NT_SUCCESS(status))
+            return status;
+
+        status = GetFeatureReport(pdoTarget, ManufacturerDateID);
         if (!NT_SUCCESS(status))
             return status;
     }
