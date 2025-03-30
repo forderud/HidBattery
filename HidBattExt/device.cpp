@@ -138,15 +138,6 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         }
     }
 
-    {
-        // reserve context space for request objects
-        WDF_OBJECT_ATTRIBUTES attr{};
-        WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&attr, REQUEST_CONTEXT);
-
-        WdfDeviceInitSetRequestAttributes(DeviceInit, &attr);
-    }
-
-
     WDFDEVICE Device = 0;
     {
         // create device
