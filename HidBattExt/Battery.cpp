@@ -97,7 +97,7 @@ Arguments:
         DevExt->State.ManufactureDate.Month = 0;
         DevExt->State.ManufactureDate.Year = 0;
 
-        DevExt->State.BatteryInfo.Capabilities = BATTERY_SYSTEM_BATTERY;
+        DevExt->State.BatteryInfo.Capabilities = BATTERY_SYSTEM_BATTERY | BATTERY_IS_SHORT_TERM;
         DevExt->State.BatteryInfo.Technology = 1; // rechargeable
 
         for (size_t i = 0; i < 4; i++)
