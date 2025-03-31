@@ -9,6 +9,13 @@ ULONG Compute_mWh(ULONG ampereSec, ULONG mV) {
     return (ampereSec * mV)/3600;
 }
 
+static ULONG SetClearMask(ULONG prev, ULONG mask, bool setMask) {
+    if (setMask)
+        return prev | mask; // set mask bits
+    else
+        return prev & ~mask; // clear mask bits
+}
+
 static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, CHAR* report, const HidConfig& hid) {
     USHORT reportLen = 0;
     if (reportType == HidP_Input)
@@ -23,11 +30,63 @@ static void UpdateBatteryState(BATT_STATE& state, HIDP_REPORT_TYPE reportType, C
         return;
 
     ULONG value = 0;
-    NTSTATUS status = HidP_GetUsageValue(reportType, code.UsagePage, /*default link collection*/0, code.Usage, &value, hid.GetPreparsedData(), report, reportLen);
-    if (!NT_SUCCESS(status)) {
-        // fails with HIDP_STATUS_USAGE_NOT_FOUND (0xc0110004) for HID_PD_SERIAL (0x02) report with UsagePage=0x84, Usage=0xff
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed UsagePage=0x%x, Usage=0x%x, (0x%x)"), code.UsagePage, code.Usage, status);
-        return;
+
+    if (code.button) {
+        USAGE usagesOn[16] = {};
+        ULONG usagesOn_count = 16;
+
+        // parse button presses
+        NTSTATUS status = HidP_GetUsages(reportType, code.UsagePage, /*default link collection*/0, usagesOn, &usagesOn_count, hid.GetPreparsedData(), report, reportLen);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsages failed UsagePage=0x%x, (0x%x)"), code.UsagePage, status);
+            return;
+        }
+
+        if (code.UsagePage == 0x84) {
+            // Power Device Page (x84)
+            bool shutdownimminent = false;
+
+            for (size_t i = 0; i < usagesOn_count; i++) {
+                USAGE usage = usagesOn[i];
+
+                if (usage == ShutdownImminent_Code.Usage)
+                    shutdownimminent = true;
+            }
+
+            WdfSpinLockAcquire(state.Lock);
+            state.BatteryStatus.PowerState = SetClearMask(state.BatteryStatus.PowerState, BATTERY_CRITICAL, shutdownimminent);
+            WdfSpinLockRelease(state.Lock);
+        } else if (code.UsagePage == 0x85) {
+            // Battery System Page (x85)
+            bool charging = false;
+            bool discharging = false;
+            bool acpresent = false;
+
+            for (size_t i = 0; i < usagesOn_count; i++) {
+                USAGE usage = usagesOn[i];
+
+                if (usage == Charging_Code.Usage)
+                    charging = true;
+                else if (usage == Discharging_Code.Usage)
+                    discharging = true;
+                else if (usage == ACPresent_Code.Usage)
+                    acpresent = true;
+            }
+
+            WdfSpinLockAcquire(state.Lock);
+            state.BatteryStatus.PowerState = SetClearMask(state.BatteryStatus.PowerState, BATTERY_CHARGING, charging);
+            state.BatteryStatus.PowerState = SetClearMask(state.BatteryStatus.PowerState, BATTERY_DISCHARGING, discharging);
+            state.BatteryStatus.PowerState = SetClearMask(state.BatteryStatus.PowerState, BATTERY_POWER_ON_LINE, acpresent);
+            WdfSpinLockRelease(state.Lock);
+        }
+    } else {
+        // parse parameter values
+        NTSTATUS status = HidP_GetUsageValue(reportType, code.UsagePage, /*default link collection*/0, code.Usage, &value, hid.GetPreparsedData(), report, reportLen);
+        if (!NT_SUCCESS(status)) {
+            // fails with HIDP_STATUS_USAGE_NOT_FOUND (0xc0110004) for HID_PD_SERIAL (0x02) report with UsagePage=0x84, Usage=0xff
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetUsageValue failed UsagePage=0x%x, Usage=0x%x, (0x%x)"), code.UsagePage, code.Usage, status);
+            return;
+        }
     }
 
     // capture shared state
@@ -283,6 +342,13 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         }
     }
 
+    // get capabilities
+    HIDP_CAPS caps = {};
+    NTSTATUS status = HidP_GetCaps(context->Hid.GetPreparsedData(), &caps);
+    if (!NT_SUCCESS(status)) {
+        return status;
+    }
+
     UCHAR TemperatureReportID = 0;
     UCHAR CycleCountReportID = 0;
     UCHAR VoltageID = 0;
@@ -295,13 +361,6 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     UCHAR ManufacturerID = 0;
     UCHAR SerialNumberID = 0;
     {
-        // get capabilities
-        HIDP_CAPS caps = {};
-        NTSTATUS status = HidP_GetCaps(context->Hid.GetPreparsedData(), &caps);
-        if (!NT_SUCCESS(status)) {
-            return status;
-        }
-
         context->Hid.InputReportByteLength = caps.InputReportByteLength;
         context->Hid.FeatureReportByteLength = caps.FeatureReportByteLength;
 
@@ -325,6 +384,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             HidCode& code = context->Hid.reports[valueCaps[i].ReportID];
             code.UsagePage = valueCaps[i].UsagePage;
             code.Usage = valueCaps[i].NotRange.Usage;
+            code.button = false;
 
             if (code == Temperature_Code)
                 TemperatureReportID = valueCaps[i].ReportID;
@@ -352,8 +412,31 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     }
 
     {
+        // get FEATURE report button caps
+        USHORT buttonCapsLen = caps.NumberFeatureButtonCaps;
+        RamArray<HIDP_BUTTON_CAPS> buttonCaps(buttonCapsLen);
+        if (!buttonCaps) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HIDP_BUTTON_CAPS[%u] allocation failure."), buttonCapsLen);
+            return status;
+        }
+        status = HidP_GetButtonCaps(HidP_Feature, buttonCaps, &buttonCapsLen, context->Hid.GetPreparsedData());
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: HidP_GetButtonCaps failed 0x%x"), status);
+            return status;
+        }
+
+        // identify UsagePage & Usage code for all HID reports
+        for (USHORT i = 0; i < buttonCapsLen; i++) {
+            HidCode& code = context->Hid.reports[buttonCaps[i].ReportID];
+            code.UsagePage = buttonCaps[i].UsagePage;
+            code.Usage = buttonCaps[i].NotRange.Usage;
+            code.button = true;
+        }
+    }
+
+    {
         // query FEATURE reports
-        NTSTATUS status = GetFeatureReport(pdoTarget, TemperatureReportID);
+        status = GetFeatureReport(pdoTarget, TemperatureReportID);
         if (!NT_SUCCESS(status))
             return status;
 

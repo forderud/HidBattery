@@ -8,8 +8,10 @@ struct HidCode {
     USAGE UsagePage = 0;
     USAGE Usage = 0;
 
+    bool button = 0; // is a button
+
     bool operator ==(HidCode other) const {
-        return (other.UsagePage == UsagePage) && (other.Usage == Usage);
+        return (other.UsagePage == UsagePage) && (other.Usage == Usage); // "button" deliberately not checked
     }
 };
 
@@ -43,6 +45,12 @@ static constexpr HidCode ManufacturerDate_Code = {0x85, 0x85};
 static constexpr HidCode Chemistry_Code = { 0x85, 0x89 };
 static constexpr HidCode Manufacturer_Code = { 0x84, 0xFD };
 static constexpr HidCode SerialNumber_Code = { 0x84, 0xFF };
+// PresentStatus fields
+static constexpr HidCode PresentStatus_Code = { 0x84, 0x02 }; // whole collection
+static constexpr HidCode Charging_Code = { 0x85, 0x44 };
+static constexpr HidCode Discharging_Code = { 0x85, 0x45 };
+static constexpr HidCode ACPresent_Code = { 0x85, 0xD0 };
+static constexpr HidCode ShutdownImminent_Code = { 0x84, 0x69 };
 
 /** Driver-specific struct for storing instance-specific data. */
 struct DEVICE_CONTEXT {
