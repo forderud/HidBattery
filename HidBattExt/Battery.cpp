@@ -601,7 +601,7 @@ Arguments:
     Irp - Supplies the IO request being processed.
 --*/
 {
-    DebugEnter();
+    //DebugEnter();
 
     ASSERTMSG("Must be called at IRQL = PASSIVE_LEVEL",
         (KeGetCurrentIrql() == PASSIVE_LEVEL));
@@ -631,7 +631,7 @@ Arguments:
         Status = WdfDeviceWdmDispatchPreprocessedIrp(Device, Irp);
     }
 
-    DebugExitStatus(Status);
+    //DebugExitStatus(Status);
     return Status;
 }
 
