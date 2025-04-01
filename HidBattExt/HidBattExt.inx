@@ -39,6 +39,8 @@ CopyFiles = @HidBattExt.sys
 [HidBattExt_Inst.NT.HW]
 
 [HidBattExt_Inst.NT.Services]
+Include = battery.inf
+;Needs = Battery_Inst.Services
 AddService = HidBattExt, %SPSVCINST_ASSOCSERVICE%, HidBattExt_Service_Inst
 
 [HidBattExt_Service_Inst]
