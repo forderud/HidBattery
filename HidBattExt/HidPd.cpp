@@ -564,7 +564,7 @@ _IRQL_requires_same_
 _IRQL_requires_max_(DISPATCH_LEVEL)
 VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_t Length) {
     UNREFERENCED_PARAMETER(Length);
-    //DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoReadFilter (Length=%Iu)\n", Length);
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoReadHidFilter (Length=%Iu)\n", Length);
 
     WDFDEVICE device = WdfIoQueueGetDevice(Queue);
 
