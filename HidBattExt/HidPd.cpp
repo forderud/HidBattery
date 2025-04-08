@@ -580,3 +580,34 @@ VOID EvtIoReadHidFilter(_In_ WDFQUEUE Queue, _In_ WDFREQUEST Request, _In_ size_
         WdfRequestComplete(Request, status);
     }
 }
+
+
+_Function_class_(EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL)
+_IRQL_requires_same_
+_IRQL_requires_max_(DISPATCH_LEVEL)
+VOID EvtIoDeviceControlHidFilter(
+    _In_  WDFQUEUE          Queue,
+    _In_  WDFREQUEST        Request,
+    _In_  size_t            OutputBufferLength,
+    _In_  size_t            InputBufferLength,
+    _In_  ULONG             IoControlCode) {
+#if 0
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtIoDeviceControlHidFilter (IoControlCode=0x%x, InputBufferLength=%Iu, OutputBufferLength=%Iu)\n", IoControlCode, InputBufferLength, OutputBufferLength);
+#endif
+    UNREFERENCED_PARAMETER(OutputBufferLength);
+    UNREFERENCED_PARAMETER(InputBufferLength);
+    UNREFERENCED_PARAMETER(IoControlCode);
+
+    WDFDEVICE Device = WdfIoQueueGetDevice(Queue);
+
+    // Forward the request down the driver stack
+    WDF_REQUEST_SEND_OPTIONS options{};
+    WDF_REQUEST_SEND_OPTIONS_INIT(&options, WDF_REQUEST_SEND_OPTION_SEND_AND_FORGET);
+
+    BOOLEAN ret = WdfRequestSend(Request, WdfDeviceGetIoTarget(Device), &options);
+    if (ret == FALSE) {
+        NTSTATUS status = WdfRequestGetStatus(Request);
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfRequestSend failed with status: 0x%x"), status);
+        WdfRequestComplete(Request, status);
+    }
+}
