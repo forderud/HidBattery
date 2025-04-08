@@ -32,16 +32,28 @@ HidBattExt.sys = 1
 
 ; Install Section
 [HidBattExt_Inst.NT]
+Include=MsHidKmdf.inf
+Needs=MsHidKmdf.NT
 Include = battery.inf
 Needs = Battery_Inst
 CopyFiles = @HidBattExt.sys
 
 [HidBattExt_Inst.NT.HW]
+Include=MsHidKmdf.inf
+Needs=MsHidKmdf.NT.HW
+
+[HidBattExt_Inst.NT.Filters]
+AddFilter=HidBattExt,,HidBattExt_Filter_Install
+
+[HidBattExt_Filter_Install]
+FilterPosition=Lower
 
 [HidBattExt_Inst.NT.Services]
+Include=MsHidKmdf.inf
+Needs=MsHidKmdf.NT.Services
 Include = battery.inf
 ;Needs = Battery_Inst.Services
-AddService = HidBattExt, %SPSVCINST_ASSOCSERVICE%, HidBattExt_Service_Inst
+AddService = HidBattExt, 0, HidBattExt_Service_Inst
 
 [HidBattExt_Service_Inst]
 ServiceType   = %SERVICE_KERNEL_DRIVER%
