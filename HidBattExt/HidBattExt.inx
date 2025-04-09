@@ -5,8 +5,8 @@
 ;--*/
 [Version]
 Signature="$Windows NT$"
-Class=Battery
-ClassGuid={72631e54-78a4-11d0-bcf7-00aa00b7b32a}
+Class       = HIDClass
+ClassGuid   = {745a17a0-74d3-11d0-b6fe-00a0c90f57da}
 Provider=%Provider%
 DriverVer=
 CatalogFile=HidBattExt.cat
@@ -34,8 +34,6 @@ HidBattExt.sys = 1
 [HidBattExt_Inst.NT]
 Include=MsHidKmdf.inf
 Needs=MsHidKmdf.NT
-Include = battery.inf
-Needs = Battery_Inst
 CopyFiles = @HidBattExt.sys
 
 [HidBattExt_Inst.NT.HW]
@@ -51,8 +49,6 @@ FilterPosition=Lower
 [HidBattExt_Inst.NT.Services]
 Include=MsHidKmdf.inf
 Needs=MsHidKmdf.NT.Services
-Include = battery.inf
-;Needs = Battery_Inst.Services
 AddService = HidBattExt, 0, HidBattExt_Service_Inst
 
 [HidBattExt_Service_Inst]
