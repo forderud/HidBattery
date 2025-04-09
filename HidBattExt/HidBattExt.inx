@@ -5,16 +5,16 @@
 ; Require Windows 11 build 22000 due to MsHidKmdf usage
 ;--*/
 [Version]
-Signature="$Windows NT$"
-Class       = HIDClass
-ClassGuid   = {745a17a0-74d3-11d0-b6fe-00a0c90f57da}
+Signature="$WINDOWS NT$"
+Class=HIDClass
+ClassGuid={745a17a0-74d3-11d0-b6fe-00a0c90f57da}
 Provider=%Provider%
 DriverVer=
 CatalogFile=HidBattExt.cat
 PnpLockdown=1
 
 [DestinationDirs]
-DefaultDestDir = 13
+DefaultDestDir=13
 
 [SourceDisksNames]
 1 = "HidBattExt Driver Disk"
@@ -41,17 +41,17 @@ CopyFiles = @HidBattExt.sys
 Include=MsHidKmdf.inf
 Needs=MsHidKmdf.NT.HW
 
-[HidBattExt_Inst.NT.Filters]
-AddFilter=HidBattExt,,HidBattExt_Filter_Install
-
-[HidBattExt_Filter_Install]
-FilterPosition=Lower
-
 [HidBattExt_Inst.NT.Services]
 DisplayName = "HidBattExt minidriver Service"
 Include=MsHidKmdf.inf
 Needs=MsHidKmdf.NT.Services
 AddService = HidBattExt, 0, HidBattExt_Service_Inst
+
+[HidBattExt_Inst.NT.Filters]
+AddFilter=HidBattExt,,HidBattExt_Filter_Install
+
+[HidBattExt_Filter_Install]
+FilterPosition=Lower
 
 [HidBattExt_Service_Inst]
 ServiceType   = %SERVICE_KERNEL_DRIVER%
@@ -63,7 +63,7 @@ ServiceBinary = %13%\HidBattExt.sys
 KmdfService = HidBattExt, HidBattExt_wdfsect
 
 [HidBattExt_wdfsect]
-KmdfLibraryVersion = $KMDFVERSION$
+KmdfLibraryVersion=$KMDFVERSION$
 
 [Strings]
 ; Strings for macro replacement
