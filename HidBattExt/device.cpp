@@ -13,11 +13,13 @@ VOID InitializeHidStateTimer(_In_ WDFTIMER  Timer) {
     WDFDEVICE Device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
     NT_ASSERTMSG("InitializeHidState Device NULL\n", Device);
 
+#if 0
     NTSTATUS status = InitializeHidState(Device);
     if (!NT_SUCCESS(status)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: InitializeHidState failure 0x%x"), status);
         return;
     }
+#endif
 
     DebugExit();
 }
@@ -35,12 +37,13 @@ _Function_class_(EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT)
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
-
+#if 0
     NTSTATUS status = InitializeBatteryClass(Device);
     if (!NT_SUCCESS(status)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: InitializeBattery failed 0x%x"), status);
         return status;
     }
+#endif
 
     {
         // schedule read of HID FEATURE reports
@@ -54,7 +57,7 @@ NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
         attr.ExecutionLevel = WdfExecutionLevelPassive; // required to access HID functions
 
         WDFTIMER timer = nullptr;
-        status = WdfTimerCreate(&timerCfg, &attr, &timer);
+        NTSTATUS status = WdfTimerCreate(&timerCfg, &attr, &timer);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfTimerCreate failed 0x%x"), status);
             return status;
@@ -113,6 +116,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     WdfFdoInitSetFilter(DeviceInit);
 
     {
+#if 0
         // register PnP callbacks (must be done before WdfDeviceCreate)
         WDF_PNPPOWER_EVENT_CALLBACKS PnpPowerCallbacks;
         WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&PnpPowerCallbacks);
@@ -120,9 +124,11 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         PnpPowerCallbacks.EvtDeviceSelfManagedIoInit = EvtSelfManagedIoInit;
         PnpPowerCallbacks.EvtDeviceSelfManagedIoCleanup = EvtSelfManagedIoCleanup;
         WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &PnpPowerCallbacks);
+#endif
     }
     
     {
+#if 0
         // Register WDM preprocess callbacks for IRP_MJ_DEVICE_CONTROL and
         // IRP_MJ_SYSTEM_CONTROL. The battery class driver needs to handle these IO
         // requests directly.
@@ -136,6 +142,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("WdfDeviceInitAssignWdmIrpPreprocessCallback(IRP_MJ_DEVICE_CONTROL) Failed. 0x%x"), status);
             return status;
         }
+#endif
     }
 
     WDFDEVICE Device = 0;
@@ -193,6 +200,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     }
 
     {
+#if 0
         // create queue for filtering HID Power Device requests
         WDF_IO_QUEUE_CONFIG queueConfig = {};
         WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchParallel);
@@ -205,6 +213,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoQueueCreate failed 0x%x"), status);
             return status;
         }
+#endif
     }
 
     return STATUS_SUCCESS;
