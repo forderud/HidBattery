@@ -47,6 +47,7 @@ AddFilter=HidBattExt,,HidBattExt_Filter_Install
 FilterPosition=Lower
 
 [HidBattExt_Inst.NT.Services]
+DisplayName = "HidBattExt minidriver Service"
 Include=MsHidKmdf.inf
 Needs=MsHidKmdf.NT.Services
 AddService = HidBattExt, 0, HidBattExt_Service_Inst
