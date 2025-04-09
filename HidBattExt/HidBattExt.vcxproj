@@ -82,7 +82,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies);hidparse.lib</AdditionalDependencies>
-      <AdditionalOptions>/brepro %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/brepro /PDBALTPATH:%_PDB% %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <DriverSign>
       <FileDigestAlgorithm>sha256</FileDigestAlgorithm>
@@ -95,7 +95,7 @@ copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies);hidparse.lib</AdditionalDependencies>
-      <AdditionalOptions>/brepro %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/brepro /PDBALTPATH:%_PDB% %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <DriverSign>
       <FileDigestAlgorithm>sha256</FileDigestAlgorithm>
@@ -108,7 +108,7 @@ copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies);hidparse.lib</AdditionalDependencies>
-      <AdditionalOptions>/brepro %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/brepro /PDBALTPATH:%_PDB% %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <DriverSign>
       <FileDigestAlgorithm>sha256</FileDigestAlgorithm>
@@ -121,7 +121,7 @@ copy $(OutDir)\HidBattExt.cer $(PackageDir)</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies);hidparse.lib</AdditionalDependencies>
-      <AdditionalOptions>/brepro %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/brepro /PDBALTPATH:%_PDB% %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <DriverSign>
       <FileDigestAlgorithm>sha256</FileDigestAlgorithm>
