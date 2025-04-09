@@ -2,6 +2,7 @@
 ; HidBatt replacement driver - https://github.com/forderud/HidBattery/
 ;
 ; Require Windows 10 build 16299 (1709) or newer due to DefaultDestDir=13 usage.
+; Require Windows 11 build 22000 due to MsHidKmdf usage
 ;--*/
 [Version]
 Signature="$Windows NT$"
@@ -23,11 +24,11 @@ HidBattExt.sys = 1
 
 ; Manufacturer Section
 [Manufacturer]
-%Provider%=HidBattExtMfg,NT$ARCH$.10.0...16299
+%Provider%=HidBattExtMfg,NT$ARCH$.10.0...22000
 
 ; Models section
 ; https://learn.microsoft.com/en-us/windows-hardware/drivers/install/inf-models-section
-[HidBattExtMfg.NT$ARCH$.10.0...16299]
+[HidBattExtMfg.NT$ARCH$.10.0...22000]
 "HID Battery (extended)"=HidBattExt_Inst, HID_DEVICE_UP:0084_U:0004
 
 ; Install Section
