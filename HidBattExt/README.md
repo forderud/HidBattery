@@ -15,10 +15,10 @@ See [Driver testing](https://github.com/forderud/IntelliMouseDriver/wiki/Driver-
 The Arduino [battery.ino](/battery/battery.ino) sketch in this repo can be used for testing multi-battery setups.  
 ![image](https://github.com/user-attachments/assets/98040437-5968-4a44-92ac-492e858bf216)  
 
-The [`BatteryQuery.exe`](https://github.com/forderud/BatterySimulator) tool can be used for querying battery parameters from the command line.
+The [`BatteryQuery.exe`](https://github.com/forderud/BatterySimulator) tool can be used for querying battery IOCTL parameters from the command line.
 
 ## Acknowledgement
-The driver is based on the [TailLight](https://github.com/forderud/IntelliMouseDriver/tree/main/TailLight) driver for Microsoft Pro IntelliMouse, which again is based on the Microsoft [firefly](https://github.com/microsoft/Windows-driver-samples/tree/main/hid/firefly) sample driver.
+The driver is based on the [TailLight](https://github.com/forderud/IntelliMouseDriver/tree/main/TailLight) driver for Microsoft Pro IntelliMouse, which again is based on Microsoft's [firefly](https://github.com/microsoft/Windows-driver-samples/tree/main/hid/firefly) sample.
 
 The filter driver design is furthermore influenced by valuable feedback from _Tim Roberts_, _Mark Roddy_ and _Doron Holan_ in the OSR [How to continuously obtain HID input reports from non-HIDClass driver](https://community.osr.com/t/how-to-continuously-obtain-hid-input-reports-from-non-hidclass-driver/59447/19) forum posting.
 
