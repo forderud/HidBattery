@@ -1,7 +1,7 @@
 # Windows HidBatt extension filter driver
 `HidBattExt` driver that extends the in-built `HidBatt` driver in Windows to also parse and report `CycleCount` and `Temperature` battery parameters.
 
-The HidBatt drivers inability to report these parameters have already been reported to Microsoft in https://aka.ms/AAu4w9g and https://aka.ms/AAu4w8p . The driver will no longer be needed if or when Microsoft improves their `HidBatt` driver.
+The HidBatt drivers inability to report these parameters have already been reported to Microsoft in https://aka.ms/AAu4w9g and https://aka.ms/AAu4w8p . The driver will no longer be needed if Microsoft improves their `HidBatt` driver.
 
 ## Description
 The filter driver places itself both _above_ and _below_ HidBatt:  
