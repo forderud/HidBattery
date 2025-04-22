@@ -289,6 +289,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         // We will let the framework to respond automatically to the pnp state changes of the target by closing and opening the handle.
         openParams.ShareAccess = FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE;
 
+        // WdfIoTargetOpen(PDO) fails with 0xc0000043 (STATUS_SHARING_VIOLATION) if forgetting to specify FILE_SHARE_DELETE
         status = WdfIoTargetOpen(pdoTarget, &openParams);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetOpen failed 0x%x"), status);
