@@ -63,6 +63,60 @@ UNICODE_STRING GetTargetPropertyString(WDFIOTARGET target, DEVICE_REGISTRY_PROPE
     return result;
 }
 
+#if 0
+void EvtDeviceFileCreate(IN WDFDEVICE Device, IN WDFREQUEST Request, IN WDFFILEOBJECT FileObject)
+/*++
+Routine Description:
+    The framework calls a driver's EvtDeviceFileCreate callback
+    when the framework receives an IRP_MJ_CREATE request.
+    The system sends this request when a user application opens the
+    device to perform an I/O operation, such as reading or writing to a device.
+    This callback is called in the context of the thread
+    that created the IRP_MJ_CREATE request.
+
+Arguments:
+    Device - Handle to a framework device object.
+    FileObject - Pointer to fileobject that represents the open handle.
+    CreateParams - Parameters for create
+--*/
+{
+    UNREFERENCED_PARAMETER(Device);
+
+    //DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
+#if DBG
+    UNICODE_STRING* filename = WdfFileObjectGetFileName(FileObject);
+    ULONG processId = WdfFileObjectGetInitiatorProcessId(FileObject);
+    ULONG flags = WdfFileObjectGetFlags(FileObject);
+
+    DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvtDeviceFileCreate filename=%wZ, processId=%u, flags=%u\n", filename, processId, flags);
+
+    FILE_OBJECT* file = WdfFileObjectWdmGetFileObject(FileObject);
+    DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: EvtDeviceFileCreate FsContext=%p\n", file->FsContext);
+#endif
+
+    // TODO:
+    // * Modify modify the privileges (https://community.osr.com/t/wdfrequestsend-when-formatted-for-read-returns-status-priviledge-not-held-even-though-prior-wdfreque/52554/7)
+    // * Pull the PFILE_OBJECT out of the read request you receive and then manually add it to the request after you format it for read (IoGetNextIrpStackLocation(WdfRequestWdmGetIrp(request))->FileObject =<…>;)
+    // * Register an EvtDeviceFileCreate callback, if the request is asking for read access, send the request down synchronously using the default target and when it comes back successfully, create a new remote IO target, 
+    //   and use WDF_IO_TARGET_OPEN_PARAMS_INIT_EXISTING_DEVICE for the open params, passing WdfDeviceWdmGetAttachedDevice for the existing device, then assign openParams.TargetFileObject to the open request’s PFILE_OBJECT
+    //   and then open the target. Then use this new io target when you format and send your own reads (https://community.osr.com/t/status-privilege-not-held-on-a-read-in-a-hid-filter-driver/40616/2)
+
+
+#if 1
+    WDFIOTARGET target = WdfDeviceGetIoTarget(Device);
+    WdfRequestFormatRequestUsingCurrentType(Request);
+
+    BOOLEAN res = WdfRequestSend(Request, target, NULL);
+    if (res == FALSE) {
+        NTSTATUS status = WdfRequestGetStatus(Request);
+        WdfRequestComplete(Request, status);
+
+    }
+#else
+    WdfRequestComplete(Request, STATUS_SUCCESS);
+#endif
+}
+#endif
 
 NTSTATUS EvhHidInterfaceChange(_In_ void* NotificationStruct, _Inout_opt_ void* Context) {
     auto* devNotificationStruct = (DEVICE_INTERFACE_CHANGE_NOTIFICATION*)NotificationStruct;
@@ -135,6 +189,17 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &PnpPowerCallbacks);
     }
     
+    {
+        // configure handling of device create, close & cleanup requests
+        WDF_FILEOBJECT_CONFIG fileConfig{};
+        WDF_FILEOBJECT_CONFIG_INIT(&fileConfig, WDF_NO_EVENT_CALLBACK, WDF_NO_EVENT_CALLBACK, WDF_NO_EVENT_CALLBACK); // keep default callbacks
+        //WDF_FILEOBJECT_CONFIG_INIT(&fileConfig, EvtDeviceFileCreate, WDF_NO_EVENT_CALLBACK, WDF_NO_EVENT_CALLBACK); // only interested in create, and not close or cleanup
+        fileConfig.AutoForwardCleanupClose = WdfTrue; // forward requests down the stack
+        fileConfig.FileObjectClass = WdfFileObjectWdfCanUseFsContext2; // cannot use FsContext, since it's reserved by HIDclass
+
+        WdfDeviceInitSetFileObjectConfig(DeviceInit, &fileConfig, WDF_NO_OBJECT_ATTRIBUTES);
+    }
+
     {
         // Register WDM preprocess callbacks for IRP_MJ_DEVICE_CONTROL and
         // IRP_MJ_SYSTEM_CONTROL. The battery class driver needs to handle these IO
