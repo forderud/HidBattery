@@ -118,7 +118,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     UNREFERENCED_PARAMETER(Driver);
 
     // Configure the device as a filter driver
-    WdfFdoInitSetFilter(DeviceInit);
+    //WdfFdoInitSetFilter(DeviceInit);
 
     {
         // register PnP callbacks (must be done before WdfDeviceCreate)
