@@ -274,6 +274,10 @@ NTSTATUS GetStandardStringReport(WDFIOTARGET target, ULONG ioctl, wchar_t (&buff
 
 NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
+
+    WDFIOTARGET localTarget = WdfDeviceGetIoTarget(Device);
+    UNREFERENCED_PARAMETER(localTarget);
+
     WDFIOTARGET_Wrap pdoTarget;
     {
         // Use PDO for HID commands instead of local IO target to avoid 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) on IOCTL_HID_SET_FEATURE
