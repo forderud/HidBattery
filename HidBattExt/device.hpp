@@ -106,6 +106,7 @@ struct DEVICE_CONTEXT {
     HidConfig      Hid;       // for lower filter usage
     BatteryState   LowState;  // lower filter instance state (not directly accessible from upper filter)
     HidBattExtIf   Interface; // for communication between driver instances
+    void*          NotificationHandle; // opaque value to identify PnP notification registration
 };
 WDF_DECLARE_CONTEXT_TYPE(DEVICE_CONTEXT)
 

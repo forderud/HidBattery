@@ -4,54 +4,11 @@
 #include "HidPd.hpp"
 
 
-_Function_class_(EVT_WDF_TIMER)
-_IRQL_requires_same_
-_IRQL_requires_max_(DISPATCH_LEVEL)
-VOID InitializeHidStateTimer(_In_ WDFTIMER  Timer) {
-    DebugEnter();
-
-    WDFDEVICE Device = (WDFDEVICE)WdfTimerGetParentObject(Timer);
-    NT_ASSERTMSG("InitializeHidState Device NULL\n", Device);
-
-    NTSTATUS status = InitializeHidState(Device);
-    if (!NT_SUCCESS(status)) {
-        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: InitializeHidState failure 0x%x"), status);
-        return;
-    }
-
-    DebugExit();
-}
-
-
 _Function_class_(EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT)
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
-    DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
-
-    if (context->Mode == FilterMode::Lower) {
-        // schedule read of HID FEATURE reports
-        // cannot call InitializeHidState immediately, since WdfIoTargetOpen of PDO will then fail with 0xc000000e (STATUS_NO_SUCH_DEVICE)
-        WDF_TIMER_CONFIG timerCfg = {};
-        WDF_TIMER_CONFIG_INIT(&timerCfg, InitializeHidStateTimer);
-
-        WDF_OBJECT_ATTRIBUTES attr = {};
-        WDF_OBJECT_ATTRIBUTES_INIT(&attr);
-        attr.ParentObject = Device;
-        attr.ExecutionLevel = WdfExecutionLevelPassive; // required to access HID functions
-
-        WDFTIMER timer = nullptr;
-        NTSTATUS status = WdfTimerCreate(&timerCfg, &attr, &timer);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfTimerCreate failed 0x%x"), status);
-            return status;
-        }
-
-        BOOLEAN inQueue = WdfTimerStart(timer, 0); // no wait
-        NT_ASSERTMSG("HidBattExt: timer already in queue", !inQueue);
-        UNREFERENCED_PARAMETER(inQueue);
-    }
-
+    UNREFERENCED_PARAMETER(Device);
     return STATUS_SUCCESS;
 }
 
@@ -88,6 +45,56 @@ UNICODE_STRING GetTargetPropertyString(WDFIOTARGET target, DEVICE_REGISTRY_PROPE
     result.MaximumLength = (USHORT)bufferLength;
     result.Length = (USHORT)bufferLength - sizeof(UNICODE_NULL);
     return result;
+}
+
+
+NTSTATUS EvhHidInterfaceChange(_In_ void* NotificationStruct, _Inout_opt_ void* Context) {
+    auto* devNotificationStruct = (DEVICE_INTERFACE_CHANGE_NOTIFICATION*)NotificationStruct;
+    auto* deviceContext = (DEVICE_CONTEXT*)Context;
+
+    ASSERTMSG("EvhHidInterfaceChange interface mismatch", IsEqualGUID(devNotificationStruct->InterfaceClassGuid, GUID_DEVINTERFACE_HID));
+
+    if (!IsEqualGUID(devNotificationStruct->Event, GUID_DEVICE_INTERFACE_ARRIVAL))
+        return STATUS_SUCCESS; // ignore interface removal and other non-arrival events
+
+    auto device = (WDFDEVICE)WdfObjectContextGetObject(deviceContext);
+
+    {
+        // open device to get underlying PDO name
+        WDFIOTARGET_Wrap newDev;
+        NTSTATUS status = WdfIoTargetCreate(device, WDF_NO_OBJECT_ATTRIBUTES, &newDev);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetCreate failed 0x%x"), status);
+            return status;
+        }
+
+        WDF_IO_TARGET_OPEN_PARAMS openParams = {};
+        WDF_IO_TARGET_OPEN_PARAMS_INIT_OPEN_BY_NAME(&openParams, devNotificationStruct->SymbolicLinkName, FILE_READ_ACCESS | FILE_WRITE_ACCESS);
+        openParams.ShareAccess = FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE;
+
+        status = WdfIoTargetOpen(newDev, &openParams);
+        if (!NT_SUCCESS(status)) {
+            //DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetOpen failed 0x%x"), status);
+            return status;
+        }
+
+        UNICODE_STRING devPdo = GetTargetPropertyString(newDev, DevicePropertyPhysicalDeviceObjectName); // owned by newDev
+
+        if (!RtlEqualUnicodeString(&devPdo, &deviceContext->PdoName, /*case insensitive*/FALSE)) {
+            //DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: EvhHidInterfaceChange skipping due to SymbolicLinkName %wZ vs. PDO %wZ mismatch\n", &devPdo, &deviceContext->PdoName);
+            return STATUS_SUCCESS; // incorrect device
+        }
+
+        DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvhHidInterfaceChange opening %wZ\n", &devPdo);
+    }
+
+    // unsubscribe from additional PnP events
+    IoUnregisterPlugPlayNotificationEx(deviceContext->NotificationHandle);
+    deviceContext->NotificationHandle = nullptr;
+
+    InitializeHidState(device);
+
+    return STATUS_SUCCESS;
 }
 
 
@@ -190,6 +197,16 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         NTSTATUS status = WdfIoQueueCreate(Device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
         if (!NT_SUCCESS(status)) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoQueueCreate failed 0x%x"), status);
+            return status;
+        }
+    }
+
+    if (deviceContext->Mode == FilterMode::Lower) {
+        // subscribe to PnP events for deferred HID PDO opening
+        NTSTATUS status = IoRegisterPlugPlayNotification(EventCategoryDeviceInterfaceChange, PNPNOTIFY_DEVICE_INTERFACE_INCLUDE_EXISTING_INTERFACES, (PVOID)&GUID_DEVINTERFACE_HID,
+                                                         WdfDriverWdmGetDriverObject(WdfDeviceGetDriver(Device)), EvhHidInterfaceChange, (PVOID)deviceContext, &deviceContext->NotificationHandle);
+        if (!NT_SUCCESS(status)) {
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IoRegisterPlugPlayNotification failed: 0x%x"), status);
             return status;
         }
     }
