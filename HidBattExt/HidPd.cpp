@@ -103,7 +103,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         WDF_IO_TARGET_OPEN_PARAMS openParams = {};
         WDF_IO_TARGET_OPEN_PARAMS_INIT_OPEN_BY_NAME(&openParams, &context->PdoName, FILE_READ_ACCESS | FILE_WRITE_ACCESS);
         // We will let the framework to respond automatically to the pnp state changes of the target by closing and opening the handle.
-        openParams.ShareAccess = FILE_SHARE_WRITE | FILE_SHARE_READ;
+        openParams.ShareAccess = FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE;
 
         status = WdfIoTargetOpen(pdoTarget, &openParams);
         if (!NT_SUCCESS(status)) {
