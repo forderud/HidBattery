@@ -390,6 +390,12 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
             DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetOpen failed 0x%x"), status);
             return status;
         }
+
+#if DBG
+        FILE_OBJECT* file = WdfIoTargetWdmGetTargetFileObject(pdoTarget);
+        DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: InitializeHidState FsContext=%p, FsContext2=%p\n", file->FsContext, file->FsContext2);
+        ASSERTMSG("HidBattExt: FsContext null", file->FsContext);
+#endif
     }
 
     HID_COLLECTION_INFORMATION collectionInfo = {};
@@ -398,7 +404,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         WDF_MEMORY_DESCRIPTOR outputDesc = {};
         WDF_MEMORY_DESCRIPTOR_INIT_BUFFER(&outputDesc, &collectionInfo, sizeof(HID_COLLECTION_INFORMATION));
 
-        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
+        NTSTATUS status = WdfIoTargetSendIoctlSynchronously(localTarget, NULL,
             IOCTL_HID_GET_COLLECTION_INFORMATION,
             NULL, // input
             &outputDesc, // output
@@ -427,7 +433,7 @@ NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
         WDF_MEMORY_DESCRIPTOR_INIT_HANDLE(&outputDesc, context->Hid.Preparsed, NULL);
 
         // populate "preparsedData"
-        status = WdfIoTargetSendIoctlSynchronously(pdoTarget, NULL,
+        status = WdfIoTargetSendIoctlSynchronously(localTarget, NULL,
             IOCTL_HID_GET_COLLECTION_DESCRIPTOR, // same as HidD_GetPreparsedData in user-mode
             NULL, // input
             &outputDesc, // output
