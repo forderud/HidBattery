@@ -183,14 +183,12 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
         }
     }
 
-    if (deviceContext->Mode == FilterMode::Lower) {
-        // subscribe to PnP events for deferred HID PDO opening
-        NTSTATUS status = IoRegisterPlugPlayNotification(EventCategoryDeviceInterfaceChange, PNPNOTIFY_DEVICE_INTERFACE_INCLUDE_EXISTING_INTERFACES, (PVOID)&GUID_DEVINTERFACE_HID,
-                                                         WdfDriverWdmGetDriverObject(WdfDeviceGetDriver(Device)), EvhHidInterfaceChange, (PVOID)deviceContext, &deviceContext->NotificationHandle);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IoRegisterPlugPlayNotification failed: 0x%x"), status);
-            return status;
-        }
+    // subscribe to PnP events for deferred HID PDO opening
+    NTSTATUS status = IoRegisterPlugPlayNotification(EventCategoryDeviceInterfaceChange, PNPNOTIFY_DEVICE_INTERFACE_INCLUDE_EXISTING_INTERFACES, (PVOID)&GUID_DEVINTERFACE_HID,
+                                                        WdfDriverWdmGetDriverObject(WdfDeviceGetDriver(Device)), EvhHidInterfaceChange, (PVOID)deviceContext, &deviceContext->NotificationHandle);
+    if (!NT_SUCCESS(status)) {
+        DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: IoRegisterPlugPlayNotification failed: 0x%x"), status);
+        return status;
     }
 
     return STATUS_SUCCESS;
