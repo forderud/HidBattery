@@ -102,6 +102,11 @@ NTSTATUS EvhHidInterfaceChange(_In_ void* NotificationStruct, _Inout_opt_ void* 
         }
 
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: EvhHidInterfaceChange opening %wZ\n", &devPdo);
+
+#if DBG
+        FILE_OBJECT* file = WdfIoTargetWdmGetTargetFileObject(newDev);
+        DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: EvhHidInterfaceChange FsContext=%p, FsContext2=%p\n", file->FsContext, file->FsContext2);
+#endif
     }
 
     // unsubscribe from additional PnP events
