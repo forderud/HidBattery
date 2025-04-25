@@ -6,12 +6,10 @@
 
 _Use_decl_annotations_
 NTSTATUS EvtPrepareHardware(WDFDEVICE Device, WDFCMRESLIST ResourcesRaw, WDFCMRESLIST ResourcesTranslated) {
-    UNREFERENCED_PARAMETER(Device);
     UNREFERENCED_PARAMETER(ResourcesRaw);
     UNREFERENCED_PARAMETER(ResourcesTranslated);
-#if 0
+
     InitializeBatteryState(Device);
-#endif
     return STATUS_SUCCESS;
 }
 
@@ -19,14 +17,12 @@ _Function_class_(EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT)
 _IRQL_requires_same_
 _IRQL_requires_max_(PASSIVE_LEVEL)
 NTSTATUS EvtSelfManagedIoInit(WDFDEVICE Device) {
-    UNREFERENCED_PARAMETER(Device);
-#if 0
     NTSTATUS status = InitializeBatteryClass(Device);
     if (!NT_SUCCESS(status)) {
         DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: InitializeBattery failed 0x%x"), status);
         return status;
     }
-#endif
+
     return STATUS_SUCCESS;
 }
 
@@ -205,7 +201,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     }
 
     {
-#if 0
+#if 1
         // Register WDM preprocess callbacks for IRP_MJ_DEVICE_CONTROL and
         // IRP_MJ_SYSTEM_CONTROL. The battery class driver needs to handle these IO
         // requests directly.
