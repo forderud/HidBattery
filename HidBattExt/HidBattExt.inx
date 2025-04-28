@@ -1,5 +1,5 @@
 ;/*++
-; HidBatt extension filter driver - https://github.com/forderud/HidBattery/
+; HidBatt replacement driver - https://github.com/forderud/HidBattery/
 ;
 ; Require Windows 10 build 16299 (1709) or newer due to DefaultDestDir=13 usage.
 ;--*/
@@ -32,21 +32,16 @@ HidBattExt.sys = 1
 
 ; Install Section
 [HidBattExt_Inst.NT]
-Include = HidBatt.inf
-Needs = HidBatt_Inst
+Include = battery.inf
+Needs = Battery_Inst
 CopyFiles = @HidBattExt.sys
 
 [HidBattExt_Inst.NT.HW]
-AddReg = HidBattExt_Inst.AddReg
-
-[HidBattExt_Inst.AddReg]
-HKR,,"UpperFilters", %REG_TYPE_MULTI_SZ%, "HidBattExt"
-HKR,,"LowerFilters", %REG_TYPE_MULTI_SZ%, "HidBattExt"
 
 [HidBattExt_Inst.NT.Services]
-Include = HidBatt.inf
-Needs = HidBatt_Inst.Services
-AddService = HidBattExt, , HidBattExt_Service_Inst
+Include = battery.inf
+;Needs = Battery_Inst.Services
+AddService = HidBattExt, %SPSVCINST_ASSOCSERVICE%, HidBattExt_Service_Inst
 
 [HidBattExt_Service_Inst]
 ServiceType   = %SERVICE_KERNEL_DRIVER%
