@@ -161,13 +161,13 @@ NTSTATUS EvhHidInterfaceChange(_In_ void* NotificationStruct, _Inout_opt_ void* 
         FILE_OBJECT* file = WdfIoTargetWdmGetTargetFileObject(newDev);
         DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: EvhHidInterfaceChange FsContext=%p, FsContext2=%p\n", file->FsContext, file->FsContext2);
 #endif
+
+        // unsubscribe from additional PnP events
+        IoUnregisterPlugPlayNotificationEx(deviceContext->NotificationHandle);
+        deviceContext->NotificationHandle = nullptr;
+
+        InitializeHidState(device, newDev);
     }
-
-    // unsubscribe from additional PnP events
-    IoUnregisterPlugPlayNotificationEx(deviceContext->NotificationHandle);
-    deviceContext->NotificationHandle = nullptr;
-
-    InitializeHidState(device);
 
     return STATUS_SUCCESS;
 }

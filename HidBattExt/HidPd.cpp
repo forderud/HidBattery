@@ -363,40 +363,11 @@ NTSTATUS GetStandardStringReport(WDFIOTARGET target, ULONG ioctl, wchar_t (&buff
     return STATUS_SUCCESS;
 }
 
-NTSTATUS InitializeHidState(_In_ WDFDEVICE Device) {
+NTSTATUS InitializeHidState(_In_ WDFDEVICE Device, WDFIOTARGET pdoTarget) {
     DEVICE_CONTEXT* context = WdfObjectGet_DEVICE_CONTEXT(Device);
 
     WDFIOTARGET localTarget = WdfDeviceGetIoTarget(Device);
     UNREFERENCED_PARAMETER(localTarget);
-
-    WDFIOTARGET_Wrap pdoTarget;
-    {
-        // Use PDO for HID commands instead of local IO target to avoid 0xc0000061 (STATUS_PRIVILEGE_NOT_HELD) on IOCTL_HID_SET_FEATURE
-        NTSTATUS status = WdfIoTargetCreate(Device, WDF_NO_OBJECT_ATTRIBUTES, &pdoTarget);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetCreate failed 0x%x"), status);
-            return status;
-        }
-
-        // open in shared read-write mode
-        WDF_IO_TARGET_OPEN_PARAMS openParams = {};
-        WDF_IO_TARGET_OPEN_PARAMS_INIT_OPEN_BY_NAME(&openParams, &context->PdoName, FILE_READ_ACCESS | FILE_WRITE_ACCESS);
-        // We will let the framework to respond automatically to the pnp state changes of the target by closing and opening the handle.
-        openParams.ShareAccess = FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE;
-
-        // WdfIoTargetOpen(PDO) fails with 0xc0000043 (STATUS_SHARING_VIOLATION) if forgetting to specify FILE_SHARE_DELETE
-        status = WdfIoTargetOpen(pdoTarget, &openParams);
-        if (!NT_SUCCESS(status)) {
-            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: WdfIoTargetOpen failed 0x%x"), status);
-            return status;
-        }
-
-#if DBG
-        FILE_OBJECT* file = WdfIoTargetWdmGetTargetFileObject(pdoTarget);
-        DebugPrint(DPFLTR_WARNING_LEVEL, "HidBattExt: InitializeHidState FsContext=%p, FsContext2=%p\n", file->FsContext, file->FsContext2);
-        ASSERTMSG("HidBattExt: FsContext null", file->FsContext);
-#endif
-    }
 
     HID_COLLECTION_INFORMATION collectionInfo = {};
     {
