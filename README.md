@@ -8,7 +8,7 @@ The project is based on Alexander Bratchik's [HIDPowerDevice](https://github.com
 * Leonardo
 
 ## Setup & Usage
-Clone this repository to your Arduino libraries folder (`C:\Users\<username>\Documents\Arduino\libraries` on Windows). Then, open the `battery/battery.ino` sketch in Arduino IDE and press "Upload". The Operating System will afterwards detect one or more new batteries.
+Clone this repository to your Arduino libraries folder (`C:\Users\<username>\Documents\Arduino\libraries\HidBattery` on Windows). Then, open the `battery/battery.ino` sketch in Arduino IDE and press "Upload". The Operating System will afterwards detect one or more new batteries.
 
 The [`BatteryQuery.exe`](https://github.com/forderud/BatterySimulator) tool can be used for querying battery parameters from the command line.
 
