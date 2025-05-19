@@ -25,6 +25,6 @@ private:
 };
 
 
-NTSTATUS InitializeHidState(_In_ WDFDEVICE Device);
+NTSTATUS InitializeHidState(_In_ WDFDEVICE Device, WDFIOTARGET pdoTarget);
 
 EVT_WDF_IO_QUEUE_IO_READ           EvtIoReadHidFilter;
