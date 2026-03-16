@@ -1,7 +1,9 @@
 # Windows HidBatt extension filter driver
 `HidBattExt` driver that extends the in-built `HidBatt` driver in Windows to also parse and report `CycleCount` and `Temperature` battery parameters. The HidBatt driver also suffer from other shortcommings not addressed by HidBattExt, such as missing WMI interface and not being available in ARM64 builds of Windows.
 
-The HidBatt drivers inability to report these parameters have already been reported to Microsoft in https://aka.ms/AAu4w9g and https://aka.ms/AAu4w8p as well as through Microsoft support, with case numbers 2504040040010238 (ARM64 inclusion and missing Temperature&CycleCount parameters) & 2504090040010176 (missing WMI interfaces). This driver will no longer be needed if Microsoft improves their `HidBatt` driver.
+The HidBatt drivers inability to report these parameters have already been reported to Microsoft in https://aka.ms/AAu4w9g and https://aka.ms/AAu4w8p as well as through Microsoft support, with case numbers 2504040040010238 (ARM64 inclusion and missing Temperature&CycleCount parameters) & 2504090040010176 (missing WMI interfaces).
+
+Windows 11 insider preview Build >= 29550.1000 includes improvements to also parse the Temperature & CycleCount parameters. This means that the HidBattExt driver is **no longer needed in Windows 11 builds >= 29550.1000**.
 
 ## Description
 The filter driver places itself both _above_ and _below_ HidBatt:  
