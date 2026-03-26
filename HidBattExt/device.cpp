@@ -140,6 +140,32 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT Devic
     // Driver Framework always zero initializes an objects context memory
     DEVICE_CONTEXT* deviceContext = WdfObjectGet_DEVICE_CONTEXT(Device);
 
+    {
+        // Win11 build version that made HidBattExt redundant
+        OSVERSIONINFOEXW ver{};
+        ver.dwOSVersionInfoSize = sizeof(ver);
+        ver.dwMajorVersion = 10;
+        ver.dwMinorVersion = 0;
+        ver.dwBuildNumber = 29550;
+
+        ULONGLONG ConditionMask = 0;
+        VER_SET_CONDITION(ConditionMask, VER_MAJORVERSION, VER_GREATER_EQUAL);
+        VER_SET_CONDITION(ConditionMask, VER_MINORVERSION, VER_GREATER_EQUAL);
+        VER_SET_CONDITION(ConditionMask, VER_BUILDNUMBER, VER_GREATER_EQUAL);
+
+        NTSTATUS status = RtlVerifyVersionInfo(&ver, VER_MAJORVERSION | VER_MINORVERSION | VER_BUILDNUMBER, ConditionMask);
+
+        if (NT_SUCCESS(status)) {
+            // Windows 11 build 29550 or newer
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: Driver no longer needed on Windows %d.%d.%d\n"), ver.dwMajorVersion, ver.dwMinorVersion, ver.dwBuildNumber);
+            DebugPrint(DPFLTR_ERROR_LEVEL, DML_ERR("HidBattExt: Please uninstall this driver.\n"));
+
+            // run driver in no-op mode
+            deviceContext->Mode = FilterMode::Disabled;
+            return STATUS_SUCCESS;
+        }
+    }
+
     if (WdfDeviceWdmGetPhysicalDevice(Device) == WdfDeviceWdmGetAttachedDevice(Device)) {
         DebugPrint(DPFLTR_INFO_LEVEL, "HidBattExt: Running as Lower filter driver below HidBatt\n");
 
