@@ -45,4 +45,4 @@ Limtation: Linux seem to assume charge values in `%`, regardless of the actual u
 
 
 # Windows HidBatt extension driver
-This repo also contains a [`HidBattExt`](HidBattExt/) filter driver that extends the in-built `HidBatt` driver in Windows to also parse and report `CycleCount` and `Temperature` battery parameters. This driver is only needed for Windows 11 builds prior to 29550.1000.
+This repo also contains a [`HidBattExt`](HidBattExt/) filter driver that extends the in-built `HidBatt` driver in Windows to also parse and report `CycleCount` and `Temperature` battery parameters. This driver is only needed for Windows 11 builds prior to 29550.
