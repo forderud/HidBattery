@@ -4,6 +4,7 @@
 
 
 enum class FilterMode {
+    Disabled,
     Upper, // Running above HidBatt. Filters (modifies) battery IOCTL communication.
     Lower, // Running below HidBatt. Filters (parses) HID Power Device communication.
 };
