@@ -104,8 +104,8 @@ void loop() {
   } else {
     Remaining[0] -= 0.02f*FullChargeCapacity; // decr. 2%
 
-    if (Remaining[0] < 0.20f*FullChargeCapacity) {
-      Remaining[0] = 0.20f*FullChargeCapacity; // clamp at 20% to prevent triggering shutdown
+    if (Remaining[0] < 0.25f*FullChargeCapacity) {
+      Remaining[0] = 0.25f*FullChargeCapacity; // clamp at 25% to prevent battery saver warning or triggering shutdown
       PresentStatus.Charging = true;
       CycleCount += 1;
     }
